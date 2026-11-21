@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 3.0 · MIAMI HEAT</title>
+<title>REACTOR 3.1 · MIAMI EVOLUTION</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -65,15 +65,19 @@ button{font:inherit;cursor:pointer}
   #combo{right:auto;width:156px;top:113px}
   #toast{left:auto;width:172px;bottom:148px;font-size:16px}
 }
+#phase-name{position:fixed;top:calc(97px + env(safe-area-inset-top));left:0;right:0;text-align:center;color:#ffe0c5;text-shadow:0 2px 8px #130e25;font-size:10px;font-weight:900;letter-spacing:.19em;pointer-events:none;opacity:0;transition:opacity .32s}
+#phase-name.visible{opacity:1}
+#game{--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px)}
+@media(min-width:760px) and (max-height:500px) and (orientation:landscape){#phase-name{width:160px;right:auto;top:calc(141px + env(safe-area-inset-top))}}
 </style>
 </head>
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>3.0</span></div><div class="subtitle">Miami Heat</div></div>
+  <div><div class="brand">REACTOR <span>3.1</span></div><div class="subtitle">Miami Evolution</div></div>
   <div class="stats"><div><span class="stat-label">Score</span><strong id="score">0</strong></div><div><span class="stat-label">Record</span><strong id="best">0</strong></div></div>
 </header>
-<div id="combo"></div><div id="toast"></div>
+<div id="combo"></div><div id="toast"></div><div id="phase-name" aria-live="polite"></div>
 <div id="bottom">
   <div><div class="meter-label">Pression <span id="pct">10%</span></div><div class="bar"><div id="pfill" class="pressure"></div></div></div>
   <div class="audio-toggles">
@@ -83,7 +87,7 @@ button{font:inherit;cursor:pointer}
   <div id="overdrive-status" data-state="charge"><div class="meter-label">Overdrive <span id="epct">Recharge · 0%</span></div><div class="bar"><div id="efill" class="energy"></div></div></div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 3.0 · MIAMI 1986</div><h1>MIAMI <span>HEAT</span></h1>
+  <div class="eyebrow">REACTOR 3.1 · MIAMI 1986</div><h1>MIAMI <span>EVOLUTION</span></h1>
   <p>Touche un groupe de deux cristaux ou plus. Les grands groupes réduisent la pression. Enchaîne les coups pour charger OVERDRIVE.</p>
   <button id="start">JOUER</button>
 </div></div>
@@ -94,13 +98,26 @@ const $=id=>document.getElementById(id),rand=()=>Math.floor(Math.random()*C.leng
 const OVERDRIVE_MS=9000, RECOVERY_MS=12000, COMBO_MS=2100;
 const DISTURBANCE_MS=45000, CHAIN_MIN=4, MAX_CHAIN_WAVES=2;
 const PRESSURE_BY_SIZE=[0,0,6,3,1,-3,-6];
+const CITY_TRANSITION_MS=6000;
+const CITY_PHASES=[
+  {score:0,title:'GOLDEN HOUR',sky:['#56355b','#ea7684','#ffbd84'],sun:1,lights:.52,night:0,reflection:.53,depth:.65},
+  {score:5000,title:'VIOLET HOUR',sky:['#171d4d','#65478f','#cd689b'],sun:.54,lights:.71,night:.23,reflection:.7,depth:.86},
+  {score:15000,title:'NEON NIGHTS',sky:['#060f30','#201c57','#654080'],sun:.12,lights:.94,night:.47,reflection:.87,depth:1.08},
+  {score:35000,title:'MIAMI AFTER DARK',sky:['#040719','#111636','#391a52'],sun:.02,lights:1,night:.68,reflection:1,depth:1.32}
+];
 const MAX_PARTICLES=80, FALL_MS=115;
 let board=[],score=0,pressure=10,energy=0,combo=0,lastMove=-Infinity;
+let cityPhase=0,phaseStarted=0,phaseCaptionUntil=0;
+let cityMix=[1,0,0,0],cityFrom=cityMix.slice();
 let qualityMoves=0,comboTier=0,critical=false;
 let elapsed=0,nextDisturbance=DISTURBANCE_MS,overUntil=0,recoverUntil=0,settleEvent=null;
 let playing=false,busy=false,musicEnabled=true,effectsEnabled=true,scene=null,audio=null,musicClock=null,best=0,toastTimer=0;
 try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
-// MIAMI HEAT: 16 bars in four phrases at 104 BPM.
+// Temporary procedural prototype. Set this to a local stem pack when the original production is ready.
+const STEM_PACK=null;
+// Example: {bars:16,files:['audio/foundation.ogg','audio/violet.ogg','audio/neon.ogg',
+//   'audio/after-dark.ogg','audio/overdrive.ogg']}. All stems share the same downbeat and length.
+const STEM_FADE_SECONDS=1.15;
 const STEP=60/104/4;
 const HARMONY=[[33,57,60,64,71],[29,53,57,60,64],[36,55,60,64,67],[31,55,59,62,69]];
 const MOTIF=[
@@ -110,6 +127,8 @@ const MOTIF=[
   [[3,74,3],[8,71,3],[12,69,3]]
 ];
 let musicBus,effectsBus,musicLevel,samples,musicStep=0,nextNote=0;
+let stemRequest,stemPack,stemVoices=[],musicPhase=0,overdriveAudio=false;
+let fallbackFrom=0,fallbackFadeAt=0;
 const hz=note=>440*2**((note-69)/12);
 
 function synth(frequency,when,duration,type,volume,bus,filterHz=0,attack=.021){
@@ -157,6 +176,9 @@ function buildKit(){
     return value;
   };
   render('snare',.23,t=>highNoise()*.74*Math.exp(-t*20)+wave(177,t)*.33*Math.exp(-t*33));
+  render('clap',.22,t=>highNoise()*(.78*Math.exp(-t*35)+.34*Math.exp(-Math.abs(t-.018)*92)+.23*Math.exp(-Math.abs(t-.033)*87)));
+  render('knock',.12,t=>(wave(136,t)+.27*wave(297,t))*Math.exp(-t*47));
+  render('riser',.45,t=>highNoise()*Math.min(1,t/.42)**1.6);
   render('hat',.11,t=>highNoise()*Math.exp(-t*48));
   render('openHat',.28,t=>highNoise()*Math.exp(-t*18));
   render('shaker',.15,t=>highNoise()*(.6+.4*wave(41,t))*Math.exp(-t*24));
@@ -176,11 +198,10 @@ function hit(name,when,volume,rate=1,length=0){
   source.start(when);
   if(length)source.stop(when+length);
 }
-function arrangeStep(step,when){
+function arrangeStep(step,when,intensity=musicPhase,active=overdriveAudio){
   const bar=Math.floor(step/16)%16, pulse=step%16;
   const phrase=Math.floor(bar/4), harmony=bar%4;
   const [root,...chord]=HARMONY[harmony];
-  const active=elapsed<overUntil;
   const breakdown=phrase===2&&harmony<2;
   const turnaround=harmony===3&&pulse>=12;
   const drums=phrase===0?[0,7,10]:phrase===3?[0,3,6,10,14]:[0,6,9,12];
@@ -192,12 +213,24 @@ function arrangeStep(step,when){
     }
   }
   if(!breakdown&&drums.includes(pulse)){
-    hit('kick',when,.24);
+    hit('kick',when,.205+intensity*.012);
+    if(intensity>=1)hit('knock',when+.002,.023*intensity);
     const next=drums.find(value=>value>pulse)??16;
     const bassNote=root+(pulse===10&&harmony===3?7:0);
-    hit('sub',when+.015,.16,hz(bassNote)/55,(next-pulse)*STEP-.024);
+    hit('sub',when+.015,.112+intensity*.018,hz(bassNote)/55,(next-pulse)*STEP-.024);
   }
-  if(pulse===4||pulse===12)hit('snare',when+.008,breakdown?.045:.145);
+  if(pulse===4||pulse===12){
+    hit('snare',when+.008,breakdown?.045:.132);
+    if(intensity>=1)hit('clap',when+.014,.038+intensity*.014);
+  }
+  if(intensity>=1&&pulse===11)hit('hat',when+swing,.025,1.13);
+  if(intensity>=2&&(pulse===5||pulse===15)){
+    const rolls=pulse===15&&intensity>=3?3:2;
+    for(let roll=0;roll<rolls;roll++)hit('hat',when+roll*STEP/(rolls+1),.019+roll*.009,1+roll*.09);
+  }
+  if(intensity>=2&&pulse===8&&!breakdown)synth(hz(chord[1]+12),when,.28,'triangle',.027,musicBus,1280);
+  if((intensity>=2&&turnaround&&pulse===13)||(active&&pulse===13))hit('riser',when,active?.055:.035);
+  if(active&&(pulse===3||pulse===11))hit('clap',when+swing,.049);
   if(!breakdown&&pulse%2===0)hit(pulse===14?'openHat':'hat',when,pulse%4===0?.040:.029);
   if(turnaround&&(pulse===13||pulse===15))hit('hat',when+swing,.032,1.21);
   if(pulse===3||pulse===11)hit('shaker',when+swing,.057,pulse===3?.87:1.14);
@@ -214,12 +247,77 @@ function arrangeStep(step,when){
   }
   if(turnaround&&pulse===15)synth(hz(50),when,.31,'sine',.035,musicBus,0,.085);
 }
+function loadStemPack(){
+  if(!STEM_PACK||stemRequest)return;
+  const {bars,files}=STEM_PACK;
+  stemRequest=Promise.resolve().then(async()=>{
+    if(!Number.isInteger(bars)||bars<1||files.length!==5)throw Error('Expected five stems and a positive bar count');
+    const duration=bars*16*STEP;
+    const buffers=await Promise.all(files.map(async file=>{
+      const url=new URL(file,document.baseURI);
+      if(url.origin!==location.origin)throw Error('Music stems must be local');
+      const response=await fetch(url);
+      if(!response.ok)throw Error('Missing stem: '+file);
+      const buffer=await audio.decodeAudioData(await response.arrayBuffer());
+      if(buffer.duration<duration||buffer.duration>duration+.12)throw Error('Invalid stem loop length: '+file);
+      return buffer;
+    }));
+    stemPack={duration,buffers};
+  }).catch(error=>console.warn('Using the MIAMI EVOLUTION audio prototype:',error.message));
+}
+function stopStems(){
+  for(const {source,gain} of stemVoices){
+    source.stop();
+    source.disconnect();
+    gain.disconnect();
+  }
+  stemVoices=[];
+}
+function startStems(when){
+  const offset=(musicStep*STEP)%stemPack.duration;
+  stemVoices=stemPack.buffers.map(buffer=>{
+    const source=audio.createBufferSource(), gain=audio.createGain();
+    source.buffer=buffer;
+    source.loop=true;
+    source.loopEnd=stemPack.duration;
+    gain.gain.value=0;
+    source.connect(gain).connect(musicLevel);
+    source.start(when,offset);
+    return {source,gain};
+  });
+  musicBus.gain.setTargetAtTime(0,when,.13);
+  mixStems(when);
+}
+function mixStems(when){
+  for(let i=0;i<stemVoices.length;i++){
+    const gain=stemVoices[i].gain.gain;
+    const target=i<4?(i<=musicPhase?1:0):(overdriveAudio?1:0);
+    gain.setTargetAtTime(target,when,STEM_FADE_SECONDS/3);
+  }
+}
 function scheduleMusic(){
-  if(!playing||!musicEnabled||audio.state!=='running')return;
+  if(!playing||audio.state!=='running')return;
   const now=audio.currentTime;
   if(nextNote<now)nextNote=now+.012;
   while(nextNote<now+.09){
-    arrangeStep(musicStep++,nextNote);
+    const downbeat=musicStep%16===0, beat=musicStep%4===0;
+    if(downbeat&&musicPhase!==cityPhase){
+      fallbackFrom=musicPhase;
+      musicPhase=cityPhase;
+      fallbackFadeAt=nextNote;
+      if(stemVoices.length)mixStems(nextNote);
+    }
+    if(beat&&overdriveAudio!==(elapsed<overUntil)){
+      overdriveAudio=elapsed<overUntil;
+      if(stemVoices.length)mixStems(nextNote);
+    }
+    if(downbeat&&stemPack&&!stemVoices.length)startStems(nextNote);
+    if(!stemVoices.length&&musicEnabled){
+      const blend=Math.min(1,(nextNote-fallbackFadeAt)/STEM_FADE_SECONDS);
+      const intensity=fallbackFrom+(musicPhase-fallbackFrom)*blend;
+      arrangeStep(musicStep,nextNote,intensity,overdriveAudio);
+    }
+    musicStep++;
     nextNote+=STEP;
   }
 }
@@ -234,24 +332,46 @@ function music(){
   if(!Audio)return;
   if(!audio){
     audio=new Audio();
-    musicBus=audio.createGain();
     musicLevel=audio.createGain();
     effectsBus=audio.createGain();
     musicLevel.gain.value=0;
     const limiter=audio.createDynamicsCompressor();
     limiter.threshold.value=-12;
     limiter.ratio.value=5;
-    musicBus.connect(musicLevel).connect(limiter);
+    musicLevel.connect(limiter);
     effectsBus.connect(limiter);
     limiter.connect(audio.destination);
     samples=buildKit();
+    resetMusicRun();
+    loadStemPack();
     musicClock=setInterval(scheduleMusic,25);
   }
   syncAudio();
   if(audio.state!=='running')audio.resume().catch(()=>{});
 }
+function resetMusicRun(){
+  musicStep=0;
+  nextNote=0;
+  musicPhase=0;
+  fallbackFrom=0;
+  fallbackFadeAt=0;
+  overdriveAudio=false;
+  if(!audio)return;
+  stopStems();
+  if(musicBus)musicBus.disconnect();
+  musicBus=audio.createGain();
+  musicBus.connect(musicLevel);
+}
 function stopMusic(){
-  if(musicLevel)musicLevel.gain.setTargetAtTime(0,audio.currentTime,.075);
+  if(!musicLevel)return;
+  musicLevel.gain.setTargetAtTime(0,audio.currentTime,.075);
+  for(const {source,gain} of stemVoices){
+    source.onended=()=>{
+      source.disconnect();
+      gain.disconnect();
+    };
+    source.stop(audio.currentTime+.33);
+  }
 }
 function updateHud(){
   const active=elapsed<overUntil;
@@ -307,6 +427,40 @@ function chargeOverdrive(amount){
   recoverUntil=overUntil+RECOVERY_MS;
   flash('⚡ OVERDRIVE!');
   cue('overdrive');
+}
+function updateCityPhase(){
+  let phase=cityPhase;
+  while(phase+1<CITY_PHASES.length&&score>=CITY_PHASES[phase+1].score)phase++;
+  if(phase!==cityPhase){
+    cityFrom=cityMix.slice();
+    cityPhase=phase;
+    phaseStarted=elapsed;
+    phaseCaptionUntil=elapsed+2300;
+    $('phase-name').textContent=CITY_PHASES[cityPhase].title;
+    $('phase-name').classList.add('visible');
+  }
+  const ratio=Math.min(1,(elapsed-phaseStarted)/CITY_TRANSITION_MS);
+  const ease=ratio*ratio*(3-2*ratio);
+  for(let i=0;i<cityMix.length;i++)cityMix[i]=cityFrom[i]*(1-ease)+(i===cityPhase?ease:0);
+  if(phaseCaptionUntil&&elapsed>=phaseCaptionUntil){
+    $('phase-name').classList.remove('visible');
+    phaseCaptionUntil=0;
+  }
+}
+function makeCitySkies(game){
+  return CITY_PHASES.map((phase,index)=>{
+    const key='sky-'+index;
+    const texture=game.textures.createCanvas(key,4,256);
+    const ctx=texture.context;
+    const gradient=ctx.createLinearGradient(0,0,0,256);
+    gradient.addColorStop(0,phase.sky[0]);
+    gradient.addColorStop(.65,phase.sky[1]);
+    gradient.addColorStop(1,phase.sky[2]);
+    ctx.fillStyle=gradient;
+    ctx.fillRect(0,0,4,256);
+    texture.refresh();
+    return game.add.image(0,0,key).setOrigin(0).setDepth(-9.8+index*.04);
+  });
 }
 function makeCrystalTextures(game){
   const graphics=game.make.graphics({x:0,y:0,add:false});
@@ -408,6 +562,12 @@ function clearEffects(){
 function start(){
   board=Array.from({length:N},()=>Array.from({length:N},rand));
   score=0;
+  cityPhase=0;
+  phaseStarted=0;
+  phaseCaptionUntil=0;
+  cityMix=[1,0,0,0];
+  cityFrom=cityMix.slice();
+  $('phase-name').classList.remove('visible');
   pressure=10;
   energy=0;
   combo=0;
@@ -419,8 +579,7 @@ function start(){
   nextDisturbance=DISTURBANCE_MS;
   overUntil=0;
   recoverUntil=0;
-  musicStep=0;
-  nextNote=0;
+  resetMusicRun();
   playing=true;
   busy=false;
   updateHud();
@@ -437,6 +596,7 @@ function finish(){
   playing=false;
   busy=false;
   stopMusic();
+  $('phase-name').classList.remove('visible');
   cue('defeat');
   clearEffects();
   overUntil=0;
@@ -446,7 +606,7 @@ function finish(){
   clearTimeout(toastTimer);
   $('toast').classList.remove('show');
   updateHud();
-  $('panel').innerHTML='<div class="eyebrow">MIAMI HEAT</div><h1>RÉACTEUR <span>CRITIQUE</span></h1><div class="results"><div><span class="stat-label">Score</span><strong>'+score.toLocaleString('fr-FR')+'</strong></div><div><span class="stat-label">Record</span><strong>'+best.toLocaleString('fr-FR')+'</strong></div></div><button id="again">REJOUER</button>';
+  $('panel').innerHTML='<div class="eyebrow">MIAMI EVOLUTION</div><h1>RÉACTEUR <span>CRITIQUE</span></h1><div class="results"><div><span class="stat-label">Score</span><strong>'+score.toLocaleString('fr-FR')+'</strong></div><div><span class="stat-label">Record</span><strong>'+best.toLocaleString('fr-FR')+'</strong></div></div><button id="again">REJOUER</button>';
   $('overlay').hidden=false;
   $('again').onclick=()=>{$('overlay').hidden=true;start()};
 }
@@ -611,7 +771,11 @@ class Game extends Phaser.Scene{
     scene=this;
     this.signs=[];
     this.bg=this.add.graphics().setDepth(-10);
+    this.skies=makeCitySkies(this);
     this.sun=this.add.graphics().setDepth(-9);
+    this.stars=this.add.graphics().setDepth(-9.2);
+    this.cityShade=this.add.graphics().setDepth(-7.8);
+    this.cityWindows=this.add.graphics().setDepth(-7.7);
     this.city=this.add.graphics().setDepth(-8);
     this.traffic=[this.add.graphics().setDepth(-7),this.add.graphics().setDepth(-7)];
     this.palms=Array.from({length:4},()=>this.add.graphics().setDepth(-5));
@@ -634,8 +798,9 @@ class Game extends Phaser.Scene{
     this.animateCity(time);
     if(!playing)return;
     elapsed+=delta;
+    updateCityPhase();
     const previousPressure=Math.floor(pressure);
-    // Pressure rises from 1.35 to 3.0 points/s over the first three minutes.
+    // Pressure rises from 1.35 to 3.1 points/s over the first three minutes.
     changePressure(delta/1000*(1.35+1.65*Math.min(1,elapsed/180000)));
     if(!playing)return;
     const comboExpired=combo>0&&elapsed-lastMove>=COMBO_MS;
@@ -661,10 +826,18 @@ class Game extends Phaser.Scene{
     const bottom=landscape?h-16:Math.max(top+N,Math.min(h-10,bottomTop-34));
     this.w=w;
     this.h=h;
-    const sides=Math.min(86,Math.max(32,Math.round(w*.122)));
-    const usableWidth=w-2*sides;
-    this.cell=Math.floor(Math.max(1,Math.min(usableWidth/N,(bottom-top)/N,72)));
-    this.left=Math.floor((w-this.cell*N)/2);
+    const insets=getComputedStyle($('game'));
+    const safeLeft=parseFloat(insets.getPropertyValue('--safe-left'))||0;
+    const safeRight=parseFloat(insets.getPropertyValue('--safe-right'))||0;
+    const rail=Math.min(54,Math.max(24,Math.round(w*.075)));
+    let sideLeft=safeLeft+rail, sideRight=safeRight+rail;
+    if(landscape){
+      sideLeft=Math.max(sideLeft,$('hud').getBoundingClientRect().right+13);
+      sideRight=Math.max(sideRight,w-$('bottom').getBoundingClientRect().left+13);
+    }
+    const usableWidth=w-sideLeft-sideRight;
+    this.cell=Math.floor(Math.max(1,Math.min(usableWidth/N,(bottom-top)/N,80)));
+    this.left=Math.floor(sideLeft+(usableWidth-this.cell*N)/2);
     this.top=Math.floor((top+bottom-this.cell*N)/2);
     this.paintCity();
     paintBoard();
@@ -675,12 +848,13 @@ class Game extends Phaser.Scene{
     const {w,h,bg,sun,city}=this;
     const horizon=this.horizon=Math.max(h*.13,Math.min(h*.36,this.top-58));
     const r=Math.min(w*.2,h*.13,105);
-    const skyHeight=horizon+r*.2;
+    const skyHeight=horizon+45;
+    for(const sky of this.skies)sky.setDisplaySize(w,skyHeight);
     bg.clear();
     bg.fillGradientStyle(0x090f2a,0x211343,0x73336f,0xb74670);
     bg.fillRect(0,0,w,skyHeight);
     bg.fillGradientStyle(0x9a3b80,0xcf5087,0xf1917a,0xf8ac7e);
-    bg.fillRect(0,skyHeight,w,h*.5-skyHeight);
+    bg.fillRect(0,skyHeight,w,Math.max(0,h*.5-skyHeight));
     bg.fillGradientStyle(0x281734,0x261737,0x080f24,0x1b132e);
     bg.fillRect(0,h*.5,w,h*.5);
     // Low-contrast reflections keep the foreground distinct from the playable grid.
@@ -695,8 +869,9 @@ class Game extends Phaser.Scene{
       bg.fillStyle(i%3===0?0x6df3ef:0xf976c0,.12*(1-i/22));
       bg.fillEllipse(x,y,18+(i*17)%76,2);
     }
-    bg.fillStyle(0xffdaee,.7);
-    for(let i=0;i<31;i++)bg.fillCircle((i*83+19)%Math.max(1,w),(i*29+13)%Math.max(1,horizon-r*.7),i%7===0?1.3:.65);
+    this.stars.clear();
+    this.stars.fillStyle(0xffdaee,.7);
+    for(let i=0;i<31;i++)this.stars.fillCircle((i*83+19)%Math.max(1,w),(i*29+13)%Math.max(1,horizon-r*.7),i%7===0?1.3:.65);
     sun.clear();
     sun.fillStyle(0xfc9a87,.1);
     sun.fillCircle(w*.56,horizon-r*.4,r*1.23);
@@ -715,6 +890,8 @@ class Game extends Phaser.Scene{
       city.fillStyle(0xe094b8,.38);
       for(let j=8;j<bh-3;j+=10)city.fillRect(x+3,horizon+21-bh+j,2,2);
     }
+    this.cityShade.clear();
+    this.cityWindows.clear();
     const hotelWidth=Math.max(48,Math.min(w*.26,132));
     this.hotel(w*.05,horizon+32,hotelWidth,hotelWidth*.83,0xeab2ba,0xffa46d,'PALOMA');
     this.hotel(w-hotelWidth-w*.045,horizon+39,hotelWidth,hotelWidth*.97,0xb8bedb,0x86f8e8,'MARÉE');
@@ -751,7 +928,7 @@ class Game extends Phaser.Scene{
   }
   paintSideCity(){
     const {w,h,left,top,cell,sideCity:g,sideLights:lights}=this;
-    const edge=Math.max(8,Math.min(left-3,185));
+    const edge=Math.max(8,Math.min(left-3,w-(left+cell*N)-3,185));
     const boardBottom=top+cell*N;
     g.clear();
     lights.clear();
@@ -794,15 +971,15 @@ class Game extends Phaser.Scene{
         g.lineStyle(1,0xeeb4d7,.4);
         g.lineBetween(x(0),y+height+3,x(edge*.74),y+height+13);
       }
-      const signX=x(edge*.62), signY=roof+Math.min(59,cell*1.04);
+      const signX=x(edge*.42), signY=roof+Math.min(59,cell*1.04);
       g.fillStyle(0x171026,1);
-      g.fillRoundedRect(signX-8,signY-10,16,65,4);
+      g.fillRoundedRect(signX-6,signY-10,12,65,4);
       g.lineStyle(9,neon,.07);
-      g.strokeRoundedRect(signX-8,signY-10,16,65,4);
+      g.strokeRoundedRect(signX-6,signY-10,12,65,4);
       g.lineStyle(5,neon,.21);
-      g.strokeRoundedRect(signX-8,signY-10,16,65,4);
+      g.strokeRoundedRect(signX-6,signY-10,12,65,4);
       g.lineStyle(1,neon,.94);
-      g.strokeRoundedRect(signX-8,signY-10,16,65,4);
+      g.strokeRoundedRect(signX-6,signY-10,12,65,4);
       const label=side<0?'O\nC\nE\nA\nN':'L\nU\nN\nA';
       this.signs.push(this.add.text(signX,signY-3,label,{
         fontFamily:'monospace',fontSize:9,fontStyle:'bold',
@@ -866,6 +1043,14 @@ class Game extends Phaser.Scene{
       g.fillStyle((row+col)%3===0?0xffd3a5:neon,.59);
       g.fillRect(wx+1,wy+1,width*.06,height*.045);
     }
+    this.cityShade.fillStyle(0x110d2a,.76);
+    this.cityShade.fillRoundedRect(x,y+9,width,height-9,6);
+    for(let row=0;row<3;row++)for(let col=0;col<5;col++){
+      const color=(row+col)%3===0?0xffb274:neon;
+      this.cityWindows.fillStyle(color,.36);
+      const wx=x+width*(.11+.17*col),wy=y+height*(.26+row*.16);
+      this.cityWindows.fillRoundedRect(wx,wy,width*.10,height*.095,2);
+    }
     const sign=this.add.text(x+width*.5,y+height*.84,name,{fontFamily:'monospace',
       fontSize:Math.max(8,Math.floor(width*.12)),fontStyle:'bold',color:name==='PALOMA'?'#fff1d0':'#e3fff8'});
     sign.setOrigin(.5).setDepth(-7).setShadow(0,0,name==='PALOMA'?'#ff7b43':'#62e8d5',6);
@@ -902,26 +1087,47 @@ class Game extends Phaser.Scene{
     }
   }
   animateCity(time){
-    this.sun.setAlpha(.92+.08*Math.sin(time/1600));
-    this.sideLights.setAlpha(.76+.18*Math.sin(time/1020));
-    this.streetGlow.setAlpha(.72+.24*Math.sin(time/1420));
-    this.sun.setX(2.6*Math.sin(time/3400));
-    this.city.setX(1.2*Math.sin(time/3400));
+    let coverage=0,sun=0,lights=0,night=0,reflection=0,depth=0;
+    for(let i=0;i<CITY_PHASES.length;i++){
+      const weight=cityMix[i], phase=CITY_PHASES[i];
+      coverage+=weight;
+      this.skies[i].setVisible(weight>.001).setAlpha(coverage?weight/coverage:0);
+      sun+=weight*phase.sun;
+      lights+=weight*phase.lights;
+      night+=weight*phase.night;
+      reflection+=weight*phase.reflection;
+      depth+=weight*phase.depth;
+    }
+    this.sun.setAlpha(sun*(.94+.06*Math.sin(time/1600)));
+    this.stars.setAlpha(.13+night);
+    this.cityShade.setAlpha(night);
+    this.cityWindows.setAlpha(Math.min(1,lights*(.82+.16*Math.sin(time/1260))));
+    this.sideLights.setAlpha(lights*(.82+.18*Math.sin(time/1020)));
+    this.streetGlow.setAlpha(reflection*(.82+.17*Math.sin(time/1420)));
+    this.sun.setX(depth*2.6*Math.sin(time/3400));
+    this.city.setX(depth*1.2*Math.sin(time/3400));
+    this.cityShade.setX(this.city.x);
+    this.cityWindows.setX(this.city.x);
     this.glass.setAlpha(.30+.20*Math.sin(time/1650));
-    this.palms.forEach((p,i)=>p.setRotation(Math.sin(time/1900+i)*.025));
+    this.palms.forEach((p,i)=>p.setRotation(Math.sin(time/1900+i)*.025*depth));
     this.traffic.forEach((car,i)=>{
       const travel=(time*(i===0?.043:.036)+i*this.w*.47)%(this.w+115);
       car.setPosition(i===0?travel-55:this.w+55-travel,this.horizon+46+i*8);
     });
-    this.signs.forEach((sign,i)=>sign.setAlpha(.86+.14*Math.sin(time/730+i)));
+    this.signs.forEach((sign,i)=>sign.setAlpha(lights*(.85+.15*Math.sin(time/730+i))));
   }
 }
 const reactor=new Phaser.Game({type:Phaser.AUTO,parent:'game',backgroundColor:'#130c2d',scale:{mode:Phaser.Scale.NONE,width:innerWidth,height:innerHeight},scene:[Game]});
-window.addEventListener('resize',()=>{
-  if(reactor.scale&&(reactor.scale.width!==innerWidth||reactor.scale.height!==innerHeight)){
-    reactor.scale.resize(innerWidth,innerHeight);
+function resizeGame(){
+  const viewport=window.visualViewport;
+  const width=innerWidth;
+  const height=viewport&&viewport.scale===1?Math.round(viewport.height):innerHeight;
+  if(reactor.scale?.canvas&&(reactor.scale.width!==width||reactor.scale.height!==height)){
+    reactor.scale.resize(width,height);
   }
-});
+}
+window.addEventListener('resize',resizeGame);
+window.visualViewport?.addEventListener('resize',resizeGame);
 $('start').onclick=()=>{$('overlay').hidden=true;start()};$('music-toggle').onclick=()=>{
   musicEnabled=!musicEnabled;
   $('music-toggle').setAttribute('aria-pressed',String(musicEnabled));
