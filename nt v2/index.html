@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 2.9 · MIAMI AFTER DARK</title>
+<title>REACTOR 3.0 · MIAMI HEAT</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -12,7 +12,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#100d25;col
 button{font:inherit;cursor:pointer}
 #game{position:fixed;inset:0;width:100vw;height:100dvh}
 #hud,#bottom{position:fixed;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));max-width:560px;margin-inline:auto}
-#hud{top:calc(10px + env(safe-area-inset-top));display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--edge);border-radius:15px;background:linear-gradient(115deg,#221330f5,#11162bea);pointer-events:none}
+#hud{top:calc(10px + env(safe-area-inset-top));display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--edge);border-radius:15px;background:linear-gradient(115deg,#25182fef,#101926ed);pointer-events:none}
 .brand{font-weight:900;letter-spacing:.08em;font-size:clamp(17px,4.6vw,25px);line-height:1.05}
 .brand span{color:var(--pink);font-size:.64em;vertical-align:middle}
 .subtitle,.stat-label,.meter-label{font-size:9px;font-weight:800;letter-spacing:.17em;text-transform:uppercase}
@@ -31,7 +31,7 @@ button{font:inherit;cursor:pointer}
 #toast[data-effect="super"],#toast[data-effect="mega"]{color:var(--gold);text-shadow:0 0 16px #ff408c,0 2px 6px #190f32}
 #toast[data-effect="mega"].announce{animation:mega-pop .36s ease-out}
 @keyframes mega-pop{0%{transform:scale(.72)}45%{transform:scale(1.07)}100%{transform:scale(1)}}
-#bottom{bottom:calc(9px + env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:7px 11px;align-items:center;padding:9px 11px;border:1px solid var(--edge);border-radius:15px;background:linear-gradient(120deg,#291632f7,#10172cf7)}
+#bottom{bottom:calc(9px + env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 11px;align-items:center;padding:9px 11px;border:1px solid var(--edge);border-radius:15px;background:linear-gradient(120deg,#291632f7,#10172cf7)}
 .meter-label{display:flex;justify-content:space-between;gap:4px;margin-bottom:4px;letter-spacing:.08em}
 #epct,#pct{color:var(--mint);white-space:nowrap}
 #pct[data-critical="true"]{color:#ff93ad}
@@ -41,14 +41,16 @@ button{font:inherit;cursor:pointer}
 .energy{background:linear-gradient(90deg,#64ecd5,#a98bff,#ff91c7)}
 #overdrive-status[data-state="active"]{text-shadow:0 0 10px #94ffe491}
 #overdrive-status[data-state="recovery"] #epct{color:#e0baff}
-#mute{grid-column:2;grid-row:1/3;width:44px;height:44px;border-radius:12px;border:1px solid #f39aca79;background:#492349;color:#fff0f9;font-size:20px}
-#mute[aria-pressed="true"]{color:#d6a9c6;background:#292039}
+.audio-toggles{grid-column:2;grid-row:1/3;display:flex;gap:4px}
+.audio-toggles button{width:44px;height:44px;border:1px solid #78ead851;border-radius:10px;background:#243b43;color:#ddfff5;font-size:18px;font-weight:800}
+.audio-toggles #effects-toggle{font-size:10px;letter-spacing:.07em}
+.audio-toggles button[aria-pressed="false"]{background:#1e1a2f;color:#b3a0b9;border-color:#b596be4d}
 #overlay{position:fixed;inset:0;display:grid;place-items:center;z-index:10;padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:#0b0a207a}
 #overlay[hidden]{display:none}
 #panel{width:min(100%,390px);padding:23px;border:1px solid #f79dc398;border-radius:23px;background:linear-gradient(143deg,#342245f5,#141029fa 66%);box-shadow:0 14px 60px #0e071fbf,0 0 25px #f483bb39;text-align:center}
 .eyebrow{color:var(--mint);font-size:10px;font-weight:850;letter-spacing:.22em;margin-bottom:8px}
 #panel h1{margin:0;font-size:clamp(27px,9vw,53px);line-height:.98;font-weight:950;font-style:italic;letter-spacing:-.025em;text-shadow:0 0 22px #ff70c073}
-#panel h1 span{display:block;color:var(--pink)}
+#panel h1 span{display:block;color:#ffae81;text-shadow:0 0 22px #ff6a636e}
 #panel p{font-size:13px;line-height:1.5;color:#e8d5e7;margin:14px 0}
 #panel button{min-height:46px;padding:9px 25px;border:0;border-radius:12px;background:linear-gradient(115deg,#ffda92,#ff85c3);color:#27152c;font-weight:900;letter-spacing:.09em}
 .results{display:flex;justify-content:center;gap:26px;margin:17px 0}
@@ -59,7 +61,7 @@ button{font:inherit;cursor:pointer}
   #hud{width:156px;right:auto;top:calc(14px + env(safe-area-inset-top));grid-template-columns:1fr;gap:8px}
   .stats{text-align:left}
   #bottom{width:156px;left:auto;bottom:calc(12px + env(safe-area-inset-bottom));grid-template-columns:1fr;padding:8px}
-  #mute{grid-column:1;grid-row:3;justify-self:end}
+  .audio-toggles{grid-column:1;grid-row:3;justify-self:end}
   #combo{right:auto;width:156px;top:113px}
   #toast{left:auto;width:172px;bottom:148px;font-size:16px}
 }
@@ -68,17 +70,20 @@ button{font:inherit;cursor:pointer}
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>2.9</span></div><div class="subtitle">Miami After Dark</div></div>
+  <div><div class="brand">REACTOR <span>3.0</span></div><div class="subtitle">Miami Heat</div></div>
   <div class="stats"><div><span class="stat-label">Score</span><strong id="score">0</strong></div><div><span class="stat-label">Record</span><strong id="best">0</strong></div></div>
 </header>
 <div id="combo"></div><div id="toast"></div>
 <div id="bottom">
   <div><div class="meter-label">Pression <span id="pct">10%</span></div><div class="bar"><div id="pfill" class="pressure"></div></div></div>
-  <button id="mute" aria-label="Couper ou rétablir le son" aria-pressed="false">♫</button>
+  <div class="audio-toggles">
+    <button id="music-toggle" aria-label="Musique" aria-pressed="true">♫</button>
+    <button id="effects-toggle" aria-label="Effets sonores" aria-pressed="true">SFX</button>
+  </div>
   <div id="overdrive-status" data-state="charge"><div class="meter-label">Overdrive <span id="epct">Recharge · 0%</span></div><div class="bar"><div id="efill" class="energy"></div></div></div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 2.9 · MIAMI 1986</div><h1>MIAMI <span>AFTER DARK</span></h1>
+  <div class="eyebrow">REACTOR 3.0 · MIAMI 1986</div><h1>MIAMI <span>HEAT</span></h1>
   <p>Touche un groupe de deux cristaux ou plus. Les grands groupes réduisent la pression. Enchaîne les coups pour charger OVERDRIVE.</p>
   <button id="start">JOUER</button>
 </div></div>
@@ -93,22 +98,27 @@ const MAX_PARTICLES=80, FALL_MS=115;
 let board=[],score=0,pressure=10,energy=0,combo=0,lastMove=-Infinity;
 let qualityMoves=0,comboTier=0,critical=false;
 let elapsed=0,nextDisturbance=DISTURBANCE_MS,overUntil=0,recoverUntil=0,settleEvent=null;
-let playing=false,busy=false,muted=false,scene=null,audio=null,musicClock=null,best=0,toastTimer=0;
+let playing=false,busy=false,musicEnabled=true,effectsEnabled=true,scene=null,audio=null,musicClock=null,best=0,toastTimer=0;
 try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
-const STEP=60/120/4;
-const CHORDS=[[45,57,60,64,67],[41,53,57,60,64],[48,55,60,64,67],[43,55,59,62,69]];
-const LEAD=[64,67,69,72,69,67,64,62,60,64,67,69,67,64,62,60];
-let master,musicBus,drumNoise,musicStep=0,nextNote=0;
+// MIAMI HEAT: 16 bars in four phrases at 104 BPM.
+const STEP=60/104/4;
+const HARMONY=[[33,57,60,64,71],[29,53,57,60,64],[36,55,60,64,67],[31,55,59,62,69]];
+const MOTIF=[
+  [[2,76,3],[6,72,2],[9,71,3],[13,69,2]],
+  [[1,72,3],[7,76,3],[12,74,2],[15,72,1]],
+  [[2,76,3],[6,72,2],[10,79,3],[14,76,2]],
+  [[3,74,3],[8,71,3],[12,69,3]]
+];
+let musicBus,effectsBus,musicLevel,samples,musicStep=0,nextNote=0;
 const hz=note=>440*2**((note-69)/12);
 
-function synth(frequency,when,duration,type,volume,bus,filterHz=0,endFrequency=0){
+function synth(frequency,when,duration,type,volume,bus,filterHz=0,attack=.021){
   const oscillator=audio.createOscillator();
   const gain=audio.createGain();
   oscillator.type=type;
   oscillator.frequency.setValueAtTime(frequency,when);
-  if(endFrequency)oscillator.frequency.exponentialRampToValueAtTime(endFrequency,when+duration*.8);
   gain.gain.setValueAtTime(.0001,when);
-  gain.gain.exponentialRampToValueAtTime(volume,when+Math.min(.022,duration*.25));
+  gain.gain.exponentialRampToValueAtTime(volume,when+Math.min(attack,duration*.4));
   gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
   if(filterHz){
     const filter=audio.createBiquadFilter();
@@ -121,51 +131,91 @@ function synth(frequency,when,duration,type,volume,bus,filterHz=0,endFrequency=0
   oscillator.stop(when+duration+.01);
 }
 function sound(frequency,duration=.14,type='triangle',volume=.035,offset=0){
-  if(!audio||muted||audio.state!=='running')return;
-  synth(frequency,audio.currentTime+.004+offset,duration,type,volume,master);
+  if(!audio||!effectsEnabled||audio.state!=='running')return;
+  synth(frequency,audio.currentTime+.004+offset,duration,type,volume,effectsBus);
 }
-function noiseHit(when,duration,frequency,volume){
-  const source=audio.createBufferSource();
-  const filter=audio.createBiquadFilter();
-  const gain=audio.createGain();
-  source.buffer=drumNoise;
-  filter.type='highpass';
-  filter.frequency.value=frequency;
+function buildKit(){
+  const kit={};
+  let seed=72821;
+  const noise=()=>{
+    seed=(Math.imul(seed,1664525)+1013904223)>>>0;
+    return seed/2147483648-1;
+  };
+  const render=(name,duration,signal)=>{
+    const buffer=audio.createBuffer(1,Math.ceil(audio.sampleRate*duration),audio.sampleRate);
+    const data=buffer.getChannelData(0);
+    for(let i=0;i<data.length;i++)data[i]=signal(i/audio.sampleRate)*Math.min(1,i/24,(data.length-1-i)/135);
+    kit[name]=buffer;
+  };
+  const wave=(f,t)=>Math.sin(2*Math.PI*f*t);
+  render('kick',.25,t=>Math.sin(2*Math.PI*(46*t+2.4*(1-Math.exp(-t*42))))*Math.exp(-t*24));
+  render('sub',1.35,t=>Math.tanh(1.45*Math.sin(2*Math.PI*(55*t+2*(1-Math.exp(-t*28)))))*Math.exp(-t*2.7));
+  let last=0;
+  const highNoise=()=>{
+    const sample=noise(), value=(sample-last)*.5;
+    last=sample;
+    return value;
+  };
+  render('snare',.23,t=>highNoise()*.74*Math.exp(-t*20)+wave(177,t)*.33*Math.exp(-t*33));
+  render('hat',.11,t=>highNoise()*Math.exp(-t*48));
+  render('openHat',.28,t=>highNoise()*Math.exp(-t*18));
+  render('shaker',.15,t=>highNoise()*(.6+.4*wave(41,t))*Math.exp(-t*24));
+  render('wood',.11,t=>(wave(642,t)*.58+wave(1087,t)*.25+highNoise()*.17)*Math.exp(-t*46));
+  return kit;
+}
+function hit(name,when,volume,rate=1,length=0){
+  const source=audio.createBufferSource(), gain=audio.createGain();
+  source.buffer=samples[name];
+  source.playbackRate.value=rate;
   gain.gain.setValueAtTime(volume,when);
-  gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
-  source.connect(filter).connect(gain).connect(musicBus);
+  if(length){
+    gain.gain.setValueAtTime(volume,when+length-.028);
+    gain.gain.exponentialRampToValueAtTime(.0001,when+length);
+  }
+  source.connect(gain).connect(musicBus);
   source.start(when);
-  source.stop(when+duration+.01);
+  if(length)source.stop(when+length);
 }
 function arrangeStep(step,when){
-  const bar=Math.floor(step/16)%CHORDS.length, beat=step%16;
-  const [root,...chord]=CHORDS[bar];
+  const bar=Math.floor(step/16)%16, pulse=step%16;
+  const phrase=Math.floor(bar/4), harmony=bar%4;
+  const [root,...chord]=HARMONY[harmony];
   const active=elapsed<overUntil;
-  if(beat===0){
-    for(const note of chord)synth(hz(note),when,1.65,'triangle',.020,musicBus,1250);
+  const breakdown=phrase===2&&harmony<2;
+  const turnaround=harmony===3&&pulse>=12;
+  const drums=phrase===0?[0,7,10]:phrase===3?[0,3,6,10,14]:[0,6,9,12];
+  const swing=pulse%2?.015:0;
+  if(pulse===0){
+    for(const note of chord){
+      synth(hz(note),when,2.38,'triangle',breakdown?.024:.015,musicBus,1150,.24);
+      if(phrase===3)synth(hz(note+12),when,1.72,'sine',.008,musicBus,1850,.20);
+    }
   }
-  if(beat%4===0)synth(113,when,.17,'sine',.17,musicBus,0,46);
-  if(beat===4||beat===12){
-    noiseHit(when,.13,1250,.049);
-    synth(174,when,.08,'triangle',.027,musicBus,0,105);
+  if(!breakdown&&drums.includes(pulse)){
+    hit('kick',when,.24);
+    const next=drums.find(value=>value>pulse)??16;
+    const bassNote=root+(pulse===10&&harmony===3?7:0);
+    hit('sub',when+.015,.16,hz(bassNote)/55,(next-pulse)*STEP-.024);
   }
-  if(beat%2===0)noiseHit(when+.009,beat%4===2?.068:.033,6700,beat%4===2?.024:.012);
-  if([0,3,6,8,10,14].includes(beat)){
-    const note=root-12+(beat===6?7:beat===14?12:0);
-    synth(hz(note),when,.22,'sawtooth',.086,musicBus,390);
+  if(pulse===4||pulse===12)hit('snare',when+.008,breakdown?.045:.145);
+  if(!breakdown&&pulse%2===0)hit(pulse===14?'openHat':'hat',when,pulse%4===0?.040:.029);
+  if(turnaround&&(pulse===13||pulse===15))hit('hat',when+swing,.032,1.21);
+  if(pulse===3||pulse===11)hit('shaker',when+swing,.057,pulse===3?.87:1.14);
+  if((phrase>=1||harmony===3)&&(pulse===7||pulse===15))hit('wood',when+swing,.067,harmony%2===0?1:1.24);
+  for(const [on,note,beats] of MOTIF[harmony]){
+    if(pulse!==on||breakdown&&on>8)continue;
+    const pitch=phrase===3&&on===15?note+12:note;
+    synth(hz(pitch),when,beats*STEP+.19,'triangle',.063,musicBus,2000,.016);
+    synth(hz(pitch-12),when+STEP*3,.35,'sine',.018,musicBus);
   }
-  if(beat%4===0){
-    const note=LEAD[bar*4+beat/4];
-    synth(hz(note),when,.31,'triangle',.059,musicBus,2150);
-    synth(hz(note),when+.185,.25,'sine',.014,musicBus);
+  if((active||combo>=4)&&pulse%2===1){
+    const note=chord[(pulse>>1)%chord.length]+12;
+    synth(hz(note+(active?12:0)),when+swing,.23,'triangle',active?.029:.014,musicBus,2450);
   }
-  if(active&&beat%2===1){
-    const note=chord[(beat>>1)%chord.length]+12;
-    synth(hz(note),when,.19,'triangle',.033,musicBus,3200);
-  }
+  if(turnaround&&pulse===15)synth(hz(50),when,.31,'sine',.035,musicBus,0,.085);
 }
 function scheduleMusic(){
-  if(!playing||audio.state!=='running')return;
+  if(!playing||!musicEnabled||audio.state!=='running')return;
   const now=audio.currentTime;
   if(nextNote<now)nextNote=now+.012;
   while(nextNote<now+.09){
@@ -175,35 +225,33 @@ function scheduleMusic(){
 }
 function syncAudio(){
   if(!audio)return;
-  master.gain.setTargetAtTime(muted?0:.78,audio.currentTime,.025);
+  const now=audio.currentTime;
+  musicLevel.gain.setTargetAtTime(musicEnabled&&playing?.85:0,now,.055);
+  effectsBus.gain.setTargetAtTime(effectsEnabled?.85:0,now,.026);
 }
 function music(){
   const Audio=window.AudioContext||window.webkitAudioContext;
   if(!Audio)return;
   if(!audio){
     audio=new Audio();
-    master=audio.createGain();
     musicBus=audio.createGain();
-    musicBus.gain.value=0;
+    musicLevel=audio.createGain();
+    effectsBus=audio.createGain();
+    musicLevel.gain.value=0;
     const limiter=audio.createDynamicsCompressor();
     limiter.threshold.value=-12;
-    limiter.ratio.value=4;
-    musicBus.connect(master).connect(limiter).connect(audio.destination);
-    drumNoise=audio.createBuffer(1,Math.ceil(audio.sampleRate*.18),audio.sampleRate);
-    const samples=drumNoise.getChannelData(0);
-    let seed=27183;
-    for(let i=0;i<samples.length;i++){
-      seed=(Math.imul(seed,1664525)+1013904223)>>>0;
-      samples[i]=seed/2147483648-1;
-    }
+    limiter.ratio.value=5;
+    musicBus.connect(musicLevel).connect(limiter);
+    effectsBus.connect(limiter);
+    limiter.connect(audio.destination);
+    samples=buildKit();
     musicClock=setInterval(scheduleMusic,25);
   }
   syncAudio();
-  musicBus.gain.setTargetAtTime(1,audio.currentTime,.045);
   if(audio.state!=='running')audio.resume().catch(()=>{});
 }
 function stopMusic(){
-  if(musicBus)musicBus.gain.setTargetAtTime(0,audio.currentTime,.075);
+  if(musicLevel)musicLevel.gain.setTargetAtTime(0,audio.currentTime,.075);
 }
 function updateHud(){
   const active=elapsed<overUntil;
@@ -273,6 +321,8 @@ function makeCrystalTextures(game){
     graphics.fillCircle(32,33,31);
     facet(0x130e2e,1,outline.map(({x,y})=>({x,y:y+3})));
     facet(color,1,outline);
+    facet(0x170f35,.48,[outline[5],outline[4],outline[3],{x:32,y:53}]);
+    facet(0xffffff,.25,[outline[0],{x:15,y:22},{x:32,y:16},{x:49,y:22}]);
     const center={x:31,y:29};
     facet(0xffffff,.52,[outline[0],outline[1],center,outline[6]]);
     facet(0xffffff,.21,[outline[6],center,outline[5]]);
@@ -287,6 +337,9 @@ function makeCrystalTextures(game){
     facet(0x1f133a,.52,[outline[4],outline[5],{x:26,y:44},center]);
     graphics.lineStyle(.9,0xece4ff,.55);
     graphics.lineBetween(44,53,54,38);
+    facet(0xffffff,.19,[{x:22,y:31},{x:33,y:19},{x:42,y:27},{x:32,y:40}]);
+    graphics.lineStyle(1,0xf6eaff,.5);
+    graphics.lineBetween(9,38,20,55);
     graphics.generateTexture('crystal-'+index,64,64);
   });
   graphics.destroy();
@@ -295,6 +348,14 @@ function paintBoard(moved=[]){
   if(!scene||!board.length)return;
   const {cell,left,top,gems,boardFrame}=scene;
   boardFrame.clear();
+  const span=cell*N;
+  boardFrame.fillStyle(0x050513,.72);
+  boardFrame.fillRoundedRect(left-12,top-6,span+24,span+29,17);
+  boardFrame.fillStyle(0x262044,1);
+  boardFrame.fillPoints([{x:left-9,y:top+span-1},{x:left+span+9,y:top+span-1},
+    {x:left+span+5,y:top+span+13},{x:left-5,y:top+span+13}],true);
+  boardFrame.lineStyle(2,0x76558e,.62);
+  boardFrame.lineBetween(left-3,top+span+12,left+span+3,top+span+12);
   boardFrame.fillStyle(0x080817,.62);
   boardFrame.fillRoundedRect(left-10,top-8,cell*N+20,cell*N+22,16);
   boardFrame.fillStyle(0x14112c,.84);
@@ -303,6 +364,10 @@ function paintBoard(moved=[]){
   boardFrame.strokeRoundedRect(left-8,top-8,cell*N+16,cell*N+16,15);
   boardFrame.lineStyle(1.4,0xddc7ff,.64);
   boardFrame.strokeRoundedRect(left-7,top-7,cell*N+14,cell*N+14,14);
+  boardFrame.lineStyle(2,0x71ffdf,.68);
+  boardFrame.lineBetween(left-5,top+17,left-5,top+span*.51);
+  boardFrame.lineStyle(2,0xff70b8,.62);
+  boardFrame.lineBetween(left+span+5,top+span*.48,left+span+5,top+span-14);
   const origins=new Map(moved.map(([x,y,from])=>[y*N+x,from]));
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
     const index=y*N+x, gem=gems[index];
@@ -381,7 +446,7 @@ function finish(){
   clearTimeout(toastTimer);
   $('toast').classList.remove('show');
   updateHud();
-  $('panel').innerHTML='<div class="eyebrow">MIAMI AFTER DARK</div><h1>RÉACTEUR <span>CRITIQUE</span></h1><div class="results"><div><span class="stat-label">Score</span><strong>'+score.toLocaleString('fr-FR')+'</strong></div><div><span class="stat-label">Record</span><strong>'+best.toLocaleString('fr-FR')+'</strong></div></div><button id="again">REJOUER</button>';
+  $('panel').innerHTML='<div class="eyebrow">MIAMI HEAT</div><h1>RÉACTEUR <span>CRITIQUE</span></h1><div class="results"><div><span class="stat-label">Score</span><strong>'+score.toLocaleString('fr-FR')+'</strong></div><div><span class="stat-label">Record</span><strong>'+best.toLocaleString('fr-FR')+'</strong></div></div><button id="again">REJOUER</button>';
   $('overlay').hidden=false;
   $('again').onclick=()=>{$('overlay').hidden=true;start()};
 }
@@ -552,6 +617,7 @@ class Game extends Phaser.Scene{
     this.palms=Array.from({length:4},()=>this.add.graphics().setDepth(-5));
     this.sideCity=this.add.graphics().setDepth(-6);
     this.sideLights=this.add.graphics().setDepth(-5.5);
+    this.streetGlow=this.add.graphics().setDepth(-4);
     this.glass=this.add.graphics().setDepth(.5);
     makeCrystalTextures(this);
     this.boardFrame=this.add.graphics().setDepth(0);
@@ -595,7 +661,7 @@ class Game extends Phaser.Scene{
     const bottom=landscape?h-16:Math.max(top+N,Math.min(h-10,bottomTop-34));
     this.w=w;
     this.h=h;
-    const sides=Math.min(76,Math.max(28,Math.round(w*.105)));
+    const sides=Math.min(86,Math.max(32,Math.round(w*.122)));
     const usableWidth=w-2*sides;
     this.cell=Math.floor(Math.max(1,Math.min(usableWidth/N,(bottom-top)/N,72)));
     this.left=Math.floor((w-this.cell*N)/2);
@@ -611,14 +677,19 @@ class Game extends Phaser.Scene{
     const r=Math.min(w*.2,h*.13,105);
     const skyHeight=horizon+r*.2;
     bg.clear();
-    bg.fillGradientStyle(0x0b0e2d,0x211345,0x9a3b80,0xcf5087);
+    bg.fillGradientStyle(0x090f2a,0x211343,0x73336f,0xb74670);
     bg.fillRect(0,0,w,skyHeight);
     bg.fillGradientStyle(0x9a3b80,0xcf5087,0xf1917a,0xf8ac7e);
     bg.fillRect(0,skyHeight,w,h*.5-skyHeight);
-    bg.fillGradientStyle(0x171531,0x171531,0x0b1027,0x24153e);
+    bg.fillGradientStyle(0x281734,0x261737,0x080f24,0x1b132e);
     bg.fillRect(0,h*.5,w,h*.5);
     // Low-contrast reflections keep the foreground distinct from the playable grid.
     const promenade=this.top+this.cell*N+9;
+    const vanishingX=w*.53, vanishingY=horizon+38;
+    bg.fillStyle(0x191327,.62);
+    bg.fillTriangle(vanishingX,vanishingY,w*.06,h,w*.94,h);
+    bg.lineStyle(1,0x9b537d,.24);
+    for(const lane of [.08,.26,.46,.66,.88])bg.lineBetween(vanishingX,vanishingY,w*lane,h);
     for(let i=0;i<20;i++){
       const x=(i*97+23)%Math.max(1,w), y=promenade+10+i*7;
       bg.fillStyle(i%3===0?0x6df3ef:0xf976c0,.12*(1-i/22));
@@ -629,7 +700,7 @@ class Game extends Phaser.Scene{
     sun.clear();
     sun.fillStyle(0xfc9a87,.1);
     sun.fillCircle(w*.56,horizon-r*.4,r*1.23);
-    sun.fillStyle(0xffc794,1);
+    sun.fillStyle(0xffb57d,1);
     sun.fillCircle(w*.56,horizon-r*.4,r);
     sun.lineStyle(3,0xcc5483,.72);
     for(let i=0;i<6;i++){
@@ -645,7 +716,7 @@ class Game extends Phaser.Scene{
       for(let j=8;j<bh-3;j+=10)city.fillRect(x+3,horizon+21-bh+j,2,2);
     }
     const hotelWidth=Math.max(48,Math.min(w*.26,132));
-    this.hotel(w*.05,horizon+32,hotelWidth,hotelWidth*.83,0xeab2ba,0xffa4d1,'PALOMA');
+    this.hotel(w*.05,horizon+32,hotelWidth,hotelWidth*.83,0xeab2ba,0xffa46d,'PALOMA');
     this.hotel(w-hotelWidth-w*.045,horizon+39,hotelWidth,hotelWidth*.97,0xb8bedb,0x86f8e8,'MARÉE');
     city.fillStyle(0x201632,1);
     city.fillRect(0,horizon+39,w,23);
@@ -674,28 +745,43 @@ class Game extends Phaser.Scene{
       car.setScale(i===0?1:-.83,i===0?1:.83);
     });
     this.paintSideCity();
+    this.paintStreetGlow();
     this.palms.forEach((p,i)=>this.drawPalm(p,i,horizon));
     this.paintGlass();
   }
   paintSideCity(){
     const {w,h,left,top,cell,sideCity:g,sideLights:lights}=this;
-    const edge=Math.min(left-6,150);
+    const edge=Math.max(8,Math.min(left-3,185));
     const boardBottom=top+cell*N;
     g.clear();
     lights.clear();
     for(const side of [-1,1]){
       const x=distance=>side<0?distance:w-distance;
       const neon=side<0?0xff6db9:0x67eddc;
-      const tint=side<0?0x91477b:0x416e86;
+      const tint=side<0?0x9a5281:0x356e81;
+      const amber=0xffa666;
+      const rearRoof=top-Math.min(65,cell*1.75);
       const roof=top+Math.min(36,cell*.65);
       const foot=boardBottom-Math.min(38,cell*.63);
       const body=(layer,color,alpha,points)=>{
         layer.fillStyle(color,alpha);
         layer.fillPoints(points.map(([a,b])=>({x:x(a),y:b})),true);
       };
+      body(g,0x38244e,1,[[0,rearRoof],[edge*.57,rearRoof+27],[edge*.99,foot],[0,foot+12]]);
+      body(g,0x805378,1,[[0,rearRoof],[edge*.49,rearRoof+24],[edge*.54,roof+21],[0,roof+12]]);
+      for(let i=0;i<3;i++){
+        const y=rearRoof+20+i*12;
+        body(lights,amber,.4,[[edge*.08,y],[edge*.33,y+6],[edge*.33,y+9],[edge*.08,y+3]]);
+      }
       body(g,0x120e27,1,[[0,roof-19],[edge*.94,roof+20],[edge*1.27,foot-9],[0,foot+38]]);
       body(g,tint,1,[[0,roof],[edge*.74,roof+22],[edge*.74,foot],[0,foot+22]]);
       body(g,0x30264d,1,[[edge*.74,roof+22],[edge*1.27,roof+43],[edge*1.27,foot-15],[edge*.74,foot]]);
+      body(g,0xd68aa9,.4,[[0,roof],[edge*.74,roof+22],[edge*.49,roof+32],[0,roof+14]]);
+      body(g,0x170f27,.44,[[edge*.49,roof+33],[edge*.74,roof+40],[edge*.74,foot],[edge*.42,foot+8]]);
+      g.lineStyle(3,neon,.21);
+      g.lineBetween(x(edge*.74),roof+22,x(edge*.74),foot);
+      g.lineStyle(1,amber,.65);
+      g.lineBetween(x(0),roof+9,x(edge*.64),roof+28);
       body(g,0x462346,1,[[0,roof-10],[edge*.74,roof+16],[edge*.74,roof+29],[0,roof+8]]);
       for(let row=0;row<5;row++){
         const y=roof+44+(foot-roof-53)*row/5;
@@ -708,10 +794,12 @@ class Game extends Phaser.Scene{
         g.lineStyle(1,0xeeb4d7,.4);
         g.lineBetween(x(0),y+height+3,x(edge*.74),y+height+13);
       }
-      const signX=x(edge*.83), signY=roof+Math.min(59,cell*1.04);
+      const signX=x(edge*.62), signY=roof+Math.min(59,cell*1.04);
       g.fillStyle(0x171026,1);
       g.fillRoundedRect(signX-8,signY-10,16,65,4);
-      g.lineStyle(5,neon,.14);
+      g.lineStyle(9,neon,.07);
+      g.strokeRoundedRect(signX-8,signY-10,16,65,4);
+      g.lineStyle(5,neon,.21);
       g.strokeRoundedRect(signX-8,signY-10,16,65,4);
       g.lineStyle(1,neon,.94);
       g.strokeRoundedRect(signX-8,signY-10,16,65,4);
@@ -726,6 +814,24 @@ class Game extends Phaser.Scene{
         const y=foot+30+i*6;
         g.fillStyle(neon,.16-i*.014);
         g.fillEllipse(x(edge*(.25+(i%3)*.22)),Math.min(h-2,y),9+i*2,2);
+      }
+    }
+  }
+  paintStreetGlow(){
+    const {streetGlow:g,w,h,top,cell,left}=this;
+    const start=top+cell*N+16;
+    g.clear();
+    for(const side of [-1,1]){
+      const rail=side<0?left:w-left;
+      for(let i=0;i<16;i++){
+        const y=start+8+i*8;
+        if(y>h-8)break;
+        const x=rail+side*(15+(i*29)%47);
+        const color=i%3===0?0xffa26e:side<0?0xff56a8:0x51edda;
+        g.fillStyle(color,.07*(1-i/17));
+        g.fillEllipse(x,y,39+i*4,6);
+        g.fillStyle(color,.22*(1-i/17));
+        g.fillEllipse(x+side*5,y,18+i*3,2);
       }
     }
   }
@@ -761,8 +867,8 @@ class Game extends Phaser.Scene{
       g.fillRect(wx+1,wy+1,width*.06,height*.045);
     }
     const sign=this.add.text(x+width*.5,y+height*.84,name,{fontFamily:'monospace',
-      fontSize:Math.max(8,Math.floor(width*.12)),fontStyle:'bold',color:'#fff0f7'});
-    sign.setOrigin(.5).setDepth(-7).setShadow(0,0,'#fd54be',6);
+      fontSize:Math.max(8,Math.floor(width*.12)),fontStyle:'bold',color:name==='PALOMA'?'#fff1d0':'#e3fff8'});
+    sign.setOrigin(.5).setDepth(-7).setShadow(0,0,name==='PALOMA'?'#ff7b43':'#62e8d5',6);
     this.signs.push(sign);
   }
   drawPalm(g,i,horizon){
@@ -777,6 +883,11 @@ class Game extends Phaser.Scene{
     g.lineTo(side*9,-37);
     g.lineTo(side*24,-85);
     g.strokePath();
+    for(let k=0;k<5;k++){
+      const y=-13-k*13, x=side*(k*3+3);
+      g.lineStyle(.85,far?0x815375:0x835478,.58);
+      g.lineBetween(x-3,y,x+3,y-2);
+    }
     g.lineStyle(1,far?0x966382:0x76527f,.65);
     g.lineBetween(side*1,-7,side*9,-37);
     g.lineBetween(side*9,-37,side*24,-85);
@@ -793,6 +904,9 @@ class Game extends Phaser.Scene{
   animateCity(time){
     this.sun.setAlpha(.92+.08*Math.sin(time/1600));
     this.sideLights.setAlpha(.76+.18*Math.sin(time/1020));
+    this.streetGlow.setAlpha(.72+.24*Math.sin(time/1420));
+    this.sun.setX(2.6*Math.sin(time/3400));
+    this.city.setX(1.2*Math.sin(time/3400));
     this.glass.setAlpha(.30+.20*Math.sin(time/1650));
     this.palms.forEach((p,i)=>p.setRotation(Math.sin(time/1900+i)*.025));
     this.traffic.forEach((car,i)=>{
@@ -808,6 +922,16 @@ window.addEventListener('resize',()=>{
     reactor.scale.resize(innerWidth,innerHeight);
   }
 });
-$('start').onclick=()=>{$('overlay').hidden=true;start()};$('mute').onclick=()=>{muted=!muted;$('mute').setAttribute('aria-pressed',String(muted));$('mute').textContent=muted?'♪':'♫';syncAudio();if(!muted)music()};
+$('start').onclick=()=>{$('overlay').hidden=true;start()};$('music-toggle').onclick=()=>{
+  musicEnabled=!musicEnabled;
+  $('music-toggle').setAttribute('aria-pressed',String(musicEnabled));
+  music();
+};
+$('effects-toggle').onclick=()=>{
+  effectsEnabled=!effectsEnabled;
+  $('effects-toggle').setAttribute('aria-pressed',String(effectsEnabled));
+  music();
+};
+
 })();
 </script></body></html>
