@@ -1,17 +1,39 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#180c32"><title>REACTOR · MIAMI 1986</title>
-<style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120821;color:white;font-family:system-ui,Arial;touch-action:none}#game{position:fixed;inset:0}#hud{position:fixed;top:env(safe-area-inset-top);left:0;right:0;padding:11px 15px;pointer-events:none;display:flex;justify-content:space-between;align-items:start;text-shadow:0 2px 8px #160621}#hud b{font-size:17px;letter-spacing:2px}#hud small{display:block;color:#9ff6f3;font-size:9px;letter-spacing:1.5px}#score{font-size:24px;font-weight:900;text-align:right}#best{font-size:10px;color:#ffcf85;text-align:right}#world{position:fixed;top:calc(61px + env(safe-area-inset-top));width:100%;text-align:center;font-size:11px;letter-spacing:3px;color:#ffe6b6;text-shadow:0 2px 6px #000}#combo{position:fixed;top:calc(84px + env(safe-area-inset-top));width:100%;text-align:center;font-size:15px;font-weight:900;color:#fff2a8;text-shadow:0 0 12px #ff5fa8;pointer-events:none;min-height:24px}#bottom{position:fixed;bottom:calc(9px + env(safe-area-inset-bottom));left:12px;right:12px;display:grid;grid-template-columns:1fr auto;gap:6px 9px;align-items:center;font-size:10px;font-weight:900;text-shadow:0 1px 5px #000}.bar{height:13px;border-radius:20px;border:1px solid #e9b6d8;background:#1a1230;overflow:hidden}.bar>div{height:100%;width:0;transition:width .15s}.pressure{background:linear-gradient(90deg,#27e9d1,#ffd06d,#ff3d7f)}.energy{background:linear-gradient(90deg,#55d7ff,#a45dff,#ffe17c)}#bottom button{background:#301544;border:1px solid #f48bbd;border-radius:8px;color:white;font-weight:900;padding:7px}#overdrive-status{grid-column:1/-1}#overlay{position:fixed;inset:0;background:#0c0827e8;display:grid;place-items:center;z-index:10;padding:18px}#overlay[hidden]{display:none}#panel{max-width:370px;width:100%;text-align:center;border:1px solid #ff87c4;background:linear-gradient(160deg,#36164f,#160c32);padding:23px;border-radius:22px;box-shadow:0 0 70px #fa5ca450}#panel h1{margin:0;color:#ff9ac9;letter-spacing:3px}#panel p{line-height:1.5;color:#f0ddec;font-size:14px}#panel button{border:0;border-radius:12px;padding:14px 29px;font-size:16px;font-weight:900;color:#261034;background:linear-gradient(90deg,#ffbd79,#ff6cba)}#toast{position:fixed;top:42%;width:100%;text-align:center;pointer-events:none;font-size:28px;font-weight:1000;text-shadow:0 0 15px #ff6ac5;opacity:0;transition:opacity .2s}#toast.show{opacity:1}</style></head>
-<body><div id="game"></div><div id="hud"><div><b>REACTOR <span style="color:#ff85c1">2.7</span></b><small>MIAMI · ARCADE</small></div><div><div id="score">0</div><div id="best">RECORD 0</div></div></div><div id="world">MIAMI · 1986</div><div id="combo"></div><div id="toast"></div>
-<div id="bottom"><div>PRESSION <span id="pct">10%</span><div class="bar"><div id="pfill" class="pressure"></div></div></div><button id="mute">♫</button><div id="overdrive-status">OVERDRIVE <span id="epct">0%</span><div class="bar"><div id="efill" class="energy"></div></div></div></div>
-<div id="overlay"><div id="panel"><h1>MIAMI 1986</h1><p>Quatre couleurs. Des combos rapides. Des explosions partout.<br><br>Touche un groupe de <b>2 cristaux ou plus</b>. La pression monte avec le temps. Les grands groupes la réduisent et les chutes peuvent déclencher des chaînes. À 100 %, OVERDRIVE triple les points pendant 9 secondes, puis la jauge se bloque pendant 12 secondes.</p><button id="start">JOUER</button><p style="font-size:11px">Prototype 2.7 · son activé au démarrage</p></div></div>
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#180c32"><title>REACTOR 2.8 · MIAMI NIGHTS</title>
+<style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120821;color:white;font-family:system-ui,Arial;touch-action:none}#game{position:fixed;inset:0}#hud{position:fixed;top:env(safe-area-inset-top);left:0;right:0;padding:11px 15px;pointer-events:none;display:flex;justify-content:space-between;align-items:start;text-shadow:0 2px 8px #160621}#hud b{font-size:17px;letter-spacing:2px}#hud small{display:block;color:#9ff6f3;font-size:9px;letter-spacing:1.5px}#score{font-size:24px;font-weight:900;text-align:right}#best{font-size:10px;color:#ffcf85;text-align:right}#world{position:fixed;top:calc(61px + env(safe-area-inset-top));width:100%;text-align:center;font-size:11px;letter-spacing:3px;color:#ffe6b6;text-shadow:0 2px 6px #000}#combo{position:fixed;top:calc(84px + env(safe-area-inset-top));width:100%;text-align:center;font-size:15px;font-weight:900;color:#fff2a8;text-shadow:0 0 12px #ff5fa8;pointer-events:none;min-height:24px}#bottom{position:fixed;bottom:calc(9px + env(safe-area-inset-bottom));left:12px;right:12px;display:grid;grid-template-columns:1fr auto;gap:6px 9px;align-items:center;font-size:10px;font-weight:900;text-shadow:0 1px 5px #000}.bar{height:13px;border-radius:20px;border:1px solid #e9b6d8;background:#1a1230;overflow:hidden}.bar>div{height:100%;width:0;transition:width .15s}.pressure{background:linear-gradient(90deg,#27e9d1,#ffd06d,#ff3d7f)}.energy{background:linear-gradient(90deg,#55d7ff,#a45dff,#ffe17c)}#bottom button{background:#301544;border:1px solid #f48bbd;border-radius:8px;color:white;font-weight:900;padding:7px}#overdrive-status{grid-column:1/-1}#overlay{position:fixed;inset:0;background:#0c0827e8;display:grid;place-items:center;z-index:10;padding:18px}#overlay[hidden]{display:none}#panel{max-width:370px;width:100%;text-align:center;border:1px solid #ff87c4;background:linear-gradient(160deg,#36164f,#160c32);padding:23px;border-radius:22px;box-shadow:0 0 70px #fa5ca450}#panel h1{margin:0;color:#ff9ac9;letter-spacing:3px}#panel p{line-height:1.5;color:#f0ddec;font-size:14px}#panel button{border:0;border-radius:12px;padding:14px 29px;font-size:16px;font-weight:900;color:#261034;background:linear-gradient(90deg,#ffbd79,#ff6cba)}#toast{position:fixed;top:42%;width:100%;text-align:center;pointer-events:none;font-size:28px;font-weight:1000;text-shadow:0 0 15px #ff6ac5;opacity:0;transition:opacity .2s}#toast.show{opacity:1}
+:root{color-scheme:dark;--pink:#ff84c7;--ink:#100d27}
+#hud{padding:14px max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));letter-spacing:.05em}
+#hud b{font-size:clamp(17px,5vw,25px);letter-spacing:.08em}#hud small{font-size:10px}
+#score{color:#fff6ff;font-variant-numeric:tabular-nums}
+#world{top:calc(65px + env(safe-area-inset-top));pointer-events:none;color:#ffd6ed;letter-spacing:.35em}
+#combo{top:calc(86px + env(safe-area-inset-top));color:#a4fcf1}
+#bottom{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));padding:9px 12px;background:#100d27eb;border:1px solid #f69cd56e;border-radius:14px;font-size:11px;letter-spacing:.04em}
+.bar{margin-top:4px;height:8px;border-color:#bba5e26e}#bottom #mute{min-width:44px;min-height:44px;grid-column:2;grid-row:1/3;padding:0;font-size:19px}
+#overdrive-status{grid-column:1;min-width:0}#epct,#pct{color:#b0fff1}#pct[data-critical="true"]{color:#ff9bb7}
+#overlay{background:#0c08279e}
+#panel{background:linear-gradient(165deg,#391b54,#14102d 70%);border:1px solid #ff9fd1;box-shadow:0 0 48px #ff73b748}
+#panel h1{font-size:clamp(29px,8vw,47px);line-height:.98;font-style:italic;letter-spacing:.03em}
+#toast{box-sizing:border-box;left:0;padding:0 10px;top:auto;bottom:calc(104px + env(safe-area-inset-bottom));color:#fff1fb;font-size:clamp(15px,4.5vw,23px);z-index:2}
+#toast[data-effect="chain"]{color:#85ffec}#toast[data-effect="critical"]{color:#ff9bb7}
+#toast[data-effect="super"],#toast[data-effect="mega"]{color:#ffe39c;text-shadow:0 0 12px #ff408c,0 2px 6px #190f32}
+#toast.show[data-effect="mega"]{animation:mega-pop .36s ease-out}
+@keyframes mega-pop{0%{transform:scale(.7)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+@media (max-height:480px){#world,#combo{top:auto;bottom:calc(75px + env(safe-area-inset-bottom))}#world{display:none}#toast{bottom:calc(90px + env(safe-area-inset-bottom))}#panel{padding:12px}#panel p{margin:8px 0}}
+</style></head>
+<body><div id="game"></div><div id="hud"><div><b>REACTOR <span style="color:#ff85c1">2.8</span></b><small>MIAMI NIGHTS</small></div><div><div id="score">0</div><div id="best">RECORD 0</div></div></div><div id="world">MIAMI · 1986</div><div id="combo"></div><div id="toast"></div>
+<div id="bottom"><div>PRESSION <span id="pct">10%</span><div class="bar"><div id="pfill" class="pressure"></div></div></div><button id="mute" aria-label="Couper ou rétablir le son" aria-pressed="false">♫</button><div id="overdrive-status">OVERDRIVE <span id="epct">0%</span><div class="bar"><div id="efill" class="energy"></div></div></div></div>
+<div id="overlay"><div id="panel"><h1>MIAMI NIGHTS</h1><p>MIAMI · 1986<br><br>Touche un groupe de <b>2 cristaux ou plus</b>. La pression monte avec le temps. Les grands groupes la réduisent et les chutes peuvent déclencher des chaînes. À 100 %, OVERDRIVE triple les points pendant 9 secondes, puis la jauge se bloque pendant 12 secondes.</p><button id="start">JOUER</button><p style="font-size:11px">Version 2.8 · son activé au démarrage</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script><script>
 (()=>{'use strict';
 const N=7,C=[0x39f6e0,0xff65ad,0xffd369,0xa68bff];
 const $=id=>document.getElementById(id),rand=()=>Math.floor(Math.random()*C.length);
 const OVERDRIVE_MS=9000, RECOVERY_MS=12000, COMBO_MS=2100;
-const DISTURBANCE_MS=45000, CHAIN_MIN=4, MAX_CHAIN_WAVES=3;
+const DISTURBANCE_MS=45000, CHAIN_MIN=4, MAX_CHAIN_WAVES=2;
+const PRESSURE_BY_SIZE=[0,0,6,3,1,-3,-6];
+const MAX_PARTICLES=80, FALL_MS=115;
 let board=[],score=0,pressure=10,energy=0,combo=0,lastMove=-Infinity;
+let qualityMoves=0,comboTier=0,critical=false;
 let elapsed=0,nextDisturbance=DISTURBANCE_MS,overUntil=0,recoverUntil=0,settleEvent=null;
-let playing=false,busy=false,muted=false,scene=null,audio=null,musicClock=null,beat=0,drawn=[],best=0,toastTimer=0;
+let playing=false,busy=false,muted=false,scene=null,audio=null,musicClock=null,beat=0,best=0,toastTimer=0;
 try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
 function sound(f,d=.14,type='triangle',v=.035){if(!audio||muted)return;let t=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+d+.01)}
 function music(){if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();audio.resume();if(musicClock)return;const melody=[329.63,392,440,523.25,440,392,329.63,293.66,261.63,329.63,392,440,392,329.63,293.66,261.63];musicClock=setInterval(()=>{if(!playing||muted)return;let i=beat++%16,boost=elapsed<overUntil;sound(melody[i]*(boost?2:1),.18,'sawtooth',boost?.023:.011);if(i%4===0)sound(i%8?110:82.4,.29,'triangle',.055);if(i%2===0)sound(140,.05,'square',boost?.017:.008)},230)}
@@ -20,18 +42,30 @@ function updateHud(){
   const remaining=Math.ceil((recoverUntil-elapsed)/1000);
   $('score').textContent=score.toLocaleString('fr-FR');
   $('best').textContent='RECORD '+best.toLocaleString('fr-FR');
-  $('pct').textContent=(pressure===100?100:Math.floor(pressure))+'%';
+  $('pct').textContent=Math.floor(pressure)+'%';
+  $('pct').dataset.critical=String(critical);
   $('pfill').style.width=pressure+'%';
   $('epct').textContent=active?'ACTIF ×3':remaining>0?'RÉCUPÉRATION · '+remaining+' s':'RECHARGE · '+energy+'%';
   $('efill').style.width=energy+'%';
   $('combo').textContent=combo>1?'COMBO ×'+combo:'';
 }
-function flash(message){
+function flash(message,style=""){
   const toast=$('toast');
   toast.textContent=message;
+  toast.dataset.effect=style;
   toast.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>toast.classList.remove('show'),700);
+}
+function cue(kind){
+  const cues={
+    clear:[330,.09,'triangle',.034], large:[523,.17,'triangle',.056],
+    combo:[659,.13,'sine',.048], super:[784,.21,'triangle',.06],
+    mega:[1047,.34,'sawtooth',.048], chain:[880,.16,'triangle',.048],
+    overdrive:[659,.4,'sawtooth',.05], critical:[185,.26,'square',.029],
+    defeat:[98,.55,'sawtooth',.045]
+  };
+  sound(...cues[kind]);
 }
 function chargeOverdrive(amount){
   if(elapsed<recoverUntil)return;
@@ -41,17 +75,90 @@ function chargeOverdrive(amount){
   overUntil=elapsed+OVERDRIVE_MS;
   recoverUntil=overUntil+RECOVERY_MS;
   flash('⚡ OVERDRIVE!');
-  sound(659,.4,'sawtooth',.05);
+  cue('overdrive');
 }
-function clearDraw(){for(const a of drawn)a.destroy();drawn=[]}
-function paintBoard(){if(!scene||!board.length)return;clearDraw();let g=scene.add.graphics(),{cell,left,top}=scene;drawn.push(g);g.fillStyle(0x0d0a2b,.87);g.fillRoundedRect(left-8,top-8,cell*N+16,cell*N+16,14);g.lineStyle(2,0xff8fc6,.95);g.strokeRoundedRect(left-8,top-8,cell*N+16,cell*N+16,14);for(let y=0;y<N;y++)for(let x=0;x<N;x++){let col=C[board[y][x]],cx=left+(x+.5)*cell,cy=top+(y+.5)*cell,r=cell*.39;g.fillStyle(col,.2);g.fillRoundedRect(cx-r-3,cy-r-3,r*2+6,r*2+6,9);g.fillStyle(col,1);g.fillPoints([{x:cx,y:cy-r},{x:cx+r*.85,y:cy-r*.13},{x:cx+r*.57,y:cy+r*.82},{x:cx-r*.57,y:cy+r*.82},{x:cx-r*.85,y:cy-r*.13}],true);g.lineStyle(1.4,0xffffff,.7);g.lineBetween(cx,cy-r*.85,cx-r*.28,cy+r*.65);g.lineBetween(cx,cy-r*.85,cx+r*.27,cy+r*.65)}}
-function burst(cells,color){if(!scene)return;let {cell,left,top}=scene;for(let [x,y]of cells){let cx=left+(x+.5)*cell,cy=top+(y+.5)*cell;for(let j=0;j<5;j++){let a=Math.random()*Math.PI*2,dist=cell*(.3+Math.random()*.6),p=scene.add.circle(cx,cy,2+Math.random()*3,color,1);scene.tweens.add({targets:p,x:cx+Math.cos(a)*dist,y:cy+Math.sin(a)*dist,alpha:0,scale:0,duration:240+Math.random()*160,onComplete:()=>p.destroy()})}}}
+function makeCrystalTextures(game){
+  const graphics=game.make.graphics({x:0,y:0,add:false});
+  const outline=[{x:32,y:4},{x:55,y:19},{x:59,y:39},{x:45,y:58},{x:19,y:58},{x:5,y:39},{x:9,y:19}];
+  const facet=(color,alpha,points)=>{
+    graphics.fillStyle(color,alpha);
+    graphics.fillPoints(points,true);
+  };
+  C.forEach((color,index)=>{
+    graphics.clear();
+    graphics.fillStyle(color,.18);
+    graphics.fillCircle(32,33,31);
+    facet(0x130e2e,1,outline.map(({x,y})=>({x,y:y+3})));
+    facet(color,1,outline);
+    const center={x:31,y:31};
+    facet(0xffffff,.52,[outline[0],outline[1],center,outline[6]]);
+    facet(0xffffff,.21,[outline[6],center,outline[5]]);
+    facet(0x151235,.31,[outline[1],outline[2],outline[3],center]);
+    facet(0x151235,.53,[outline[3],outline[4],center]);
+    graphics.lineStyle(1.7,0xfff4ff,.73);
+    graphics.strokePoints(outline,true,true);
+    graphics.lineStyle(1.6,0xffffff,.58);
+    graphics.lineBetween(32,8,31,29);
+    graphics.lineBetween(12,20,27,14);
+    graphics.generateTexture('crystal-'+index,64,64);
+  });
+  graphics.destroy();
+}
+function paintBoard(moved=[]){
+  if(!scene||!board.length)return;
+  const {cell,left,top,gems,boardFrame}=scene;
+  boardFrame.clear();
+  boardFrame.fillStyle(0x0c0b22,.97);
+  boardFrame.fillRoundedRect(left-7,top-7,cell*N+14,cell*N+14,14);
+  boardFrame.lineStyle(4,0xff73ba,.23);
+  boardFrame.strokeRoundedRect(left-8,top-8,cell*N+16,cell*N+16,15);
+  boardFrame.lineStyle(1.4,0xff9dd8,.83);
+  boardFrame.strokeRoundedRect(left-7,top-7,cell*N+14,cell*N+14,14);
+  const origins=new Map(moved.map(([x,y,from])=>[y*N+x,from]));
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    const index=y*N+x, gem=gems[index];
+    const targetY=top+(y+.5)*cell;
+    const from=origins.get(index);
+    scene.tweens.killTweensOf(gem);
+    boardFrame.fillStyle(0xac85dc,(x+y)%2?.10:.055);
+    boardFrame.fillRoundedRect(left+x*cell+1,top+y*cell+1,cell-2,cell-2,5);
+    gem.setTexture('crystal-'+board[y][x]).setDisplaySize(cell*.91,cell*.91);
+    gem.setPosition(left+(x+.5)*cell,from===undefined?targetY:top+(Math.max(-.35,from)+.5)*cell);
+    gem.setVisible(true).setAlpha(from<0?.3:1);
+    if(from!==undefined)scene.tweens.add({targets:gem,y:targetY,alpha:1,duration:FALL_MS,ease:'Cubic.Out'});
+  }
+}
+function burst(cells,color,intensity){
+  const {cell,left,top,particles}=scene;
+  let cursor=0;
+  for(const [x,y] of cells){
+    for(let i=0;i<intensity+2;i++){
+      while(cursor<particles.length&&particles[cursor].visible)cursor++;
+      if(cursor===particles.length)return;
+      const p=particles[cursor++];
+      const angle=Math.random()*Math.PI*2;
+      const distance=cell*(.28+Math.random()*.66);
+      const cx=left+(x+.5)*cell,cy=top+(y+.5)*cell;
+      p.setPosition(cx,cy).setFillStyle(color).setAlpha(1).setScale(.6+Math.random()).setVisible(true);
+      scene.tweens.add({targets:p,x:cx+Math.cos(angle)*distance,y:cy+Math.sin(angle)*distance,
+        alpha:0,scale:0,duration:150+Math.random()*110,onComplete:()=>p.setVisible(false)});
+    }
+  }
+}
+function clearEffects(){
+  for(const item of [...scene.particles,...scene.gems])scene.tweens.killTweensOf(item);
+  for(const item of scene.particles)item.setVisible(false);
+  scene.cameras.main.resetFX();
+}
 function start(){
   board=Array.from({length:N},()=>Array.from({length:N},rand));
   score=0;
   pressure=10;
   energy=0;
   combo=0;
+  qualityMoves=0;
+  comboTier=0;
+  critical=false;
   lastMove=-Infinity;
   elapsed=0;
   nextDisturbance=DISTURBANCE_MS;
@@ -72,6 +179,8 @@ function award(points){
 function finish(){
   playing=false;
   busy=false;
+  cue('defeat');
+  clearEffects();
   overUntil=0;
   recoverUntil=0;
   if(settleEvent)settleEvent.remove();
@@ -85,7 +194,16 @@ function finish(){
 }
 function changePressure(amount){
   pressure=Math.max(0,Math.min(100,pressure+amount));
-  if(pressure===100)finish();
+  if(pressure===100){
+    finish();
+    return;
+  }
+  if(pressure>=82&&!critical){
+    critical=true;
+    cue('critical');
+    flash('PRESSION CRITIQUE','critical');
+  }
+  if(pressure<74)critical=false;
 }
 function findGroup(x,y,seen){
   const color=board[y][x], stack=[[x,y]], group=[];
@@ -98,13 +216,27 @@ function findGroup(x,y,seen){
   }
   return group;
 }
-function collapse(groups){
+// Label the connected components before each wave. Labels fall with their crystals.
+function labelComponents(){
+  const labels=Array.from({length:N},()=>Array(N).fill(0));
+  const seen=new Set();
+  let label=0;
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    if(seen.has(y*N+x))continue;
+    label++;
+    for(const [a,b] of findGroup(x,y,seen))labels[b][a]=label;
+  }
+  return labels;
+}
+function collapse(groups,intensity=1){
+  const labels=labelComponents();
   const columns=new Set(), moved=[];
   for(const group of groups){
-    burst(group,C[board[group[0][1]][group[0][0]]]);
-    for(const [x,y] of group){
-      board[y][x]=-1;
-      columns.add(x);
+    const [x,y]=group[0];
+    burst(group,C[board[y][x]],intensity);
+    for(const [a,b] of group){
+      board[b][a]=-1;
+      columns.add(a);
     }
   }
   for(const x of columns){
@@ -112,41 +244,77 @@ function collapse(groups){
     for(let y=N-1;y>=0;y--){
       if(board[y][x]<0)continue;
       board[destination][x]=board[y][x];
-      if(destination!==y)moved.push([x,destination]);
+      labels[destination][x]=labels[y][x];
+      if(destination!==y)moved.push([x,destination,y]);
       destination--;
     }
     for(let y=destination;y>=0;y--){
       board[y][x]=rand();
-      moved.push([x,y]);
+      labels[y][x]=0;
+      moved.push([x,y,y-destination-1]);
     }
   }
-  paintBoard();
-  return moved;
+  paintBoard(moved);
+  return {labels,moved};
 }
-function resolveChain(moved,wave){
-  settleEvent=scene.time.delayedCall(180,()=>{
+function chainGroups({labels,moved}){
+  const seen=new Set(), groups=[];
+  for(const [x,y] of moved){
+    if(seen.has(y*N+x))continue;
+    const group=findGroup(x,y,seen);
+    if(group.length<CHAIN_MIN)continue;
+    const first=labels[y][x];
+    if(first===0||group.some(([a,b])=>labels[b][a]!==first))groups.push(group);
+  }
+  return groups;
+}
+function resolveChain(fall,wave){
+  const groups=wave<=MAX_CHAIN_WAVES?chainGroups(fall):[];
+  settleEvent=scene.time.delayedCall(FALL_MS+10,()=>{
     settleEvent=null;
     if(!playing)return;
-    const seen=new Set(), groups=[];
-    if(wave<=MAX_CHAIN_WAVES){
-      for(const [x,y] of moved){
-        if(seen.has(y*N+x))continue;
-        const group=findGroup(x,y,seen);
-        if(group.length>=CHAIN_MIN)groups.push(group);
-      }
-    }
     if(!groups.length){
       busy=false;
       return;
     }
-    const bonus=groups.reduce((total,group)=>total+group.length*group.length*5*wave,0);
-    const gained=bonus*(elapsed<overUntil?3:1);
-    award(bonus);
-    flash('CHAÎNE ×'+wave+' · +'+gained);
-    sound(460+wave*110,.12,'triangle',.035);
+    const points=groups.reduce((total,group)=>total+group.length*group.length*5*wave,0);
+    const gained=points*(elapsed<overUntil?3:1);
+    award(points);
+    flash('CHAÎNE ×'+wave+' · +'+gained,'chain');
+    cue('chain');
     updateHud();
-    resolveChain(collapse(groups),wave+1);
+    resolveChain(collapse(groups,2),wave+1);
   });
+}
+function pressureForGroup(size){
+  return size<7?PRESSURE_BY_SIZE[size]:-Math.min(15,8+(size-7)*2);
+}
+function comboPoints(size){
+  const base=10*size*size;
+  const steps=Math.min(combo-1,5);
+  return base+Math.floor(base*steps*Math.min(size-1,5)/25);
+}
+function updateCombo(size){
+  if(elapsed-lastMove>=COMBO_MS){
+    combo=0;
+    qualityMoves=0;
+    comboTier=0;
+  }
+  combo=Math.min(combo+1,12);
+  lastMove=elapsed;
+  if(size>=4)qualityMoves++;
+  if(size>=4&&combo>=6&&qualityMoves>=3&&comboTier<3){
+    comboTier=3;
+    return 3;
+  }
+  if(size>=4&&combo>=4&&qualityMoves>=2&&comboTier<2){
+    comboTier=2;
+    return 2;
+  }
+  return combo>=2?1:0;
+}
+function energyForGroup(size,reward){
+  return Math.min(22,2+(size-2)*2+Math.max(0,size-4)*2)+(reward===3?10:0);
 }
 function tap(x,y){
   if(!playing||busy)return;
@@ -157,24 +325,42 @@ function tap(x,y){
     return;
   }
   busy=true;
-  combo=elapsed-lastMove<COMBO_MS?Math.min(combo+1,12):1;
-  lastMove=elapsed;
-  award(size*size*10*(1+Math.floor((combo-1)/3)));
-  changePressure(Math.max(-13,7-size*2));
+  const reward=updateCombo(size);
+  award(comboPoints(size));
+  changePressure(pressureForGroup(size));
   if(!playing)return;
-  if(size>=5||combo>=4)flash(size>=7?'MEGA REACTION!':combo>=5?'CHAIN REACTION!':'SUPER!');
-  sound(300+size*45,.18,'triangle',.04);
-  if(navigator.vibrate&&size>=5)navigator.vibrate(size>=8?35:12);
-  chargeOverdrive(Math.min(25,size*3+Math.min(combo,8)));
+  if(reward===3){
+    flash('MEGA COMBO ×'+combo,'mega');
+    cue('mega');
+  }else if(reward===2){
+    flash('SUPER COMBO ×'+combo,'super');
+    cue('super');
+  }else if(reward===1){
+    flash('COMBO ×'+combo,'combo');
+    cue('combo');
+  }else{
+    cue(size>=5?'large':'clear');
+  }
+  if(navigator.vibrate&&(size>=5||reward>=2))navigator.vibrate(reward===3?35:12);
+  chargeOverdrive(energyForGroup(size,reward));
   updateHud();
-  scene.cameras.main.shake(65,size>=7?.003:.0013);
-  resolveChain(collapse([group]),1);
+  scene.cameras.main.shake(reward===3?110:60,reward===3?.003: .0012);
+  resolveChain(collapse([group],reward>=2?3:size>=5?2:1),1);
 }
 class Game extends Phaser.Scene{
   constructor(){super('Game')}
   create(){
     scene=this;
-    this.bg=this.add.graphics();
+    this.signs=[];
+    this.bg=this.add.graphics().setDepth(-10);
+    this.sun=this.add.graphics().setDepth(-9);
+    this.city=this.add.graphics().setDepth(-8);
+    this.traffic=[this.add.graphics().setDepth(-7),this.add.graphics().setDepth(-7)];
+    this.palms=Array.from({length:4},()=>this.add.graphics().setDepth(-6));
+    makeCrystalTextures(this);
+    this.boardFrame=this.add.graphics().setDepth(0);
+    this.gems=Array.from({length:N*N},()=>this.add.image(0,0,'crystal-0').setDepth(1).setVisible(false));
+    this.particles=Array.from({length:MAX_PARTICLES},()=>this.add.circle(0,0,2.5,0xffffff).setDepth(2).setVisible(false));
     this.scale.on('resize',()=>this.layout());
     this.layout();
     this.input.on('pointerdown',p=>{
@@ -183,11 +369,12 @@ class Game extends Phaser.Scene{
     });
   }
   update(time,delta){
+    this.animateCity(time);
     if(!playing)return;
     elapsed+=delta;
     const previousPressure=Math.floor(pressure);
-    // Pressure rises from 0.8 to 2.0 points/s over the first four minutes.
-    changePressure(delta/1000*(0.8+Math.min(1.2,elapsed/200000)));
+    // Pressure rises from 1.35 to 3.0 points/s over the first three minutes.
+    changePressure(delta/1000*(1.35+1.65*Math.min(1,elapsed/180000)));
     if(!playing)return;
     const comboExpired=combo>0&&elapsed-lastMove>=COMBO_MS;
     if(comboExpired)combo=0;
@@ -203,9 +390,147 @@ class Game extends Phaser.Scene{
       sound(210,.23,'triangle',.025);
     }
   }
-layout(){let w=this.scale.width,h=this.scale.height;this.w=w;this.h=h;let safeTop=105,safeBottom=120;this.cell=Math.max(27,Math.floor(Math.min((w-30)/7,(h-safeTop-safeBottom)/7,67)));this.left=Math.floor((w-this.cell*N)/2);this.top=Math.max(safeTop,Math.floor((h-this.cell*N)/2));this.paint();paintBoard()}
-paint(){let g=this.bg,w=this.w,h=this.h;g.clear();g.fillGradientStyle(0x140b35,0x140b35,0xa63b86,0xf5a16f);g.fillRect(0,0,w,h);let sy=h*.26,r=Math.min(82,w*.22);g.fillStyle(0xffcf86);g.fillCircle(w*.5,sy,r);g.lineStyle(4,0xdc668f,.8);for(let i=0;i<5;i++){let yy=sy+r*.1+i*r*.18;g.lineBetween(w*.5-r*.9,yy,w*.5+r*.9,yy)}let horizon=sy+r*.9;g.fillStyle(0x291534);for(let i=0;i<17;i++){let bh=20+(i*41)%70;g.fillRect(i*w/16,horizon-bh,w/16+1,bh)}g.fillStyle(0x130c2b);g.fillRect(0,horizon,w,h-horizon);g.lineStyle(1,0x49e5dc,.25);for(let i=-8;i<=8;i++)g.lineBetween(w*.5,horizon,w*.5+i*w*.26,h);for(let i=1;i<13;i++){let q=i/13;g.lineBetween(0,horizon+(h-horizon)*q*q,w,horizon+(h-horizon)*q*q)}for(let s of [-1,1]){let px=s<0?w*.08:w*.92;g.lineStyle(4,0x14152d);g.lineBetween(px,horizon-72,px,horizon+4);for(let i=0;i<4;i++){let a=i*Math.PI/2+.5;g.lineBetween(px,horizon-65,px+Math.cos(a)*30,horizon-65+Math.sin(a)*20)}}}}
+  layout(){
+    const {width:w,height:h}=this.scale;
+    const hudBottom=Math.max($('hud').getBoundingClientRect().bottom,$('combo').getBoundingClientRect().bottom<h*.45?$('combo').getBoundingClientRect().bottom:0);
+    const bottomTop=$('bottom').getBoundingClientRect().top;
+    const top=Math.max(hudBottom+11,Math.min(112,h*.23));
+    const bottom=Math.max(top+N,Math.min(h-10,bottomTop-34));
+    this.w=w;
+    this.h=h;
+    this.cell=Math.floor(Math.max(1,Math.min((w-26)/N,(bottom-top)/N,72)));
+    this.left=Math.floor((w-this.cell*N)/2);
+    this.top=Math.floor((top+bottom-this.cell*N)/2);
+    this.paintCity();
+    paintBoard();
+  }
+  paintCity(){
+    for(const sign of this.signs)sign.destroy();
+    this.signs.length=0;
+    const {w,h,bg,sun,city}=this;
+    const horizon=this.horizon=Math.max(h*.13,Math.min(h*.36,this.top-58));
+    const r=Math.min(w*.2,h*.13,105);
+    const skyHeight=horizon+r*.2;
+    bg.clear();
+    bg.fillGradientStyle(0x0b0e2d,0x211345,0x9a3b80,0xcf5087);
+    bg.fillRect(0,0,w,skyHeight);
+    bg.fillGradientStyle(0x9a3b80,0xcf5087,0xf1917a,0xf8ac7e);
+    bg.fillRect(0,skyHeight,w,h*.5-skyHeight);
+    bg.fillGradientStyle(0x171531,0x171531,0x0b1027,0x24153e);
+    bg.fillRect(0,h*.5,w,h*.5);
+    // Low-contrast reflections keep the foreground distinct from the playable grid.
+    const promenade=this.top+this.cell*N+9;
+    for(let i=0;i<20;i++){
+      const x=(i*97+23)%Math.max(1,w), y=promenade+10+i*7;
+      bg.fillStyle(i%3===0?0x6df3ef:0xf976c0,.12*(1-i/22));
+      bg.fillEllipse(x,y,18+(i*17)%76,2);
+    }
+    bg.fillStyle(0xffdaee,.7);
+    for(let i=0;i<31;i++)bg.fillCircle((i*83+19)%Math.max(1,w),(i*29+13)%Math.max(1,horizon-r*.7),i%7===0?1.3:.65);
+    sun.clear();
+    sun.fillStyle(0xfc9a87,.1);
+    sun.fillCircle(w*.56,horizon-r*.4,r*1.23);
+    sun.fillStyle(0xffc794,1);
+    sun.fillCircle(w*.56,horizon-r*.4,r);
+    sun.lineStyle(3,0xcc5483,.72);
+    for(let i=0;i<6;i++){
+      const y=r*(.12+i*.14),half=Math.sqrt(r*r-y*y);
+      sun.lineBetween(w*.56-half,horizon-r*.4+y,w*.56+half,horizon-r*.4+y);
+    }
+    city.clear();
+    for(let i=0;i<19;i++){
+      const x=i*w/18, bh=16+(i*37)%67;
+      city.fillStyle(0x42244f,1);
+      city.fillRect(x,horizon+21-bh,w/17,bh);
+      city.fillStyle(0xe094b8,.38);
+      for(let j=8;j<bh-3;j+=10)city.fillRect(x+3,horizon+21-bh+j,2,2);
+    }
+    const hotelWidth=Math.max(48,Math.min(w*.26,132));
+    this.hotel(w*.05,horizon+32,hotelWidth,hotelWidth*.83,0xeab2ba,0xffa4d1,'PALOMA');
+    this.hotel(w-hotelWidth-w*.045,horizon+39,hotelWidth,hotelWidth*.97,0xb8bedb,0x86f8e8,'MARÉE');
+    city.fillStyle(0x201632,1);
+    city.fillRect(0,horizon+39,w,23);
+    city.lineStyle(1,0xffa1c7,.55);
+    city.lineBetween(0,horizon+40,w,horizon+40);
+    for(let i=0;i<16;i++){
+      const x=i*w/15;
+      city.fillStyle(i%2?0x74f4ed:0xff84c1,.19);
+      city.fillEllipse(x,horizon+57+(i*19)%74,14+(i*7)%25,3);
+      city.fillStyle(0xffd6aa,.38);
+      city.fillRect(x,horizon+50,9,1);
+    }
+    this.traffic.forEach((car,i)=>{
+      car.clear();
+      car.fillStyle(0x1a1230,1);
+      car.fillRoundedRect(-18,-6,36,8,3);
+      car.fillRoundedRect(-9,-10,17,7,3);
+      car.fillStyle(0xde77b1,.8);
+      car.fillRect(-6,-9,11,3);
+      car.fillStyle(0xffe6ad,.19);
+      car.fillTriangle(16,-3,45,-8,45,3);
+      car.fillStyle(0xffecc4,1);
+      car.fillRect(14,-4,5,2);
+      car.fillStyle(0xff4486,1);
+      car.fillRect(-18,-4,3,2);
+      car.setScale(i===0?1:-.83,i===0?1:.83);
+    });
+    this.palms.forEach((p,i)=>this.drawPalm(p,i,horizon));
+  }
+  hotel(x,base,width,height,pastel,neon,name){
+    const g=this.city, y=base-height;
+    g.fillStyle(0x231631,.65);
+    g.fillRoundedRect(x+4,y+5,width,height,7);
+    g.fillStyle(pastel,1);
+    g.fillRoundedRect(x,y+9,width,height-9,6);
+    g.fillRoundedRect(x+width*.32,y,width*.36,height,6);
+    g.fillStyle(0x785179,.68);
+    g.fillRect(x,y+height*.77,width,height*.23);
+    g.lineStyle(2,neon,1);
+    g.lineBetween(x+3,y+12,x+width-3,y+12);
+    g.lineBetween(x+3,y+height*.76,x+width-3,y+height*.76);
+    for(let row=0;row<3;row++)for(let col=0;col<5;col++){
+      const wx=x+width*(.11+.17*col), wy=y+height*(.26+row*.16);
+      g.fillStyle(0x352443,1);
+      g.fillRoundedRect(wx,wy,width*.10,height*.095,2);
+      g.fillStyle((row+col)%3===0?0xffd3a5:neon,.59);
+      g.fillRect(wx+1,wy+1,width*.06,height*.045);
+    }
+    const sign=this.add.text(x+width*.5,y+height*.84,name,{fontFamily:'monospace',
+      fontSize:Math.max(8,Math.floor(width*.12)),fontStyle:'bold',color:'#fff0f7'});
+    sign.setOrigin(.5).setDepth(-7).setShadow(0,0,'#fd54be',6);
+    this.signs.push(sign);
+  }
+  drawPalm(g,i,horizon){
+    const far=i<2, side=i%2===0?1:-1, scale=far?.55:1;
+    const x=this.w*(i===0?.27:i===1?.74:i===2?.02:.98);
+    const y=horizon+(far?51:103);
+    g.clear();
+    g.setPosition(x,y).setScale(scale);
+    g.lineStyle(far?5:8,far?0x372042:0x19142e,1);
+    g.beginPath();
+    g.moveTo(0,0);
+    g.lineTo(side*9,-37);
+    g.lineTo(side*24,-85);
+    g.strokePath();
+    g.fillStyle(far?0x472750:0x1c1835,1);
+    for(let j=0;j<7;j++){
+      const angle=-Math.PI+j*Math.PI/6, length=30+(j%3)*8;
+      const dx=Math.cos(angle)*length,dy=Math.sin(angle)*length;
+      g.fillPoints([{x:side*24,y:-85},{x:side*24+dx*.57,y:-92+dy*.55},
+        {x:side*24+dx,y:-76+dy},{x:side*24+dx*.54,y:-81+dy*.56}],true);
+    }
+  }
+  animateCity(time){
+    this.sun.setAlpha(.92+.08*Math.sin(time/1600));
+    this.palms.forEach((p,i)=>p.setRotation(Math.sin(time/1900+i)*.025));
+    this.traffic.forEach((car,i)=>{
+      const travel=(time*(i===0?.043:.036)+i*this.w*.47)%(this.w+115);
+      car.setPosition(i===0?travel-55:this.w+55-travel,this.horizon+46+i*8);
+    });
+    this.signs.forEach((sign,i)=>sign.setAlpha(.86+.14*Math.sin(time/730+i)));
+  }
+}
 new Phaser.Game({type:Phaser.AUTO,parent:'game',backgroundColor:'#130c2d',scale:{mode:Phaser.Scale.RESIZE,width:innerWidth,height:innerHeight},scene:[Game]});
-$('start').onclick=()=>{$('overlay').hidden=true;start()};$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'♪':'♫';if(!muted)music()};
+$('start').onclick=()=>{$('overlay').hidden=true;start()};$('mute').onclick=()=>{muted=!muted;$('mute').setAttribute('aria-pressed',String(muted));$('mute').textContent=muted?'♪':'♫';if(!muted)music()};
 })();
 </script></body></html>
