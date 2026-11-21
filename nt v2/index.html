@@ -1,51 +1,211 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#180c32"><title>REACTOR · MIAMI 1986</title>
 <style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120821;color:white;font-family:system-ui,Arial;touch-action:none}#game{position:fixed;inset:0}#hud{position:fixed;top:env(safe-area-inset-top);left:0;right:0;padding:11px 15px;pointer-events:none;display:flex;justify-content:space-between;align-items:start;text-shadow:0 2px 8px #160621}#hud b{font-size:17px;letter-spacing:2px}#hud small{display:block;color:#9ff6f3;font-size:9px;letter-spacing:1.5px}#score{font-size:24px;font-weight:900;text-align:right}#best{font-size:10px;color:#ffcf85;text-align:right}#world{position:fixed;top:calc(61px + env(safe-area-inset-top));width:100%;text-align:center;font-size:11px;letter-spacing:3px;color:#ffe6b6;text-shadow:0 2px 6px #000}#combo{position:fixed;top:calc(84px + env(safe-area-inset-top));width:100%;text-align:center;font-size:15px;font-weight:900;color:#fff2a8;text-shadow:0 0 12px #ff5fa8;pointer-events:none;min-height:24px}#bottom{position:fixed;bottom:calc(9px + env(safe-area-inset-bottom));left:12px;right:12px;display:grid;grid-template-columns:1fr auto;gap:6px 9px;align-items:center;font-size:10px;font-weight:900;text-shadow:0 1px 5px #000}.bar{height:13px;border-radius:20px;border:1px solid #e9b6d8;background:#1a1230;overflow:hidden}.bar>div{height:100%;width:0;transition:width .15s}.pressure{background:linear-gradient(90deg,#27e9d1,#ffd06d,#ff3d7f)}.energy{background:linear-gradient(90deg,#55d7ff,#a45dff,#ffe17c)}#bottom button{background:#301544;border:1px solid #f48bbd;border-radius:8px;color:white;font-weight:900;padding:7px}#overdrive-status{grid-column:1/-1}#overlay{position:fixed;inset:0;background:#0c0827e8;display:grid;place-items:center;z-index:10;padding:18px}#overlay[hidden]{display:none}#panel{max-width:370px;width:100%;text-align:center;border:1px solid #ff87c4;background:linear-gradient(160deg,#36164f,#160c32);padding:23px;border-radius:22px;box-shadow:0 0 70px #fa5ca450}#panel h1{margin:0;color:#ff9ac9;letter-spacing:3px}#panel p{line-height:1.5;color:#f0ddec;font-size:14px}#panel button{border:0;border-radius:12px;padding:14px 29px;font-size:16px;font-weight:900;color:#261034;background:linear-gradient(90deg,#ffbd79,#ff6cba)}#toast{position:fixed;top:42%;width:100%;text-align:center;pointer-events:none;font-size:28px;font-weight:1000;text-shadow:0 0 15px #ff6ac5;opacity:0;transition:opacity .2s}#toast.show{opacity:1}</style></head>
-<body><div id="game"></div><div id="hud"><div><b>REACTOR <span style="color:#ff85c1">2.6</span></b><small>MIAMI · ARCADE</small></div><div><div id="score">0</div><div id="best">RECORD 0</div></div></div><div id="world">MIAMI · 1986</div><div id="combo"></div><div id="toast"></div>
+<body><div id="game"></div><div id="hud"><div><b>REACTOR <span style="color:#ff85c1">2.7</span></b><small>MIAMI · ARCADE</small></div><div><div id="score">0</div><div id="best">RECORD 0</div></div></div><div id="world">MIAMI · 1986</div><div id="combo"></div><div id="toast"></div>
 <div id="bottom"><div>PRESSION <span id="pct">10%</span><div class="bar"><div id="pfill" class="pressure"></div></div></div><button id="mute">♫</button><div id="overdrive-status">OVERDRIVE <span id="epct">0%</span><div class="bar"><div id="efill" class="energy"></div></div></div></div>
-<div id="overlay"><div id="panel"><h1>MIAMI 1986</h1><p>Quatre couleurs. Des combos rapides. Des explosions partout.<br><br>Touche un groupe de <b>2 cristaux ou plus</b>. À 100 %, OVERDRIVE se déclenche automatiquement et triple les points pendant 9 secondes. Les grands groupes refroidissent le réacteur.</p><button id="start">JOUER</button><p style="font-size:11px">Prototype 2.6 · son activé au démarrage</p></div></div>
+<div id="overlay"><div id="panel"><h1>MIAMI 1986</h1><p>Quatre couleurs. Des combos rapides. Des explosions partout.<br><br>Touche un groupe de <b>2 cristaux ou plus</b>. La pression monte avec le temps. Les grands groupes la réduisent et les chutes peuvent déclencher des chaînes. À 100 %, OVERDRIVE triple les points pendant 9 secondes, puis la jauge se bloque pendant 12 secondes.</p><button id="start">JOUER</button><p style="font-size:11px">Prototype 2.7 · son activé au démarrage</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script><script>
 (()=>{'use strict';
-const N=7,C=[0x39f6e0,0xff65ad,0xffd369,0xa68bff],$=id=>document.getElementById(id),rand=()=>Math.floor(Math.random()*4);
-let board=[],score=0,pressure=10,energy=0,combo=0,lastMove=0,overUntil=0,overTimer=0,playing=false,busy=false,muted=false,scene=null,audio=null,musicClock=null,beat=0,drawn=[],best=0,toastTimer=0;
+const N=7,C=[0x39f6e0,0xff65ad,0xffd369,0xa68bff];
+const $=id=>document.getElementById(id),rand=()=>Math.floor(Math.random()*C.length);
+const OVERDRIVE_MS=9000, RECOVERY_MS=12000, COMBO_MS=2100;
+const DISTURBANCE_MS=45000, CHAIN_MIN=4, MAX_CHAIN_WAVES=3;
+let board=[],score=0,pressure=10,energy=0,combo=0,lastMove=-Infinity;
+let elapsed=0,nextDisturbance=DISTURBANCE_MS,overUntil=0,recoverUntil=0,settleEvent=null;
+let playing=false,busy=false,muted=false,scene=null,audio=null,musicClock=null,beat=0,drawn=[],best=0,toastTimer=0;
 try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
 function sound(f,d=.14,type='triangle',v=.035){if(!audio||muted)return;let t=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+d+.01)}
-function music(){if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();audio.resume();if(musicClock)return;const melody=[329.63,392,440,523.25,440,392,329.63,293.66,261.63,329.63,392,440,392,329.63,293.66,261.63];musicClock=setInterval(()=>{if(!playing||muted)return;let i=beat++%16,boost=Date.now()<overUntil;sound(melody[i]*(boost?2:1),.18,'sawtooth',boost?.023:.011);if(i%4===0)sound(i%8?110:82.4,.29,'triangle',.055);if(i%2===0)sound(140,.05,'square',boost?.017:.008)},230)}
-function updateHud(){ $('score').textContent=score.toLocaleString('fr-FR');$('best').textContent='RECORD '+best.toLocaleString('fr-FR');$('pct').textContent=Math.round(pressure)+'%';$('pfill').style.width=pressure+'%';$('epct').textContent=energy+'%';$('efill').style.width=energy+'%';$('combo').textContent=combo>1?'COMBO ×'+combo+(Date.now()<overUntil?' · OVERDRIVE':''):Date.now()<overUntil?'⚡ OVERDRIVE':''}
-function flash(s){let e=$('toast');e.textContent=s;e.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove('show'),700)}
-function resetOverdrive(){
-  clearTimeout(overTimer);
-  overTimer=0;
-  overUntil=0;
+function music(){if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();audio.resume();if(musicClock)return;const melody=[329.63,392,440,523.25,440,392,329.63,293.66,261.63,329.63,392,440,392,329.63,293.66,261.63];musicClock=setInterval(()=>{if(!playing||muted)return;let i=beat++%16,boost=elapsed<overUntil;sound(melody[i]*(boost?2:1),.18,'sawtooth',boost?.023:.011);if(i%4===0)sound(i%8?110:82.4,.29,'triangle',.055);if(i%2===0)sound(140,.05,'square',boost?.017:.008)},230)}
+function updateHud(){
+  const active=elapsed<overUntil;
+  const remaining=Math.ceil((recoverUntil-elapsed)/1000);
+  $('score').textContent=score.toLocaleString('fr-FR');
+  $('best').textContent='RECORD '+best.toLocaleString('fr-FR');
+  $('pct').textContent=(pressure===100?100:Math.floor(pressure))+'%';
+  $('pfill').style.width=pressure+'%';
+  $('epct').textContent=active?'ACTIF ×3':remaining>0?'RÉCUPÉRATION · '+remaining+' s':'RECHARGE · '+energy+'%';
+  $('efill').style.width=energy+'%';
+  $('combo').textContent=combo>1?'COMBO ×'+combo:'';
 }
-function activateOverdrive(){
-  if(!playing||pressure>=100||energy<100||overUntil)return;
+function flash(message){
+  const toast=$('toast');
+  toast.textContent=message;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toast.classList.remove('show'),700);
+}
+function chargeOverdrive(amount){
+  if(elapsed<recoverUntil)return;
+  energy=Math.min(100,energy+amount);
+  if(energy<100)return;
   energy=0;
-  overUntil=Date.now()+9000;
+  overUntil=elapsed+OVERDRIVE_MS;
+  recoverUntil=overUntil+RECOVERY_MS;
   flash('⚡ OVERDRIVE!');
   sound(659,.4,'sawtooth',.05);
-  overTimer=setTimeout(()=>{
-    resetOverdrive();
-    if(!playing)return;
-    if(energy===100&&pressure<100)activateOverdrive();
-    else flash('OVERDRIVE TERMINÉ');
-    updateHud();
-  },9000);
 }
 function clearDraw(){for(const a of drawn)a.destroy();drawn=[]}
 function paintBoard(){if(!scene||!board.length)return;clearDraw();let g=scene.add.graphics(),{cell,left,top}=scene;drawn.push(g);g.fillStyle(0x0d0a2b,.87);g.fillRoundedRect(left-8,top-8,cell*N+16,cell*N+16,14);g.lineStyle(2,0xff8fc6,.95);g.strokeRoundedRect(left-8,top-8,cell*N+16,cell*N+16,14);for(let y=0;y<N;y++)for(let x=0;x<N;x++){let col=C[board[y][x]],cx=left+(x+.5)*cell,cy=top+(y+.5)*cell,r=cell*.39;g.fillStyle(col,.2);g.fillRoundedRect(cx-r-3,cy-r-3,r*2+6,r*2+6,9);g.fillStyle(col,1);g.fillPoints([{x:cx,y:cy-r},{x:cx+r*.85,y:cy-r*.13},{x:cx+r*.57,y:cy+r*.82},{x:cx-r*.57,y:cy+r*.82},{x:cx-r*.85,y:cy-r*.13}],true);g.lineStyle(1.4,0xffffff,.7);g.lineBetween(cx,cy-r*.85,cx-r*.28,cy+r*.65);g.lineBetween(cx,cy-r*.85,cx+r*.27,cy+r*.65)}}
 function burst(cells,color){if(!scene)return;let {cell,left,top}=scene;for(let [x,y]of cells){let cx=left+(x+.5)*cell,cy=top+(y+.5)*cell;for(let j=0;j<5;j++){let a=Math.random()*Math.PI*2,dist=cell*(.3+Math.random()*.6),p=scene.add.circle(cx,cy,2+Math.random()*3,color,1);scene.tweens.add({targets:p,x:cx+Math.cos(a)*dist,y:cy+Math.sin(a)*dist,alpha:0,scale:0,duration:240+Math.random()*160,onComplete:()=>p.destroy()})}}}
-function start(){board=Array.from({length:N},()=>Array.from({length:N},rand));score=0;pressure=10;energy=0;combo=0;lastMove=0;resetOverdrive();playing=true;busy=false;updateHud();paintBoard();music()}
-function finish(){playing=false;resetOverdrive();updateHud(); if(score>best){best=score;try{localStorage.setItem('reactor_miami_best',String(best))}catch(e){}}$('panel').innerHTML='<h1>RÉACTEUR CRITIQUE</h1><p>Score : <b>'+score.toLocaleString('fr-FR')+'</b><br>Record : '+best.toLocaleString('fr-FR')+'</p><button id="again">REJOUER</button>';$('overlay').hidden=false;$('again').onclick=()=>{$('overlay').hidden=true;start()}}
-function tap(x,y){if(!playing||busy)return;let target=board[y][x],stack=[[x,y]],seen=new Set(),group=[];while(stack.length){let [a,b]=stack.pop(),k=a+','+b;if(a<0||a>=N||b<0||b>=N||seen.has(k)||board[b][a]!==target)continue;seen.add(k);group.push([a,b]);stack.push([a+1,b],[a-1,b],[a,b+1],[a,b-1])}if(group.length<2){sound(145,.065,'square',.01);return}
-busy=true;let now=Date.now();combo=now-lastMove<2100?Math.min(combo+1,12):1;lastMove=now;let boosted=now<overUntil,mult=boosted?3:1;score+=group.length*group.length*10*mult*(1+Math.floor((combo-1)/3));if(score>best){best=score;try{localStorage.setItem('reactor_miami_best',String(best))}catch(e){}}
-pressure=Math.max(0,Math.min(100,pressure+Math.max(-13,7-group.length*2)));energy=Math.min(100,energy+Math.min(25,group.length*3+Math.min(combo,8)));burst(group,C[target]);if(group.length>=5||combo>=4)flash(group.length>=7?'MEGA REACTION!':combo>=5?'CHAIN REACTION!':'SUPER!');sound(300+group.length*45,.18,'triangle',.04);if(navigator.vibrate&&group.length>=5)navigator.vibrate(group.length>=8?35:12);
-for(let [a,b]of group)board[b][a]=-1;for(let a=0;a<N;a++){let values=[];for(let b=N-1;b>=0;b--)if(board[b][a]>=0)values.push(board[b][a]);for(let b=N-1;b>=0;b--)board[b][a]=values[N-1-b]??rand()}
-activateOverdrive();updateHud();scene.cameras.main.shake(65,group.length>=7?.003:.0013);scene.time.delayedCall(125,()=>{paintBoard();busy=false;if(pressure>=100)finish()})}
-class Game extends Phaser.Scene{constructor(){super('Game')}create(){scene=this;this.bg=this.add.graphics();this.scale.on('resize',()=>this.layout());this.layout();this.input.on('pointerdown',p=>{let x=Math.floor((p.x-this.left)/this.cell),y=Math.floor((p.y-this.top)/this.cell);if(x>=0&&x<N&&y>=0&&y<N)tap(x,y)});this.time.addEvent({delay:45000,loop:true,callback:()=>{if(!playing||busy)return;for(let i=0;i<3;i++)board[Phaser.Math.Between(0,6)][Phaser.Math.Between(0,6)]=rand();paintBoard();flash('PERTURBATION');sound(210,.23,'triangle',.025)}})}
+function start(){
+  board=Array.from({length:N},()=>Array.from({length:N},rand));
+  score=0;
+  pressure=10;
+  energy=0;
+  combo=0;
+  lastMove=-Infinity;
+  elapsed=0;
+  nextDisturbance=DISTURBANCE_MS;
+  overUntil=0;
+  recoverUntil=0;
+  playing=true;
+  busy=false;
+  updateHud();
+  paintBoard();
+  music();
+}
+function award(points){
+  score+=points*(elapsed<overUntil?3:1);
+  if(score<=best)return;
+  best=score;
+  try{localStorage.setItem('reactor_miami_best',String(best))}catch(e){}
+}
+function finish(){
+  playing=false;
+  busy=false;
+  overUntil=0;
+  recoverUntil=0;
+  if(settleEvent)settleEvent.remove();
+  settleEvent=null;
+  clearTimeout(toastTimer);
+  $('toast').classList.remove('show');
+  updateHud();
+  $('panel').innerHTML='<h1>RÉACTEUR CRITIQUE</h1><p>Score : <b>'+score.toLocaleString('fr-FR')+'</b><br>Record : '+best.toLocaleString('fr-FR')+'</p><button id="again">REJOUER</button>';
+  $('overlay').hidden=false;
+  $('again').onclick=()=>{$('overlay').hidden=true;start()};
+}
+function changePressure(amount){
+  pressure=Math.max(0,Math.min(100,pressure+amount));
+  if(pressure===100)finish();
+}
+function findGroup(x,y,seen){
+  const color=board[y][x], stack=[[x,y]], group=[];
+  while(stack.length){
+    const [a,b]=stack.pop(), key=b*N+a;
+    if(a<0||a>=N||b<0||b>=N||seen.has(key)||board[b][a]!==color)continue;
+    seen.add(key);
+    group.push([a,b]);
+    stack.push([a+1,b],[a-1,b],[a,b+1],[a,b-1]);
+  }
+  return group;
+}
+function collapse(groups){
+  const columns=new Set(), moved=[];
+  for(const group of groups){
+    burst(group,C[board[group[0][1]][group[0][0]]]);
+    for(const [x,y] of group){
+      board[y][x]=-1;
+      columns.add(x);
+    }
+  }
+  for(const x of columns){
+    let destination=N-1;
+    for(let y=N-1;y>=0;y--){
+      if(board[y][x]<0)continue;
+      board[destination][x]=board[y][x];
+      if(destination!==y)moved.push([x,destination]);
+      destination--;
+    }
+    for(let y=destination;y>=0;y--){
+      board[y][x]=rand();
+      moved.push([x,y]);
+    }
+  }
+  paintBoard();
+  return moved;
+}
+function resolveChain(moved,wave){
+  settleEvent=scene.time.delayedCall(180,()=>{
+    settleEvent=null;
+    if(!playing)return;
+    const seen=new Set(), groups=[];
+    if(wave<=MAX_CHAIN_WAVES){
+      for(const [x,y] of moved){
+        if(seen.has(y*N+x))continue;
+        const group=findGroup(x,y,seen);
+        if(group.length>=CHAIN_MIN)groups.push(group);
+      }
+    }
+    if(!groups.length){
+      busy=false;
+      return;
+    }
+    const bonus=groups.reduce((total,group)=>total+group.length*group.length*5*wave,0);
+    const gained=bonus*(elapsed<overUntil?3:1);
+    award(bonus);
+    flash('CHAÎNE ×'+wave+' · +'+gained);
+    sound(460+wave*110,.12,'triangle',.035);
+    updateHud();
+    resolveChain(collapse(groups),wave+1);
+  });
+}
+function tap(x,y){
+  if(!playing||busy)return;
+  const group=findGroup(x,y,new Set());
+  const size=group.length;
+  if(size<2){
+    sound(145,.065,'square',.01);
+    return;
+  }
+  busy=true;
+  combo=elapsed-lastMove<COMBO_MS?Math.min(combo+1,12):1;
+  lastMove=elapsed;
+  award(size*size*10*(1+Math.floor((combo-1)/3)));
+  changePressure(Math.max(-13,7-size*2));
+  if(!playing)return;
+  if(size>=5||combo>=4)flash(size>=7?'MEGA REACTION!':combo>=5?'CHAIN REACTION!':'SUPER!');
+  sound(300+size*45,.18,'triangle',.04);
+  if(navigator.vibrate&&size>=5)navigator.vibrate(size>=8?35:12);
+  chargeOverdrive(Math.min(25,size*3+Math.min(combo,8)));
+  updateHud();
+  scene.cameras.main.shake(65,size>=7?.003:.0013);
+  resolveChain(collapse([group]),1);
+}
+class Game extends Phaser.Scene{
+  constructor(){super('Game')}
+  create(){
+    scene=this;
+    this.bg=this.add.graphics();
+    this.scale.on('resize',()=>this.layout());
+    this.layout();
+    this.input.on('pointerdown',p=>{
+      const x=Math.floor((p.x-this.left)/this.cell),y=Math.floor((p.y-this.top)/this.cell);
+      if(x>=0&&x<N&&y>=0&&y<N)tap(x,y);
+    });
+  }
+  update(time,delta){
+    if(!playing)return;
+    elapsed+=delta;
+    const previousPressure=Math.floor(pressure);
+    // Pressure rises from 0.8 to 2.0 points/s over the first four minutes.
+    changePressure(delta/1000*(0.8+Math.min(1.2,elapsed/200000)));
+    if(!playing)return;
+    const comboExpired=combo>0&&elapsed-lastMove>=COMBO_MS;
+    if(comboExpired)combo=0;
+    const crossedSecond=Math.floor((elapsed-delta)/1000)!==Math.floor(elapsed/1000);
+    const crossedOverdriveEnd=elapsed-delta<overUntil&&elapsed>=overUntil;
+    const crossedRecoveryEnd=elapsed-delta<recoverUntil&&elapsed>=recoverUntil;
+    if(comboExpired||previousPressure!==Math.floor(pressure)||crossedSecond||crossedOverdriveEnd||crossedRecoveryEnd)updateHud();
+    if(elapsed>=nextDisturbance&&!busy){
+      nextDisturbance+=DISTURBANCE_MS;
+      for(let i=0;i<3;i++)board[Phaser.Math.Between(0,N-1)][Phaser.Math.Between(0,N-1)]=rand();
+      paintBoard();
+      flash('PERTURBATION');
+      sound(210,.23,'triangle',.025);
+    }
+  }
 layout(){let w=this.scale.width,h=this.scale.height;this.w=w;this.h=h;let safeTop=105,safeBottom=120;this.cell=Math.max(27,Math.floor(Math.min((w-30)/7,(h-safeTop-safeBottom)/7,67)));this.left=Math.floor((w-this.cell*N)/2);this.top=Math.max(safeTop,Math.floor((h-this.cell*N)/2));this.paint();paintBoard()}
 paint(){let g=this.bg,w=this.w,h=this.h;g.clear();g.fillGradientStyle(0x140b35,0x140b35,0xa63b86,0xf5a16f);g.fillRect(0,0,w,h);let sy=h*.26,r=Math.min(82,w*.22);g.fillStyle(0xffcf86);g.fillCircle(w*.5,sy,r);g.lineStyle(4,0xdc668f,.8);for(let i=0;i<5;i++){let yy=sy+r*.1+i*r*.18;g.lineBetween(w*.5-r*.9,yy,w*.5+r*.9,yy)}let horizon=sy+r*.9;g.fillStyle(0x291534);for(let i=0;i<17;i++){let bh=20+(i*41)%70;g.fillRect(i*w/16,horizon-bh,w/16+1,bh)}g.fillStyle(0x130c2b);g.fillRect(0,horizon,w,h-horizon);g.lineStyle(1,0x49e5dc,.25);for(let i=-8;i<=8;i++)g.lineBetween(w*.5,horizon,w*.5+i*w*.26,h);for(let i=1;i<13;i++){let q=i/13;g.lineBetween(0,horizon+(h-horizon)*q*q,w,horizon+(h-horizon)*q*q)}for(let s of [-1,1]){let px=s<0?w*.08:w*.92;g.lineStyle(4,0x14152d);g.lineBetween(px,horizon-72,px,horizon+4);for(let i=0;i<4;i++){let a=i*Math.PI/2+.5;g.lineBetween(px,horizon-65,px+Math.cos(a)*30,horizon-65+Math.sin(a)*20)}}}}
 new Phaser.Game({type:Phaser.AUTO,parent:'game',backgroundColor:'#130c2d',scale:{mode:Phaser.Scale.RESIZE,width:innerWidth,height:innerHeight},scene:[Game]});
 $('start').onclick=()=>{$('overlay').hidden=true;start()};$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'♪':'♫';if(!muted)music()};
-setInterval(()=>{if(!playing)return;if(combo&&Date.now()-lastMove>=2100){combo=0;updateHud()}},300);
 })();
 </script></body></html>
