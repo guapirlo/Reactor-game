@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 3.4 · NEON IMPACT</title>
+<title>REACTOR 3.5 · MIAMI GLOW UP</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -115,8 +115,6 @@ button{font:inherit;cursor:pointer}
 #arcade-fx[data-effect="super"]{--fx:#77ffef;--hit:#43a9ff;--headline:clamp(20px,calc(var(--board-fx-span) * .084),45px)}
 #arcade-fx[data-effect="mega"]{--fx:#ffda9c;--hit:#ff4dbd;--headline:clamp(22px,calc(var(--board-fx-span) * .102),55px)}
 #arcade-fx[data-effect="overdrive"]{--fx:#8ffff9;--hit:#fa64c9;--headline:clamp(24px,calc(var(--board-fx-span) * .114),61px)}
-#arcade-fx[data-effect="phase"]{--fx:#e0a7ff;--hit:#ae67d9;--headline:clamp(15px,calc(var(--board-fx-span) * .061),33px)}
-#arcade-fx[data-effect="phase"] #announcement{font-style:normal;letter-spacing:.10em}
 #arcade-fx[data-effect="critical"]{--fx:#ff8e9c;--hit:#ea3a62}
 #arcade-fx.show .fx-seal{animation:fx-standard var(--fx-time) cubic-bezier(.17,.78,.24,1) both}
 #arcade-fx.show:is([data-effect="super"],[data-effect="mega"],[data-effect="overdrive"]) .fx-arc{display:block}
@@ -125,23 +123,52 @@ button{font:inherit;cursor:pointer}
 #arcade-fx.show[data-effect="super"] .fx-seal{animation-name:fx-super}
 #arcade-fx.show[data-effect="mega"] .fx-seal{animation-name:fx-mega}
 #arcade-fx.show[data-effect="overdrive"] .fx-seal{animation-name:fx-overdrive}
-#arcade-fx.show[data-effect="phase"] .fx-seal{animation-name:fx-phase}
 @keyframes fx-standard{0%{opacity:0;transform:translateY(8px) scale(.82)}23%{opacity:1;transform:scale(1.075)}65%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-13px) scale(.95)}}
 @keyframes fx-super{0%{opacity:0;transform:translateX(36%) skewX(-18deg)}23%{opacity:1;transform:translateX(-4%) skewX(-5deg)}64%{opacity:1;transform:none}100%{opacity:0;transform:translateX(-18%) skewX(-12deg)}}
 @keyframes fx-mega{0%{opacity:0;transform:translate(29%,-42px) rotate(-15deg) scale(.76)}24%{opacity:1;transform:translate(-4%,4px) rotate(-6deg) scale(1.13)}66%{opacity:1;transform:rotate(-3deg)}100%{opacity:0;transform:translate(-17%,23px) rotate(-8deg) scale(1.02)}}
 @keyframes fx-overdrive{0%{opacity:0;transform:scale(.53,1.24)}22%{opacity:1;transform:scale(1.11)}67%{opacity:1;transform:none}100%{opacity:0;transform:scale(1.16,.89)}}
-@keyframes fx-phase{0%{opacity:0;transform:translateY(12px) scaleX(.91)}27%,70%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-8px) scaleX(1.04)}}
 @keyframes fx-points{0%,16%{opacity:0;transform:translateY(7px)}35%,71%{opacity:1;transform:none}100%{opacity:.4;transform:translateY(-9px)}}
 @keyframes fx-lightning{0%,100%{opacity:0}21%{opacity:.88}59%{opacity:.21}}
 @media(max-width:360px){#pressure-state{font-size:7px}#reactor-meter .meter-label,#overdrive-status .meter-label{letter-spacing:0}#score-module{gap:5px;min-width:101px;padding-inline:5px}.best-readout{padding-left:4px}}
 @media(min-width:760px) and (max-height:500px) and (orientation:landscape){#pressure-state{display:none}#reactor-meter .meter-label{font-size:8px;letter-spacing:.025em}#score-module{justify-content:space-between}#score{font-size:21px}}
 @media(prefers-reduced-motion:reduce){#arcade-fx.show .fx-seal,#arcade-fx.show #announcement-points{animation:none!important}#arcade-fx.show .fx-arc{display:none!important}#reactor-meter .bar,#overdrive-status .energy::after{animation:none!important}.bar>div,#hud::before,#bottom::before{transition:none}}
+/* A separate ink and luminous fill keep the four feedback tiers readable. */
+#arcade-fx{--ink:#b1fff7;--ink-hi:#ecfffa;--ink-low:#25e6f1;--outline:#10122e}
+#arcade-fx[data-effect="super"]{--ink:#ffd45c;--ink-hi:#fff3aa;--ink-low:#ff9d35;--fx:#ffcc62;--hit:#ff780e}
+#arcade-fx[data-effect="mega"]{--ink:#ff63be;--ink-hi:#ffd266;--ink-low:#ff42af;--fx:#ff69ca;--hit:#e139a5}
+#arcade-fx[data-effect="overdrive"]{--ink:#55ffe3;--ink-hi:#dcf8ff;--ink-low:#22ddf1;--fx:#64f9f5;--hit:#cb66ff}
+#arcade-fx[data-effect="critical"]{--ink:#ff99a7;--ink-hi:#ffe5d7;--ink-low:#ff768e}
+#announcement{color:var(--ink);text-shadow:1px 2px var(--outline),0 0 7px var(--fx)}
+@supports (background-clip:text){
+  #announcement{background:linear-gradient(168deg,var(--ink-hi) 8%,var(--ink) 34%,var(--ink-low) 84%) 50% 50% / 100% 155%;background-clip:text;color:transparent;text-shadow:none;-webkit-text-stroke:.85px #17102d;filter:drop-shadow(0 2px 1px #0f0e27) drop-shadow(0 0 4px var(--fx))}
+  #arcade-fx.show #announcement{animation:ink-sheen var(--fx-time) ease-out both}
+}
+@keyframes ink-sheen{0%{background-position:50% 0%}34%{background-position:50% 100%}100%{background-position:50% 60%}}
+#overdrive-status{--reservoir-glow:#9a82ed;--reservoir-tip:#a3c7ff}
+#overdrive-status[data-level="1"]{--reservoir-glow:#78aeff;--reservoir-tip:#6cf8fa}
+#overdrive-status[data-level="2"]{--reservoir-glow:#71fff1;--reservoir-tip:#b4fffb}
+#overdrive-status[data-level="3"]{--reservoir-glow:#ff83e3;--reservoir-tip:#ffc4f4}
+#overdrive-status .energy-reservoir{isolation:isolate;overflow:hidden;border-color:#a99ce7a6;box-shadow:inset 0 1px 2px #05071f,0 0 5px #a891ff46;background:linear-gradient(#181932,#10172d)}
+#overdrive-status .energy-reservoir::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 calc(12.5% - 1px),#171334c9 calc(12.5% - 1px) 12.5%),repeating-linear-gradient(90deg,transparent 0 calc(25% - 1px),#eff8ffc4 calc(25% - 1px) 25%);background-blend-mode:screen}
+#overdrive-status .energy{background:linear-gradient(180deg,#fff5ff64,transparent 48%,#150f3a55),linear-gradient(90deg,#9561fa,#47e8ef 55%,#ff68d2);box-shadow:0 0 6px var(--reservoir-glow);border-radius:2px}
+#overdrive-status .energy::before{content:"";position:absolute;right:0;top:0;bottom:0;width:2px;background:var(--reservoir-tip);box-shadow:0 0 4px 1px var(--reservoir-tip)}
+#overdrive-status[data-level="2"] .energy::after,#overdrive-status[data-level="3"] .energy::after,#overdrive-status[data-state="active"] .energy::after{content:"";position:absolute;inset:0;width:46%;background:radial-gradient(ellipse at 20% 23%,#fff 0 1px,transparent 2px),radial-gradient(ellipse at 59% 74%,#fff 0 1px,transparent 2px),linear-gradient(103deg,transparent,#fff8,transparent);animation:reservoir-flow 1.9s linear infinite}
+#overdrive-status[data-state="active"]{--reservoir-tip:#fbffff;--reservoir-glow:#67fff6}
+#overdrive-status[data-state="active"] .energy-reservoir{border-color:#e6fff8;animation:reservoir-surge .65s ease-out both}
+#overdrive-status[data-state="active"] .energy{background:linear-gradient(180deg,#eafcff88,transparent 65%),linear-gradient(90deg,#af5af7,#30f8ee 48%,#ca8fff)}
+#overdrive-status[data-state="active"] .energy::after{animation-duration:1.05s}
+#overdrive-status[data-state="recovery"]{--reservoir-tip:#cdb5f6;--reservoir-glow:#8673ca}
+#overdrive-status[data-state="recovery"] .energy-reservoir{border-color:#8f7cb3a6}
+#overdrive-status[data-state="recovery"] .energy{background:linear-gradient(90deg,#4b518d,#8e78c2 70%,#c8acf4);box-shadow:none}
+@keyframes reservoir-flow{from{transform:translateX(-110%)}to{transform:translateX(240%)}}
+@keyframes reservoir-surge{0%{box-shadow:0 0 15px 1px #a5fff8d4}100%{box-shadow:0 0 6px #8cfff86d}}
+@media(prefers-reduced-motion:reduce){#arcade-fx.show #announcement,#overdrive-status .energy-reservoir,#overdrive-status .energy::after{animation:none!important}#overdrive-status .energy::after{display:none}}
 </style>
 </head>
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>3.4</span></div><div class="subtitle">Neon Impact</div></div>
+  <div><div class="brand">REACTOR <span>3.5</span></div><div class="subtitle">Miami Glow Up</div></div>
   <div class="stats" id="score-module"><div class="score-readout"><span class="stat-label">Score</span><strong id="score">0</strong></div><div class="best-readout"><span class="stat-label">Best</span><strong id="best">0</strong></div></div>
 </header>
 <div id="combo"></div>
@@ -156,10 +183,10 @@ button{font:inherit;cursor:pointer}
     <button id="music-toggle" aria-label="Musique" aria-pressed="true">♫</button>
     <button id="effects-toggle" aria-label="Effets sonores" aria-pressed="true">SFX</button>
   </div>
-  <div id="overdrive-status" data-state="charge"><div class="meter-label"><span class="energy-label">OVERDRIVE</span><span id="epct">CHARGE · 0%</span></div><div class="bar"><div id="efill" class="energy"></div></div></div>
+  <div id="overdrive-status" data-state="charge"><div class="meter-label"><span class="energy-label">OVERDRIVE</span><span id="epct">CHARGE · 0%</span></div><div class="bar energy-reservoir" aria-hidden="true"><div id="efill" class="energy"></div></div></div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 3.4 · MIAMI 1986</div><h1>NEON <span>IMPACT</span></h1>
+  <div class="eyebrow">REACTOR 3.5 · MIAMI 1986</div><h1>MIAMI <span>GLOW UP</span></h1>
   <p>Touche un groupe de deux cristaux ou plus. Les grands groupes réduisent la pression. Enchaîne les coups pour charger OVERDRIVE.</p>
   <button id="start">JOUER</button>
 </div></div>
@@ -182,10 +209,10 @@ const PRESSURE={
 };
 const CITY_TRANSITION_MS=6000;
 const CITY_PHASES=[
-  {score:0,title:'GOLDEN HOUR',sky:['#56355b','#ea7684','#ffbd84'],sun:1,lights:.52,night:0,reflection:.53,depth:.65},
-  {score:5000,title:'VIOLET HOUR',sky:['#171d4d','#65478f','#cd689b'],sun:.54,lights:.71,night:.23,reflection:.7,depth:.86},
-  {score:15000,title:'NEON NIGHTS',sky:['#060f30','#201c57','#654080'],sun:.12,lights:.94,night:.47,reflection:.87,depth:1.08},
-  {score:35000,title:'MIAMI AFTER DARK',sky:['#040719','#111636','#391a52'],sun:.02,lights:1,night:.68,reflection:1,depth:1.32}
+  {score:0,sky:['#62416e','#ec778f','#ffc68a'],sun:1,lights:.72,night:0,reflection:.65,depth:.65,glow:[0xffa46e,0xffc16e],halo:.31},
+  {score:5000,sky:['#303367','#8958af','#ee8bb4'],sun:.58,lights:.82,night:.19,reflection:.78,depth:.86,glow:[0xff78d3,0x9fa5ff],halo:.34},
+  {score:15000,sky:['#182b60','#45408f','#965aa9'],sun:.15,lights:.98,night:.38,reflection:.93,depth:1.08,glow:[0xff49c5,0x5dfcff],halo:.39},
+  {score:35000,sky:['#17234c','#38316f','#733c87'],sun:.025,lights:1,night:.52,reflection:1,depth:1.32,glow:[0xc578ff,0x47e5f8],halo:.45}
 ];
 const MAX_PARTICLES=80, FALL_MS=115;
 let board=[],score=0,pressure=PRESSURE.initial,energy=0,combo=0,lastMove=-Infinity;
@@ -196,7 +223,7 @@ let elapsed=0,nextDisturbance=DISTURBANCE_MS,overUntil=0,recoverUntil=0,settleEv
 let playing=false,busy=false,musicEnabled=true,effectsEnabled=true,scene=null,audio=null,musicClock=null,best=0;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const ANNOUNCEMENTS={
-  combo:[1,460],clear:[2,520],chain:[3,570],super:[4,720],phase:[5,1050],
+  combo:[1,460],clear:[2,520],chain:[3,570],super:[4,720],
   critical:[6,680],mega:[7,880],end:[8,580],overdrive:[9,1050],notice:[2,550]
 };
 let currentAnnouncement=null,announcementQueue=[],cityImpact=0,lastReactorTick=0;
@@ -525,6 +552,7 @@ function updateHud(){
   $('pfill').style.width=pressure+'%';
   const driveState=active?'active':remaining?'recovery':'charge';
   $('overdrive-status').dataset.state=driveState;
+  $('overdrive-status').dataset.level=String(Math.min(3,Math.floor(energy/25)));
   $('bottom').dataset.overdrive=driveState;
   $('epct').textContent=active?'×3 · '+overdriveSeconds(overUntil)+' s':remaining?'Récup. · '+remaining+' s':'Charge · '+energy+'%';
   $('efill').style.width=(active?100*(overUntil-elapsed)/OVERDRIVE_MS:remaining?100*(1-(recoverUntil-elapsed)/RECOVERY_MS):energy)+'%';
@@ -546,7 +574,7 @@ function flash(message,style='notice'){
   const [priority,duration]=ANNOUNCEMENTS[style];
   const event={message,style,priority,duration,expires:elapsed+1750};
   if(!currentAnnouncement||priority>currentAnnouncement.priority){
-    if(currentAnnouncement&&['phase','mega'].includes(currentAnnouncement.style)){
+    if(currentAnnouncement&&currentAnnouncement.style==='mega'){
       announcementQueue=announcementQueue.filter(item=>item.style!==currentAnnouncement.style);
       announcementQueue.push(currentAnnouncement);
       announcementQueue.sort((a,b)=>b.priority-a.priority);
@@ -616,7 +644,6 @@ function updateCityPhase(){
     cityFrom=cityMix.slice();
     cityPhase=phase;
     phaseStarted=elapsed;
-    flash(CITY_PHASES[cityPhase].title,'phase');
   }
   const ratio=Math.min(1,(elapsed-phaseStarted)/CITY_TRANSITION_MS);
   const ease=ratio*ratio*(3-2*ratio);
@@ -636,6 +663,29 @@ function makeCitySkies(game){
     texture.refresh();
     return game.add.image(0,0,key).setOrigin(0).setDepth(-9.8+index*.04);
   });
+}
+function makeNeonHalos(game){
+  const texture=game.textures.createCanvas('neon-halo',64,64);
+  const ctx=texture.context;
+  const halo=ctx.createRadialGradient(32,32,0,32,32,32);
+  halo.addColorStop(0,'#ffffffa8');
+  halo.addColorStop(.26,'#ffffff6c');
+  halo.addColorStop(.63,'#ffffff31');
+  halo.addColorStop(1,'#ffffff00');
+  ctx.fillStyle=halo;
+  ctx.fillRect(0,0,64,64);
+  texture.refresh();
+  return Array.from({length:4},(_,i)=>game.add.image(0,0,'neon-halo').setDepth(i<2?-7.6:-3.1));
+}
+function phaseGlow(side){
+  let red=0,green=0,blue=0;
+  for(let i=0;i<CITY_PHASES.length;i++){
+    const color=CITY_PHASES[i].glow[side], weight=cityMix[i];
+    red+=(color>>16)*weight;
+    green+=((color>>8)&255)*weight;
+    blue+=(color&255)*weight;
+  }
+  return (Math.round(red)<<16)|(Math.round(green)<<8)|Math.round(blue);
 }
 function makeCrystalTextures(game){
   const graphics=game.make.graphics({x:0,y:0,add:false});
@@ -691,12 +741,16 @@ function paintBoard(moved=[]){
   boardFrame.fillRoundedRect(left-7,top-7,cell*N+14,cell*N+14,14);
   boardFrame.lineStyle(4,0xff73ba,.17);
   boardFrame.strokeRoundedRect(left-8,top-8,cell*N+16,cell*N+16,15);
-  boardFrame.lineStyle(1.4,0xddc7ff,.64);
+  boardFrame.lineStyle(1.4,0xddc7ff,.76);
   boardFrame.strokeRoundedRect(left-7,top-7,cell*N+14,cell*N+14,14);
   boardFrame.lineStyle(2,0x71ffdf,.68);
   boardFrame.lineBetween(left-5,top+17,left-5,top+span*.51);
   boardFrame.lineStyle(2,0xff70b8,.62);
   boardFrame.lineBetween(left+span+5,top+span*.48,left+span+5,top+span-14);
+  boardFrame.lineStyle(1,0xffabdf,.63);
+  boardFrame.lineBetween(left+10,top-6,left+span*.32,top-6);
+  boardFrame.lineStyle(1,0xbaffef,.69);
+  boardFrame.lineBetween(left+span*.59,top+span+7,left+span-10,top+span+7);
   const origins=new Map(moved.map(([x,y,from])=>[y*N+x,from]));
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
     const index=y*N+x, gem=gems[index];
@@ -964,6 +1018,7 @@ class Game extends Phaser.Scene{
     this.signs=[];
     this.bg=this.add.graphics().setDepth(-10);
     this.skies=makeCitySkies(this);
+    this.halos=makeNeonHalos(this);
     this.sun=this.add.graphics().setDepth(-9);
     this.stars=this.add.graphics().setDepth(-9.2);
     this.cityShade=this.add.graphics().setDepth(-7.8);
@@ -1117,6 +1172,13 @@ class Game extends Phaser.Scene{
     this.cityShade.clear();
     this.cityWindows.clear();
     const hotelWidth=Math.max(48,Math.min(w*.26,132));
+    const span=this.cell*N, boardBottom=this.top+span;
+    const haloSize=Math.min(w*.52,245);
+    for(let i=0;i<2;i++){
+      const side=i===0?-1:1;
+      this.halos[i].setPosition(w/2+side*(w*.34),horizon+22).setDisplaySize(haloSize,haloSize*.7);
+      this.halos[i+2].setPosition(w/2+side*(span*.47),boardBottom+38).setDisplaySize(haloSize*1.25,haloSize*.47);
+    }
     this.hotel(w*.05,horizon+32,hotelWidth,hotelWidth*.83,0xeab2ba,0xffa46d,'PALOMA');
     this.hotel(w-hotelWidth-w*.045,horizon+39,hotelWidth,hotelWidth*.97,0xb8bedb,0x86f8e8,'MARÉE');
     city.fillStyle(0x201632,1);
@@ -1159,7 +1221,7 @@ class Game extends Phaser.Scene{
     lights.clear();
     for(const side of [-1,1]){
       const x=distance=>side<0?distance:w-distance;
-      const neon=side<0?0xff6db9:0x67eddc;
+      const neon=side<0?0xff5cbf:0x67fff0;
       const tint=side<0?0x9a5281:0x356e81;
       const amber=0xffa666;
       const rearRoof=top-Math.min(65,cell*1.75);
@@ -1191,7 +1253,9 @@ class Game extends Phaser.Scene{
         for(let col=0;col<2;col++){
           const a=edge*(.04+.33*col), b=a+edge*.23;
           body(g,0x17142d,1,[[a,y],[b,y+4],[b,y+height+4],[a,y+height]]);
-          body(lights,row%2===0?0xffcd98:neon,.72,[[a+2,y+2],[b-2,y+5],[b-2,y+height],[a+2,y+height-2]]);
+          body(lights,row%2===0?0xffd39c:neon,.86,[[a+2,y+2],[b-2,y+5],[b-2,y+height],[a+2,y+height-2]]);
+          lights.lineStyle(.8,0xffedf6,.55);
+          lights.lineBetween(x(a+2),y+2,x(b-2),y+5);
         }
         g.lineStyle(1,0xeeb4d7,.4);
         g.lineBetween(x(0),y+height+3,x(edge*.74),y+height+13);
@@ -1199,7 +1263,7 @@ class Game extends Phaser.Scene{
       const signX=x(edge*.42), signY=roof+Math.min(59,cell*1.04);
       g.fillStyle(0x171026,1);
       g.fillRoundedRect(signX-6,signY-10,12,65,4);
-      g.lineStyle(9,neon,.07);
+      g.lineStyle(9,neon,.12);
       g.strokeRoundedRect(signX-6,signY-10,12,65,4);
       g.lineStyle(5,neon,.21);
       g.strokeRoundedRect(signX-6,signY-10,12,65,4);
@@ -1209,8 +1273,12 @@ class Game extends Phaser.Scene{
       this.signs.push(this.add.text(signX,signY-3,label,{
         fontFamily:'monospace',fontSize:9,fontStyle:'bold',
         color:side<0?'#ffd3ec':'#cafff5',align:'center',lineSpacing:-1
-      }).setOrigin(.5,0).setDepth(-5.2).setShadow(0,0,side<0?'#ff429d':'#45e7d6',4));
-      g.lineStyle(3,neon,.18);
+      }).setOrigin(.5,0).setDepth(-5.2).setShadow(0,0,side<0?'#ff429d':'#45e7d6',6));
+      lights.lineStyle(5,neon,.18);
+      lights.lineBetween(x(edge*.74),roof+24,x(edge*.74),foot-5);
+      lights.lineStyle(1,neon,.78);
+      lights.lineBetween(x(edge*.74),roof+26,x(edge*.74),foot-5);
+      g.lineStyle(3,neon,.25);
       g.lineBetween(x(0),foot+23,x(edge*.74),foot+1);
       for(let i=0;i<9;i++){
         const y=foot+30+i*6;
@@ -1230,10 +1298,14 @@ class Game extends Phaser.Scene{
         if(y>h-8)break;
         const x=rail+side*(15+(i*29)%47);
         const color=i%3===0?0xffa26e:side<0?0xff56a8:0x51edda;
-        g.fillStyle(color,.07*(1-i/17));
+        g.fillStyle(color,.14*(1-i/17));
         g.fillEllipse(x,y,39+i*4,6);
-        g.fillStyle(color,.22*(1-i/17));
+        g.fillStyle(color,.37*(1-i/17));
         g.fillEllipse(x+side*5,y,18+i*3,2);
+        if(i%3===0){
+          g.lineStyle(.75,0xffe7f0,.38*(1-i/17));
+          g.lineBetween(x-5,y,x+12+i,y);
+        }
       }
     }
   }
@@ -1258,6 +1330,11 @@ class Game extends Phaser.Scene{
     g.fillRoundedRect(x+width*.32,y,width*.36,height,6);
     g.fillStyle(0x785179,.68);
     g.fillRect(x,y+height*.77,width,height*.23);
+    this.cityWindows.lineStyle(6,neon,.14);
+    this.cityWindows.lineBetween(x+5,y+12,x+width-5,y+12);
+    this.cityWindows.lineBetween(x+5,y+height*.76,x+width-5,y+height*.76);
+    this.cityWindows.lineStyle(1,0xffe8de,.62);
+    this.cityWindows.lineBetween(x+6,y+11,x+width-6,y+11);
     g.lineStyle(2,neon,1);
     g.lineBetween(x+3,y+12,x+width-3,y+12);
     g.lineBetween(x+3,y+height*.76,x+width-3,y+height*.76);
@@ -1275,6 +1352,8 @@ class Game extends Phaser.Scene{
       this.cityWindows.fillStyle(color,.36);
       const wx=x+width*(.11+.17*col),wy=y+height*(.26+row*.16);
       this.cityWindows.fillRoundedRect(wx,wy,width*.10,height*.095,2);
+      this.cityWindows.fillStyle(0xfff2dd,.43);
+      this.cityWindows.fillRect(wx+1,wy+1,width*.064,1);
     }
     const sign=this.add.text(x+width*.5,y+height*.84,name,{fontFamily:'monospace',
       fontSize:Math.max(8,Math.floor(width*.12)),fontStyle:'bold',color:name==='PALOMA'?'#fff1d0':'#e3fff8'});
@@ -1343,7 +1422,7 @@ class Game extends Phaser.Scene{
     l.fillEllipse(-15,this.h*.36+7,112,3);
   }
   animateCity(time){
-    let coverage=0,sun=0,lights=0,night=0,reflection=0,depth=0;
+    let coverage=0,sun=0,lights=0,night=0,reflection=0,depth=0,halo=0;
     for(let i=0;i<CITY_PHASES.length;i++){
       const weight=cityMix[i], phase=CITY_PHASES[i];
       coverage+=weight;
@@ -1353,6 +1432,7 @@ class Game extends Phaser.Scene{
       night+=weight*phase.night;
       reflection+=weight*phase.reflection;
       depth+=weight*phase.depth;
+      halo+=weight*phase.halo;
     }
     this.sun.setAlpha(sun*(.94+.06*Math.sin(time/1600)));
     this.stars.setAlpha(.13+night);
@@ -1363,10 +1443,15 @@ class Game extends Phaser.Scene{
     const danger=playing?Math.max(0,(pressure-60)/40):0;
     const sway=subdued?0:Math.sin(time/3400);
     this.edgeDanger.setAlpha(danger*.79);
+    for(let i=0;i<2;i++){
+      const tint=phaseGlow(i);
+      this.halos[i].setTint(tint).setAlpha(halo+impact*.11+(active?.10:0));
+      this.halos[i+2].setTint(tint).setAlpha((halo+impact*.18)*reflection+(active?.12:0));
+    }
     this.warmSpill.setAlpha(danger*.82);
     this.edgeElectric.setAlpha(active?(subdued?.58:.65+.13*Math.sin(time/240)):impact*.65);
     this.neonSpill.setAlpha(active?.87:impact*.58);
-    this.lightSweep.setVisible(!subdued).setX(time*.023%(this.w+135)-65).setAlpha(.48+impact*.35);
+    this.lightSweep.setVisible(!subdued).setX(time*.025%(this.w+135)-65).setAlpha(.59+impact*.31);
     this.cityWindows.setAlpha(Math.min(1,lights*(.82+(subdued?0:.16*Math.sin(time/1260)))+impact*.35+(active?.16:0)));
     this.sideLights.setAlpha(Math.min(1,lights*(.82+(subdued?0:.18*Math.sin(time/1020)))+impact*.29+(active?.19:0)));
     this.streetGlow.setAlpha(Math.min(1,reflection*(.82+(subdued?0:.17*Math.sin(time/1420)))+impact*.34+(active?.17:0)));
@@ -1374,13 +1459,13 @@ class Game extends Phaser.Scene{
     this.city.setX(depth*1.2*sway);
     this.cityShade.setX(this.city.x);
     this.cityWindows.setX(this.city.x);
-    this.glass.setAlpha(.30+(subdued?0:.20*Math.sin(time/1650))+impact*.30);
+    this.glass.setAlpha(.42+(subdued?0:.15*Math.sin(time/1950))+impact*.23);
     this.palms.forEach((p,i)=>p.setRotation((subdued?0:Math.sin(time/1900+i))*.025*depth));
     this.traffic.forEach((car,i)=>{
       const travel=(time*(i===0?.043:.036)+i*this.w*.47)%(this.w+115);
       car.setPosition(i===0?travel-55:this.w+55-travel,this.horizon+46+i*8);
     });
-    this.signs.forEach((sign,i)=>sign.setAlpha(Math.min(1,lights*(.85+(subdued?0:.15*Math.sin(time/730+i)))+impact*.4+(active?.15:0))).setX(sign.homeX+1.5*sway));
+    this.signs.forEach((sign,i)=>sign.setAlpha(Math.min(1,lights*(.93+(subdued?0:.07*Math.sin(time/960+i)))+impact*.4+(active?.15:0))).setX(sign.homeX+1.5*sway));
   }
 }
 const reactor=new Phaser.Game({type:Phaser.AUTO,parent:'game',backgroundColor:'#130c2d',scale:{mode:Phaser.Scale.NONE,width:innerWidth,height:innerHeight},scene:[Game]});
