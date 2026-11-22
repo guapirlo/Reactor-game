@@ -596,6 +596,70 @@ body[data-storm="true"] #game::after{content:"";position:absolute;inset:0 0 auto
 @keyframes storm-air{0%,72%,100%{opacity:.12}79%{opacity:.52}90%{opacity:.22}}
 @media(prefers-reduced-motion:reduce){body[data-storm="true"] #game::after{animation:none;opacity:.12}}
 html[data-reduce-motion="true"] body[data-storm="true"] #game::after{animation:none;opacity:.12}
+#campaign-menu{width:min(100%,555px);scroll-behavior:smooth;scroll-padding-top:60px;background:#111025}
+#campaign-menu .campaign-tools{position:sticky;top:0;z-index:4;padding:5px 0;background:#151328f5}
+.campaign-chapter{aspect-ratio:360/530;padding:0;margin:6px 0;border-radius:7px;animation:none;background:#252146}
+.campaign-chapter::before,.campaign-route::before{content:none}
+.campaign-chapter .chapter-art{opacity:1}
+.campaign-chapter>h3,.campaign-chapter>p{position:absolute;left:10px;margin:0;background:#251936dc;border:1px solid #fff5;color:white;border-radius:4px;padding:4px 7px}
+.campaign-chapter>h3{top:8px}
+.campaign-chapter>p{top:41px;font-size:10px}
+.miami-letter{font-family:system-ui,sans-serif;font-weight:1000;font-style:italic;letter-spacing:-.065em;line-height:.96;text-transform:uppercase;text-shadow:0 2px #6a336b,0 0 9px #d94cb378}
+#mission-title,#panel .miami-letter{font-size:clamp(29px,7.5vw,52px);color:#f9eeff;overflow-wrap:anywhere}
+.campaign-route{position:absolute;inset:0;display:block;margin:0}
+#arcade-menu .level-node{
+  position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:clamp(44px,13vw,60px);height:clamp(44px,13vw,60px);transform:translate(-50%,-50%);
+  min-height:44px;padding:0;gap:0;letter-spacing:0;background:#292147;border:2px solid #aafff7;border-radius:50%;
+  box-shadow:0 0 9px #5fffdb69,0 4px #382151;touch-action:pan-y
+}
+#arcade-menu .level-node[data-locked=true]{border-color:#cbb3e4;background:#27233e;opacity:.93;box-shadow:0 4px #25203e}
+#arcade-menu .level-node[data-current=true]{animation:map-current 1.55s ease-in-out infinite;border-color:#ffca9d!important}
+.level-number{width:auto;height:auto;border:0;font-size:clamp(15px,4.5vw,22px);font-style:italic;font-weight:950;color:#fdfeff}
+.level-lock{font-size:11px;line-height:12px;color:#ffe1bd}
+.level-node small{position:absolute;top:calc(100% + 2px);padding:2px 5px;border-radius:5px;background:#20132f;color:#ffe0a1;line-height:1;white-space:nowrap;font-size:12px;text-shadow:0 1px #161329}
+.campaign-landmarks{position:absolute;right:5px;bottom:6px}
+#arcade-menu .campaign-landmarks button{font-size:16px}
+.map-car{animation:map-car 7s ease-in-out infinite alternate}
+.map-boat{animation:map-boat 4s ease-in-out infinite}
+.map-storefront{animation:map-sign 3.6s ease-in-out infinite}
+.map-palm{transform-box:fill-box;transform-origin:center;animation:map-palm 4.8s ease-in-out infinite}
+.map-water{animation:map-sign 5.4s ease-in-out infinite}
+@keyframes map-car{to{transform:translate(-59px,0)}}
+@keyframes map-boat{50%{transform:translate(2px,2px)}}
+@keyframes map-sign{50%{opacity:.68}}
+@keyframes map-palm{50%{transform:rotate(5deg)}}
+@keyframes map-current{50%{box-shadow:0 0 21px #ffd98acc,0 4px #382151}}
+#panel .victory-stars{font-size:clamp(40px,14vw,73px);line-height:1;margin:3px auto;text-shadow:0 0 20px #ffd68588;animation:map-award .65s cubic-bezier(.23,.83,.38,1) both}
+@keyframes map-award{from{transform:scale(.73);opacity:.38}to{transform:none;opacity:1}}
+#comic{width:min(94vw,840px);max-height:94dvh;padding:11px;border:1px solid #f99bd6;border-radius:12px;background:#130f24;color:#fff;box-shadow:0 0 32px #ff6bc779}
+#comic::backdrop{background:#08051adf}
+#comic h2{font-size:clamp(18px,5vw,36px);margin:4px 0 9px}
+.comic-picture{width:100%;aspect-ratio:16/9;max-height:53dvh;overflow:hidden;position:relative;background:#0b0915;border:1px solid #d487ce}
+.comic-picture img{display:block;width:100%;height:100%;object-fit:contain;background:#0b0915;animation:comic-push var(--shot-duration) linear both;will-change:transform,opacity}
+.comic-picture img[data-motion=pan-right]{animation-name:comic-pan}
+.comic-picture img[data-motion=pull-out]{animation-name:comic-pull}
+.comic-picture[data-paused=true] img{animation-play-state:paused}
+.comic-picture::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 16px #8942a875}
+.comic-dialogue{min-height:2.7em;font:700 clamp(14px,3.5vw,20px)/1.3 system-ui;color:#fff5ff;margin:9px 0}
+.comic-controls{display:flex;flex-wrap:wrap;gap:5px}
+.comic-controls button{flex:1 1 auto;min-height:44px;border:1px solid #b5b3eb;border-radius:6px;padding:5px 7px;background:#2b2141;color:white;font-size:13px}
+@keyframes comic-push{0%{opacity:0;transform:scale(1)}8%{opacity:1}100%{opacity:1;transform:scale(1.09)}}
+@keyframes comic-pan{0%{opacity:.1;transform:scale(1.08) translateX(-2%)}8%{opacity:1}100%{opacity:1;transform:scale(1.12) translateX(3%)}}
+@keyframes comic-pull{0%{opacity:.12;transform:scale(1.13)}8%{opacity:1}100%{opacity:1;transform:scale(1)}}
+#celebration .king-medal{margin:8px auto;width:clamp(76px,26vw,140px);aspect-ratio:1;display:grid;place-items:center;border:6px double #fff1b2;border-radius:50%;background:radial-gradient(circle at 27% 22%,#fff5cb,#dea959 60%,#944d4a);font:900 clamp(38px,13vw,69px)/1 system-ui;color:#5a3555;box-shadow:0 0 22px #ffcd8690;animation:map-award .55s both}
+#celebration-stars{font-weight:900;color:#ffde89}
+@media(max-height:470px) and (orientation:landscape){#comic{width:min(92vw,700px)} .comic-picture{max-height:49dvh}}
+@media(prefers-reduced-motion:reduce){
+  #campaign-menu{scroll-behavior:auto}
+  .map-car,.map-boat,.map-storefront,.map-palm,.map-water,#arcade-menu .level-node[data-current=true],#panel .victory-stars,.comic-picture img,#celebration .king-medal{animation:none!important;will-change:auto}
+}
+html[data-reduce-motion=true] #campaign-menu{scroll-behavior:auto}
+html[data-reduce-motion=true] :is(.map-car,.map-boat,.map-storefront,.map-palm,.map-water,.level-node,.victory-stars,.comic-picture img,.king-medal){animation:none!important;will-change:auto}
+
+#campaign-menu>h2{font-family:"Brush Script MT","Segoe Script",cursive;font-style:italic;letter-spacing:.015em;color:#ffe2ed;text-shadow:0 0 12px #ff72c6}
+#campaign-menu .archive-films{position:static}#chapter-films[hidden]{display:none}
+.campaign-chapter[data-offscreen=true] :is(.map-car,.map-boat,.map-storefront,.map-palm,.map-water,.level-node){animation-play-state:paused!important}
 </style>
 </head>
 <body data-mode="menu">
@@ -693,10 +757,11 @@ html[data-reduce-motion="true"] body[data-storm="true"] #game::after{animation:n
     <div class="campaign-tools"><button id="current-level" data-i18n="current">Current level</button><button id="replay-celebration" data-i18n="celebrate" hidden>Replay celebration</button></div>
     <p id="campaign-secret" role="status"></p>
     <div id="campaign-map"></div>
+    <div id="chapter-films" class="campaign-tools archive-films" hidden></div>
     <button class="back" data-back-to="adventure" data-back data-i18n="back">Back</button>
   </section>
   <section id="mission-menu" class="hub-page hub-card" hidden>
-    <p id="mission-family"></p><h2 id="mission-title"></h2>
+    <p id="mission-family"></p><h2 id="mission-title" class="miami-letter"></h2><p id="mission-stars"></p>
     <h3 data-i18n="requirements">Objectives</h3><ul id="mission-goals"></ul>
     <p id="mission-limits"></p><p id="mission-obstacles"></p><p data-i18n="starHelp"></p>
     <p id="mission-locked" role="status"></p>
@@ -796,16 +861,26 @@ html[data-reduce-motion="true"] body[data-storm="true"] #game::after{animation:n
     <div class="training-actions"><button id="training-skip" type="button" data-i18n="skip">Skip</button><button id="training-next" type="button"></button></div>
   </div>
 </dialog>
+<dialog id="comic" aria-labelledby="comic-title">
+  <h2 id="comic-title" class="miami-letter"></h2>
+  <div class="comic-picture"></div>
+  <p class="comic-dialogue" aria-live="polite"></p>
+  <div class="comic-controls">
+    <button type="button" data-comic-skip></button><button type="button" data-comic-next></button>
+    <button type="button" data-comic-replay></button><button type="button" data-comic-mute></button>
+  </div>
+</dialog>
 <dialog id="celebration" aria-labelledby="celebration-title">
   <div class="legend-skyline" aria-hidden="true"></div>
-  <h2 id="celebration-title" data-i18n="legend">Miami Legend</h2><p id="celebration-name"></p>
+  <div class="king-medal" aria-hidden="true">★</div>
+  <h2 id="celebration-title" class="miami-letter">KING OF MIAMI</h2><p id="celebration-name"></p><p id="celebration-stars"></p>
   <p data-i18n="legendEarned">Miami campaign completed</p>
   <form method="dialog"><button data-i18n="back">Back</button></form>
 </dialog>
 <div id="achievement-notice" role="status" hidden></div>
 <div id="overlay" hidden><div id="panel"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
-<script src="./js/adventure.js"></script><script src="./js/profile.js"></script><script src="./js/locale.js"></script><script>
+<script src="./js/cutscenes.js"></script><script src="./js/adventure.js"></script><script src="./js/profile.js"></script><script src="./js/locale.js"></script><script>
 (()=>{'use strict';
 const N=7;
 const $=id=>document.getElementById(id),rand=()=>Math.floor(Math.random()*C.length);
@@ -1347,7 +1422,7 @@ function tryMenuTrack(fromGesture){
   return true;
 }
 function syncMenuAmbience(fromGesture=false){
-  if(menuWaitingForGameplay||runMode!=='menu')return;
+  if(menuWaitingForGameplay||runMode!=='menu'||$('comic')?.open)return;
   if(!musicEnabled||document.hidden||musicVolume()===0){
     stopMenuAmbience();
     return;
@@ -2064,7 +2139,12 @@ function finish(result='reactor'){
   $('overlay').dataset.shutdown=String(result==='reactor');
   $('overlay').hidden=false;
   notifyProgress(progression);
-  if(document.body&&won&&adventureRun?.level.number===20)showCelebration();
+  if(document.body&&won&&ReactorCutscenes.finaleLevels.includes(adventureRun?.level.number)){
+    const completed=adventureRun;
+    setTimeout(()=>{
+      if(adventureRun===completed&&!completed.cinematicRequested&&runMode==='ended'&&!$('overlay').hidden)replayChapter(completed.level.number);
+    },1050);
+  }
 }
 function changePressure(amount){
   pressure=Math.max(0,Math.min(100,pressure+amount));
@@ -3673,6 +3753,7 @@ function resizeGame(){
 window.addEventListener('resize',resizeGame);
 window.visualViewport?.addEventListener('resize',resizeGame);
 function showScreen(next){
+  campaignObserver?.disconnect();
   stopWorldGlobe?.();
   stopWorldGlobe=null;
   if(runMode==='menu'){
@@ -4157,19 +4238,37 @@ function discoverCampaignSecret(name){
   notifyProgress(result);
   cue('achievement');
 }
+const routePoints=[[92,112],[243,191],[160,283],[293,370],[120,468]];
+const mapInk={
+  golden:['#d98c8b','#3d8c95','#ffde99'],
+  violet:['#8563b1','#263e70','#f4a8fc'],
+  neon:['#3c2869','#212756','#82fff2'],
+  midnight:['#241e52','#101c36','#fa94ec']
+};
 function chapterArt(theme){
   const g=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  g.setAttribute('viewBox','0 0 360 300');
+  g.setAttribute('viewBox','0 0 360 530');
   g.setAttribute('preserveAspectRatio','none');
   g.setAttribute('aria-hidden','true');
   g.classList.add('chapter-art');
-  const shapes={
-    golden:'<path d="M0 132Q104 80 175 157T360 222V300H0Z" fill="#38e2d8"/><path d="M0 223Q147 106 189 186T360 242" fill="none" stroke="#ffdda3" stroke-width="38"/><path d="M289 195q-7-48 0-106m0 4q-24-19-59-8m59 8q24-24 52-15m-52 15q-14-36-35-35" stroke="#46214d" stroke-width="6" fill="none"/>',
-    violet:'<path fill="#f098e4" d="M26 295V105H41V84H83V105H102V295ZM126 295V91H149V65H209V91H237V295ZM253 295V116H316V91H326V116H340V295Z"/><path d="M50 130v145m29-145v145m74-150v155m46-155v155m82-140v140m38-140v140" stroke="#422440" stroke-width="6" stroke-dasharray="8 12"/>',
-    neon:'<path d="M0 256L27 125 99 108 129 192 146 76 195 56 219 183 274 114 360 139V300H0Z" fill="#352354"/><path d="M25 226l24-91 51-14m54 84 12-113 31-12m64 166 20-114 74 23" fill="none" stroke="#5bfce9" stroke-width="5"/><path d="M46 183l49-10m74-14 33-6m89 35 60 7" stroke="#ff52c7" stroke-width="12"/>',
-    midnight:'<path d="M0 300V221H34V167H71V207H112V158H162V208H199V133H236V191H273V161H304V203H360V300Z" fill="#141927"/><path d="M274 34l-27 28 16 9-41 46 17-39-16-10 36-41Z" fill="#c5aaff"/><path d="M77 288l145-78m-77 87 120-82m-33 85 58-66" fill="none" stroke="#d276f4" stroke-width="3"/>'
+  const [sky,sea,trim]=mapInk[theme];
+  const route='M180 0 C180 52 92 55 92 112 S243 146 243 191 S160 236 160 283 S293 321 293 370 S120 419 120 468 S180 496 180 530';
+  const land='M0 108 Q83 70 199 128 T360 100 V530 H0 Z';
+  const shore='M0 430 Q101 361 152 417 T360 475 V530 H0Z';
+  const hotels=[22,151,277].map((x,i)=>{
+    const y=34+i*12,w=53+i*3,h=48-i*3;
+    const windows=Array.from({length:12},(_,j)=>'<rect x="'+(x+9+j%4*10)+'" y="'+(y+13+Math.floor(j/4)*9)+'" width="4" height="3" fill="'+trim+'"/>').join('');
+    return '<g><path d="M'+x+' '+(y+h)+'V'+y+'h10v-7h32v7h'+(w-42)+'v'+h+'z" fill="#292344" stroke="'+trim+'"/>'+windows+'<path d="M'+(x-4)+' '+(y+39)+'h'+(w+8)+'" stroke="'+trim+'"/></g>';
+  }).join('');
+  const palms=[[27,146],[332,233],[51,368]].map(([x,y])=>'<g transform="translate('+x+' '+y+')"><path d="M0 43Q-5 16 2-4" stroke="#282143" stroke-width="5" fill="none"/><g class="map-palm"><path d="M2-4Q-19-21-31-3Q-14-9 0-2Q-12 4-20 17Q-4 7 3-4Q13-3 28 8Q23-8 4-6Q15-19 27-19Q10-26 2-4Q-1-26-14-26Q-6-20 2-4" fill="#263451" stroke="'+trim+'" stroke-width=".6"/></g></g>').join('');
+  const areas={
+    golden:'<path d="'+shore+'" fill="#eaa984"/><path class="map-water" d="M0 470Q92 410 156 462T360 510V530H0z" fill="#54abc0"/><g fill="#f9accc" stroke="#ffe9ac"><path d="M43 266q15-17 30 0z"/><path d="M68 310q15-17 30 0z"/><path d="M297 286q15-17 30 0z"/></g><path d="M58 266v14m25 30v14m229-38v14" stroke="#ffe6c6"/><path d="M15 315h25m-30 10h23m310 25h13" stroke="#c9ffff"/>',
+    violet:'<path class="map-water" d="M0 207Q94 227 100 317T0 487z M360 256Q281 286 275 372T360 469z" fill="#6366ad"/><path d="M0 271h66v9H0zm0 47h48v9H0zm360 45h-54v8h54z" fill="#cf98bc"/><g fill="#ffd6ee" class="map-boat"><path d="M24 292h42l-7 5H31zm272 113h40l-9 6h-23z"/><path d="M45 272v20h13zM315 383v22h13z"/></g><path d="M19 305h36m254 117h37m-301-70h25" stroke="#a9edff" opacity=".75"/>',
+    neon:'<path d="M18 253h85v81H18z" fill="#204361" stroke="#81ffef"/><path d="M29 263h62v60H29z M60 263v60" fill="none" stroke="#ffd49c"/><circle cx="60" cy="293" r="10" fill="none" stroke="#ffd49c"/><path d="M278 267h67v65h-67z" fill="#2a2048" stroke="#ff78d5"/><path class="map-storefront" d="M285 282h53m-46 18h41m-40 12h25" stroke="#ff8ede" stroke-width="5"/><path d="M280 252h60m-320 92h90" stroke="#95f9ff"/>',
+    midnight:'<path d="M0 395v-70h23v-44h21v37h17v-36h32v40h19v56h44v-42h22v-50h24v68h37v-50h27v-29h27v55h21v-31h46v96z" fill="#171c37" stroke="#766bd2"/><path class="map-storefront" d="M30 310v33m47-46v37m111-29v46m85-55v50m55-24v29" stroke="#f584ef" stroke-width="4" stroke-dasharray="3 7"/><path d="M319 267l-34 57 21-8-22 43 48-59-22 9z" fill="#d3baff" opacity=".65"/>'
   };
-  g.innerHTML=shapes[theme]||'';
+  g.innerHTML='<rect width="360" height="530" fill="'+sky+'"/><circle cx="309" cy="58" r="41" fill="'+trim+'" opacity=".69"/><path d="'+land+'" fill="'+sea+'"/><path d="'+shore+'" fill="#241f45" opacity=".5"/>'+areas[theme]+hotels+palms+
+    '<path d="'+route+'" stroke="#fd9adc" stroke-opacity=".42" stroke-width="30" fill="none"/><path d="'+route+'" stroke="#271d41" stroke-width="25" fill="none"/><path d="'+route+'" stroke="#ffc49c" stroke-width="1.4" stroke-dasharray="5 5" fill="none"/><g class="map-car"><rect x="316" y="181" width="23" height="8" rx="3" fill="#ff9fce"/><path d="M319 181l4-4h10l4 4" fill="#92fff5"/><path d="M340 184h7" stroke="#ffe4aa"/></g>';
   return g;
 }
 function renderCampaign(){
@@ -4184,17 +4283,23 @@ function renderCampaign(){
     const aerial=playerNode('section',undefined,'campaign-chapter');
     aerial.append(chapterArt(chapter.theme));
     aerial.dataset.chapter=chapter.theme;
-    aerial.append(playerNode('h3',t('chapter',{n:index+1})+' · '+chapter.name),
+    aerial.append(playerNode('h3',t('chapter',{n:index+1})+' · '+chapter.name,'miami-letter'),
       playerNode('p',t('rewards')+' · '+t(rewardKeys[chapter.reward])));
     const route=playerNode('div',undefined,'campaign-route');
-    for(const level of campaign.levels.filter(item=>item.chapter===index)){
+    for(const [slot,level] of campaign.levels.filter(item=>item.chapter===index).entries()){
       const earned=playerProfile.state.campaign.levels[level.number]?.stars||0;
+      const locked=level.number>unlocked;
       const button=uiButton('',()=>{selectedLevel=level.number;showScreen('mission');});
       button.className='level-node';
       button.dataset.current=String(level.number===unlocked&&!earned);
-      button.dataset.locked=String(level.number>unlocked);
-      button.append(playerNode('span',String(level.number),'level-number'),playerNode('strong',level.title),
-        playerNode('small',level.number>unlocked?'◇':'★'.repeat(earned)+'☆'.repeat(3-earned)));
+      button.dataset.locked=String(locked);
+      button.setAttribute('aria-label',t('level',{n:level.number})+' '+level.title+' · '+(locked?t('locked',{n:level.number-1}):t('stars')+' '+earned+' / 3'));
+      button.setAttribute('aria-current',button.dataset.current==='true'?'step':'false');
+      button.style.left=routePoints[slot][0]/360*100+'%';
+      button.style.top=routePoints[slot][1]/530*100+'%';
+      button.append(playerNode('span',String(level.number),'level-number'));
+      if(locked)button.append(playerNode('span','🔒','level-lock'));
+      else button.append(playerNode('small','★'.repeat(earned)+'☆'.repeat(3-earned)));
       route.append(button);
     }
     const scenery=playerNode('div',undefined,'campaign-landmarks');
@@ -4206,14 +4311,30 @@ function renderCampaign(){
     aerial.append(route,scenery);
     map.append(aerial);
   }
-  const node=map.querySelector('[data-current="true"]');
-  // Offer a shortcut without moving focus on each return from the preview.
+  if(typeof IntersectionObserver==='function'){
+    campaignObserver=new IntersectionObserver(entries=>{
+      for(const entry of entries)entry.target.dataset.offscreen=String(!entry.isIntersecting);
+    },{root:$('campaign-menu')});
+    for(const chapter of map.children)campaignObserver.observe(chapter);
+  }
+  const node=map.querySelector('[data-current="true"]')||map.querySelector('.campaign-chapter:last-child .level-node:last-child');
   $('current-level').onclick=()=>node?.scrollIntoView({block:'center',behavior:reducedMotion.matches?'instant':'smooth'});
+  requestAnimationFrame(()=>{if(screen==='campaign')node?.scrollIntoView({block:'center',behavior:'instant'});});
+  const archive=$('chapter-films');
+  archive.replaceChildren();
+  for(const level of ReactorCutscenes.finaleLevels){
+    if(!playerProfile.state.campaign.levels[level])continue;
+    const button=uiButton(t('replayFilm')+' · '+campaign.chapters[level/5-1].name,()=>replayChapter(level));
+    archive.append(button);
+  }
+  archive.hidden=!archive.childElementCount;
 }
 function renderMission(){
   const level=campaign.levels[selectedLevel-1], unlocked=profiles.unlockedLevel(playerProfile.state);
   $('mission-title').textContent=level.title;
-  $('mission-family').textContent=t('level',{n:level.number})+' · '+t('family'+level.family);
+  $('mission-family').textContent=t('chapter',{n:level.chapter+1})+' · '+campaign.chapters[level.chapter].name+' / '+t('level',{n:level.number})+' · '+t('family'+level.family);
+  const earned=playerProfile.state.campaign.levels[level.number]?.stars||0;
+  $('mission-stars').textContent=t('stars')+' · '+'★'.repeat(earned)+'☆'.repeat(3-earned)+' · '+earned+' / 3';
   const constraints=[
     level.moves!==null?t('moves')+' '+level.moves:'',
     level.time!==null?t('time')+' '+level.time+' s':''
@@ -4267,19 +4388,55 @@ function renderResult(result,stars){
     return;
   }
   const won=result==='win', level=adventureRun.level;
-  panel.append(playerNode('div',t(won?'win':'loss'),'eyebrow'),playerNode('h1',level.title));
-  if(won)panel.append(playerNode('p','★'.repeat(stars)+'☆'.repeat(3-stars)+' · '+formatNumber(score),'victory-stars'));
+  panel.append(playerNode('div',t(won?'win':'loss'),'eyebrow'),playerNode('h1',level.title,'miami-letter'));
+  if(won)panel.append(playerNode('p','★'.repeat(stars)+'☆'.repeat(3-stars),'victory-stars'),playerNode('p',t('score')+' '+formatNumber(score)));
   else panel.append(playerNode('p',t({reactor:'reactor',moves:'outMoves',time:'outTime'}[result])));
   if(won&&level.reward)panel.append(playerNode('p',t('rewards')+' · '+t(rewardKeys[level.reward])));
   if(won&&level.number===20)panel.append(playerNode('p',playerProfile.state.player.nickname+' · '+t('legend')));
-  panel.append(uiButton(t('replay'),()=>{pendingMission=level;$('overlay').hidden=true;start();}));
-  if(won&&level.number<20)panel.append(uiButton(t('next'),()=>{returnToMenu('campaign');launchMission(level.number+1);}));
+  panel.append(uiButton(t('replay'),()=>{selectedLevel=level.number;returnToMenu('mission');}));
+  if(won&&level.number<20)panel.append(uiButton(t('continue'),()=>{selectedLevel=level.number+1;returnToMenu('mission');}));
+  if(won&&ReactorCutscenes.finaleLevels.includes(level.number))panel.append(uiButton(t('replayFilm'),()=>replayChapter(level.number)));
   panel.append(uiButton(t('campaign'),()=>returnToMenu('campaign')));
   if(won&&level.number===20)panel.append(uiButton(t('celebrate'),()=>{returnToMenu('campaign');showCelebration();}));
 }
+let comicManifest,comicPlayer,comicPending=false,campaignObserver;
+function replayChapter(level){
+  if(!playerProfile.state.campaign.levels[level]||$('comic').open||$('celebration').open||comicPending)return;
+  if(runMode==='ended'&&adventureRun?.level.number===level)adventureRun.cinematicRequested=true;
+  const origin={mode:runMode,screen,run:adventureRun};
+  comicPending=true;
+  const manifest=new URL('./assets/cutscenes/miami/scenes.json',location.href);
+  comicManifest??=fetch(manifest)
+    .then(response=>{if(!response.ok)throw Error('HTTP '+response.status);return response.json();})
+    .then(json=>ReactorCutscenes.normalize(json,manifest))
+    .catch(error=>{console.warn('Miami cutscenes:',error);return new Map();});
+  const stillHere=()=>origin.mode===runMode&&origin.screen===screen&&origin.run===adventureRun;
+  comicManifest.then(scenes=>{
+    const scene=scenes.get(level);
+    if(!stillHere()){comicPending=false;return;}
+    if(!scene){comicPending=false;if(level===20)showCelebration();return;}
+    comicPlayer??=ReactorCutscenes.makePlayer($('comic'),{
+      reducedMotion:()=>reducedMotion.matches,
+      language:()=>playerProfile.state.settings.language,strings:t,
+      music:SKINS.miami.menu.music,volume:musicVolume,enabled:()=>musicEnabled,
+      toggle:()=>setMusicEnabled(!musicEnabled)
+    });
+    stopMenuAmbience();
+    stopMusic(180,()=>{
+      comicPending=false;
+      if(!stillHere())return;
+      comicPlayer.open(scene,()=>{
+        if(level===20)showCelebration();
+        else if(runMode==='menu')syncMenuAmbience(true);
+      });
+    });
+  });
+}
 function showCelebration(){
   if(!playerProfile.state.campaign.levels[20])return;
+  if($('celebration').open)return;
   $('celebration-name').textContent=playerProfile.state.player.nickname;
+  $('celebration-stars').textContent='★ '+profiles.totals(playerProfile.state).stars+' / 60 · '+t('stars');
   $('celebration').style.setProperty('--skyline-preview','url('+MIAMI_PREVIEW+')');
   $('celebration').showModal();
   cue('record');
@@ -4548,6 +4705,7 @@ if(document.body){
     $('nickname-status').textContent=t(valid?'saved':'badName');
   };
   $('replay-celebration').onclick=showCelebration;
+  $('celebration').addEventListener('close',()=>{if(runMode==='menu')syncMenuAmbience(true);});
   persistOptions();
   setMode('menu');
   if(!readStore(TRAINING_KEY).status&&!best&&!Object.values(unlocks).some(Boolean))openTraining(true);
