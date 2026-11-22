@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 3.8 · MIAMI ALIVE</title>
+<title>REACTOR 3.9 · NEON TAKEOVER</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -50,7 +50,7 @@ button{font:inherit;cursor:pointer}
 .results strong{display:block;color:var(--gold);font-size:24px;font-variant-numeric:tabular-nums}
 @media(max-width:360px){.stats{gap:6px}.brand{font-size:16px}#hud{padding-inline:9px}}
 @media(max-height:480px){#panel{padding:12px 18px}#panel h1{font-size:27px}#panel p{margin:6px 0}#combo{top:calc(62px + env(safe-area-inset-top))}}
-@media (min-width:760px) and (max-height:500px) and (orientation:landscape){
+@media (min-width:600px) and (max-height:500px) and (orientation:landscape){
   #hud{width:156px;right:auto;top:calc(14px + env(safe-area-inset-top));grid-template-columns:1fr;gap:8px}
   .stats{text-align:left}
   #bottom{width:156px;left:auto;bottom:calc(12px + env(safe-area-inset-bottom));grid-template-columns:1fr;padding:8px}
@@ -130,7 +130,7 @@ button{font:inherit;cursor:pointer}
 @keyframes fx-points{0%,16%{opacity:0;transform:translateY(7px)}35%,71%{opacity:1;transform:none}100%{opacity:.4;transform:translateY(-9px)}}
 @keyframes fx-lightning{0%,100%{opacity:0}21%{opacity:.88}59%{opacity:.21}}
 @media(max-width:360px){#pressure-state{font-size:7px}#reactor-meter .meter-label,#overdrive-status .meter-label{letter-spacing:0}#score-module{gap:5px;min-width:101px;padding-inline:5px}.best-readout{padding-left:4px}}
-@media(min-width:760px) and (max-height:500px) and (orientation:landscape){#pressure-state{display:none}#reactor-meter .meter-label{font-size:8px;letter-spacing:.025em}#score-module{justify-content:space-between}#score{font-size:21px}}
+@media(min-width:600px) and (max-height:500px) and (orientation:landscape){#pressure-state{display:none}#reactor-meter .meter-label{font-size:8px;letter-spacing:.025em}#score-module{justify-content:space-between}#score{font-size:21px}}
 @media(prefers-reduced-motion:reduce){#arcade-fx.show .fx-seal,#arcade-fx.show #announcement-points{animation:none!important}#arcade-fx.show .fx-arc{display:none!important}#reactor-meter .bar,#overdrive-status .energy::after{animation:none!important}.bar>div,#hud::before,#bottom::before{transition:none}}
 /* A separate ink and luminous fill keep the four feedback tiers readable. */
 #arcade-fx{--ink:#b1fff7;--ink-hi:#ecfffa;--ink-low:#25e6f1;--outline:#10122e}
@@ -188,7 +188,7 @@ button{font:inherit;cursor:pointer}
 #overdrive-status[data-compact="true"] .energy-reservoir{height:8px}
 #bottom{padding-block:9px;gap:0 11px}
 #bottom .audio-toggles{grid-row:1}
-@media(min-width:760px) and (max-height:500px) and (orientation:landscape){#bottom{row-gap:7px}#bottom .audio-toggles{grid-row:2}}
+@media(min-width:600px) and (max-height:500px) and (orientation:landscape){#bottom{row-gap:7px}#bottom .audio-toggles{grid-row:2}}
 @keyframes overload-case{0%{box-shadow:inset 0 0 8px #e3fcff70,0 0 20px #78fffdae,0 0 9px #ff81df91}100%{box-shadow:inset 1px 0 #a9ffff,inset -1px 0 #ffa4f3,0 0 13px #56fff384}}
 #arcade-fx[data-effect="super"]{--headline:clamp(20px,calc(var(--board-fx-span) * .112),62px);--ink:#fff166;--ink-hi:#b6ffff;--ink-low:#ffae49;--hit:#4deaff}
 #arcade-fx[data-effect="mega"]{--headline:clamp(23px,calc(var(--board-fx-span) * .128),69px);--ink:#ff6fbf;--ink-hi:#ffed8f;--ink-low:#ff42be}
@@ -202,12 +202,39 @@ button{font:inherit;cursor:pointer}
 #overlay[data-shutdown="true"] #panel{position:relative;border-color:#ff9caa;box-shadow:0 12px 36px #0a0719b5,0 0 25px #ff626646}
 @keyframes shutdown{from{opacity:1}to{opacity:0}}
 @media(prefers-reduced-motion:reduce){#overlay[data-shutdown="true"]::before{display:none}}
+/* The two reactor instruments share one frame. The sound controls stay in the safe corner. */
+#reactor-stack{position:fixed;left:var(--stack-x,-300px);top:var(--stack-y,-160px);width:var(--stack-width,200px);display:grid;gap:5px;padding:5px;pointer-events:none;z-index:2;border:1px solid #a995d370;border-radius:11px;background:linear-gradient(145deg,#2b223ef7,#14182cf7);box-shadow:inset 0 1px #caaaff40,0 3px 0 #110d26,0 0 9px #a195e548}
+#reactor-stack[data-surge="true"],#reactor-stack[data-overdrive="active"]{box-shadow:inset 0 1px #d7fffb83,0 0 12px #6cf9f77a,0 0 5px #ff7ed669}
+#reactor-stack #reactor-meter{min-width:0;padding:2px 5px 3px}
+#reactor-stack #reactor-meter .bar{height:8px}
+#reactor-stack #overdrive-status{position:relative;inset:auto;width:auto;z-index:auto;min-width:0;padding:4px 6px 5px;border-radius:7px}
+#reactor-stack .overdrive-label{margin-bottom:3px}
+#reactor-stack[data-compact="true"]{gap:3px;padding:3px}
+#reactor-stack[data-compact="true"] #reactor-meter{padding:1px 4px 2px}
+#reactor-stack[data-compact="true"] #overdrive-status{padding:2px 4px 3px}
+#reactor-stack[data-compact="true"] .overdrive-label{line-height:14px}
+#reactor-stack[data-compact="true"] #drive-mode{font-size:7px;letter-spacing:0}
+#bottom{left:auto;right:max(12px,env(safe-area-inset-right));bottom:calc(9px + env(safe-area-inset-bottom));width:auto;margin:0;display:block;transform:none;padding:4px;border-radius:11px}
+#bottom .audio-toggles{display:flex}
+#arcade-fx{--combo-growth:1;isolation:isolate}
+#arcade-fx .fx-seal{width:min(100%,var(--board-fx-span));padding:9px 4% 10px;box-sizing:border-box}
+#arcade-fx .fx-seal::before{inset:0 -1.5%;border-radius:0;background:linear-gradient(100deg,#20114ceb,#101537f5 45%,#27104cf2);clip-path:polygon(5% 0,100% 0,95% 100%,0 100%);border-block:1px solid var(--fx);box-shadow:inset 0 2px 7px var(--hit),inset 0 -2px 7px var(--hit)}
+#arcade-fx #announcement{font-size:calc(var(--headline) * var(--combo-growth));letter-spacing:-.035em;white-space:nowrap;line-height:1.06}
+#arcade-fx[data-effect="combo"]{--headline:clamp(13px,calc(var(--board-fx-span) * .070),46px);--hit:#5d9cff;--ink:#93fff4;--ink-low:#4bebfb}
+#arcade-fx[data-effect="super"]{--headline:clamp(12px,calc(var(--board-fx-span) * .083),51px);--ink:#99fff2;--ink-hi:#fffbe9;--ink-low:#42cfff;--fx:#53f8ff;--hit:#7874ff}
+#arcade-fx[data-effect="mega"]{--headline:clamp(12px,calc(var(--board-fx-span) * .088),61px);--ink:#ff70c0;--ink-hi:#ffd6f1;--ink-low:#fd3da7;--fx:#ff6bdd;--hit:#aa4af0}
+#arcade-fx[data-effect="overdrive"]{--headline:clamp(16px,calc(var(--board-fx-span) * .127),72px);--ink:#8ffef9;--ink-low:#63e7ff;--fx:#5effed;--hit:#ff4ed2}
+#arcade-fx[data-effect="super"] #announcement,#arcade-fx[data-effect="mega"] #announcement{white-space:nowrap}
+#arcade-fx .fx-arc-left{right:81%}#arcade-fx .fx-arc-right{left:81%}
+#arcade-fx.show .fx-seal::before{animation:banner-border var(--fx-time) ease-out both}
+@keyframes banner-border{0%{opacity:0}25%{opacity:1}69%{opacity:.92}100%{opacity:.2}}
+@media(prefers-reduced-motion:reduce){#arcade-fx.show .fx-seal::before{animation:none}}
 </style>
 </head>
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>3.8</span></div><div class="subtitle">Miami Alive</div></div>
+  <div><div class="brand">REACTOR <span>3.9</span></div><div class="subtitle">Neon Takeover</div></div>
   <div class="stats" id="score-module"><div class="score-readout"><span class="stat-label">Score</span><strong id="score">0</strong></div><div class="best-readout"><span class="stat-label">Best</span><strong id="best">0</strong></div></div>
 </header>
 <div id="combo"></div>
@@ -216,18 +243,20 @@ button{font:inherit;cursor:pointer}
     <span id="announcement"></span><span id="announcement-points"></span>
   </div>
 </div>
-<div id="overdrive-status" data-state="charge"><div class="overdrive-label"><span class="energy-label">OVERDRIVE</span><span id="epct"><span id="drive-mode">CHARGE</span><strong id="drive-value">0%</strong></span></div><div class="bar energy-reservoir" aria-hidden="true"><div id="efill" class="energy"></div></div></div>
-<div id="bottom" data-overdrive="charge">
+<div id="reactor-stack" data-overdrive="charge">
   <div id="reactor-meter" data-danger="stable"><div class="meter-label"><span>REACTOR / PRESSURE</span><span id="pressure-state">STABLE</span><strong id="pct">10%</strong></div><div class="bar"><div id="pfill" class="pressure"></div></div></div>
+<div id="overdrive-status" data-state="charge"><div class="overdrive-label"><span class="energy-label">OVERDRIVE</span><span id="epct"><span id="drive-mode">CHARGE</span><strong id="drive-value">0%</strong></span></div><div class="bar energy-reservoir" aria-hidden="true"><div id="efill" class="energy"></div></div></div>
+</div>
+<div id="bottom">
   <div class="audio-toggles">
-    <button id="music-toggle" aria-label="Musique" aria-pressed="true">♫</button>
-    <button id="effects-toggle" aria-label="Effets sonores" aria-pressed="true">SFX</button>
+    <button id="music-toggle" aria-label="Music" aria-pressed="true">♫</button>
+    <button id="effects-toggle" aria-label="Sound effects" aria-pressed="true">SFX</button>
   </div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 3.8 · MIAMI 1986</div><h1>MIAMI <span>ALIVE</span></h1>
-  <p>Touche un groupe de deux cristaux ou plus. Les grands groupes réduisent la pression. Enchaîne les coups pour charger OVERDRIVE.</p>
-  <button id="start">JOUER</button>
+  <div class="eyebrow">REACTOR 3.9 · MIAMI 1986</div><h1>NEON <span>TAKEOVER</span></h1>
+  <p>Tap a group of two or more gems. Bigger groups cool the reactor. Chain clears to charge OVERDRIVE.</p>
+  <button id="start">PLAY</button>
 </div></div>
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script><script>
 (()=>{'use strict';
@@ -248,10 +277,10 @@ const PRESSURE={
 };
 const CITY_TRANSITION_MS=6000;
 const CITY_PHASES=[
-  {score:0,sky:['#77427a','#f77da1','#ffce86'],sun:1,lights:.72,night:0,reflection:.65,depth:.65,glow:[0xffa46e,0xffc16e],halo:.31,sea:[0x39d9cd,0x137a9d],sand:0xf6bd83,sunDrop:0},
-  {score:5000,sky:['#3a3590','#a054ca','#fb92c0'],sun:.58,lights:.82,night:.19,reflection:.78,depth:.86,glow:[0xff78d3,0x9fa5ff],halo:.34,sea:[0x609dc6,0x383c89],sand:0xd18db6,sunDrop:.57},
-  {score:15000,sky:['#1d3783','#5839a9','#b25dc7'],sun:0,lights:.98,night:.38,reflection:.93,depth:1.08,glow:[0xff49c5,0x5dfcff],halo:.39,sea:[0x23578f,0x171a5b],sand:0x6662a2,sunDrop:1.17},
-  {score:35000,sky:['#17295c','#46358b','#943d9e'],sun:0,lights:1,night:.52,reflection:1,depth:1.32,glow:[0xc578ff,0x47e5f8],halo:.45,sea:[0x1b5185,0x14153c],sand:0x52458d,sunDrop:1.46}
+  {score:0,sky:['#804875','#f6a089','#ffdb92'],sun:1,lights:.72,night:0,reflection:.65,depth:.65,glow:[0xffa46e,0xffc16e],halo:.31,sea:[0x39d9cd,0x137a9d],sand:0xf6bd83,sunDrop:0},
+  {score:5000,sky:['#362f77','#9943af','#ef80ab'],sun:.58,lights:.82,night:.19,reflection:.78,depth:.86,glow:[0xff78d3,0x9fa5ff],halo:.34,sea:[0x609dc6,0x383c89],sand:0xae779f,sunDrop:.72},
+  {score:15000,sky:['#192957','#493184','#994da6'],sun:0,lights:.98,night:.38,reflection:.93,depth:1.08,glow:[0xff49c5,0x5dfcff],halo:.39,sea:[0x224f89,0x14184d],sand:0x58538b,sunDrop:1.17},
+  {score:35000,sky:['#0e1a45','#342766','#763784'],sun:0,lights:1,night:.62,reflection:1,depth:1.32,glow:[0xff53df,0x46f5ff],halo:.49,sea:[0x184b7c,0x11143b],sand:0x473879,sunDrop:1.46}
 ];
 const MAX_PARTICLES=80, FALL_MS=115;
 let board=[],score=0,pressure=PRESSURE.initial,energy=0,combo=0,lastMove=-Infinity;
@@ -284,9 +313,9 @@ function reportMusicError(){
   if(musicFailed)return;
   musicFailed=true;
   musicNeedsGesture=false;
-  const message='Bande-son indisponible. Vérifiez le fichier audio/miami-reactor.mp3.';
+  const message='Soundtrack unavailable. Check audio/miami-reactor.mp3.';
   setMusicStatus(message);
-  if(playing)flash('MUSIQUE INDISPONIBLE','notice');
+  if(playing)flash('MUSIC UNAVAILABLE','notice');
 }
 function getMusicTrack(){
   if(musicTrack)return musicTrack;
@@ -298,7 +327,7 @@ function getMusicTrack(){
   track.addEventListener('playing',()=>{
     musicNeedsGesture=false;
     musicFailed=false;
-    setMusicStatus('Bande-son Miami Reactor');
+    setMusicStatus('Miami Reactor soundtrack');
   });
   track.src=MUSIC_PATH;
   musicTrack=track;
@@ -321,7 +350,7 @@ function syncMusic(fromGesture=false){
     if(!playing||!musicEnabled||document.hidden||error.name==='AbortError')return;
     if(error.name==='NotAllowedError'){
       musicNeedsGesture=true;
-      setMusicStatus('Touchez le jeu pour reprendre la musique.');
+      setMusicStatus('Tap the game to resume music.');
     }else reportMusicError();
   });
 }
@@ -397,11 +426,11 @@ function updateTension(){
   if(target>.60)sound(132,.079,'triangle',.032,.115,88,tensionBus);
 }
 function pressureState(value){
-  if(value>=100)return ['failed','ARRÊT'];
+  if(value>=100)return ['failed','MELTDOWN'];
   if(value>=95)return ['maximum','DANGER'];
-  if(value>=80)return ['critical','CRITIQUE'];
-  if(value>=60)return ['hot','CHAUD'];
-  if(value>=40)return ['warning','ALERTE'];
+  if(value>=80)return ['critical','CRITICAL'];
+  if(value>=60)return ['hot','HOT'];
+  if(value>=40)return ['warning','WARNING'];
   return ['stable','STABLE'];
 }
 function overdriveSeconds(deadline){
@@ -420,7 +449,7 @@ function updateScoreDisplay(){
   const next=portion===1?scoreTarget:Math.round(scoreFrom+(scoreTarget-scoreFrom)*(1-(1-portion)**3));
   if(next!==scoreShown){
     scoreShown=next;
-    $('score').textContent=scoreShown.toLocaleString('fr-FR');
+    $('score').textContent=scoreShown.toLocaleString('en-US');
   }
 }
 function updateDashboardLight(){
@@ -428,12 +457,12 @@ function updateDashboardLight(){
   if(surge===surgeDisplayed)return;
   surgeDisplayed=surge;
   $('hud').dataset.surge=String(surge);
-  $('bottom').dataset.surge=String(surge);
+  $('reactor-stack').dataset.surge=String(surge);
 }
 function resetScoreDisplay(){
   scoreShown=scoreFrom=scoreTarget=score;
   scoreCountAt=scoreSurgeUntil=0;
-  $('score').textContent=score.toLocaleString('fr-FR');
+  $('score').textContent=score.toLocaleString('en-US');
   updateDashboardLight();
 }
 function updateHud(){
@@ -441,7 +470,7 @@ function updateHud(){
   const remaining=overdriveSeconds(recoverUntil);
   const [danger,label]=pressureState(pressure);
   updateScoreDisplay();
-  $('best').textContent=best.toLocaleString('fr-FR');
+  $('best').textContent=best.toLocaleString('en-US');
   $('pct').textContent=Math.floor(pressure)+'%';
   $('pressure-state').textContent=label;
   $('reactor-meter').dataset.danger=danger;
@@ -449,8 +478,8 @@ function updateHud(){
   const driveState=active?'active':remaining?'recovery':'charge';
   $('overdrive-status').dataset.state=driveState;
   $('overdrive-status').dataset.level=String(energy>=95?4:Math.min(3,Math.floor(energy/25)));
-  $('bottom').dataset.overdrive=driveState;
-  $('drive-mode').textContent=active?'ACTIF ×3':remaining?'RÉCUP.':'CHARGE';
+  $('reactor-stack').dataset.overdrive=driveState;
+  $('drive-mode').textContent=active?'ACTIVE ×3':remaining?'COOLDOWN':'CHARGE';
   $('drive-value').textContent=active?overdriveSeconds(overUntil)+' s':remaining?remaining+' s':energy+'%';
   $('efill').style.width=(active?100*(overUntil-elapsed)/OVERDRIVE_MS:remaining?100*(1-(recoverUntil-elapsed)/RECOVERY_MS):energy)+'%';
   $('combo').textContent=combo>1?'COMBO ×'+combo:'';
@@ -463,13 +492,16 @@ function showAnnouncement(event){
   $('announcement').textContent=title;
   $('announcement-points').textContent=points?'+'+points+' PTS':'';
   overlay.style.setProperty('--fx-time',event.duration+'ms');
+  overlay.style.setProperty('--combo-growth',String(event.growth));
   void overlay.offsetWidth;
   overlay.classList.add('show');
   currentAnnouncement={...event,until:elapsed+event.duration};
 }
 function flash(message,style='notice'){
   const [priority,duration]=ANNOUNCEMENTS[style];
-  const event={message,style,priority,duration,expires:elapsed+1750};
+  const escalating=style==='combo'||style==='super'||style==='mega'||style==='chain';
+  const growth=escalating?Math.min(1.24,1+Math.max(0,combo-2)*.026):1;
+  const event={message,style,priority,duration,growth,expires:elapsed+1750};
   if(!currentAnnouncement||priority>currentAnnouncement.priority){
     if(currentAnnouncement&&currentAnnouncement.style==='mega'){
       announcementQueue=announcementQueue.filter(item=>item.style!==currentAnnouncement.style);
@@ -504,35 +536,49 @@ function resetAnnouncements(){
   $('announcement-points').textContent='';
 }
 function cue(kind){
+  const tier=Math.min(5,Math.max(0,combo-2));
   switch(kind){
     case 'overdrive':
-      sound(133,.34,'triangle',.070,0,446);
-      sound(63,.27,'sine',.106,.29,39);
-      sound(442,.17,'triangle',.042,.33,289);
+      sound(119,.32,'triangle',.061,0,590);
+      sound(67,.27,'sine',.105,.26,39);
+      sound(478,.19,'triangle',.040,.30,258);
       break;
     case 'critical':
       sound(175,.18,'triangle',.055);
       sound(147,.19,'triangle',.045,.22);
       break;
     case 'defeat':
-      sound(55,.55,'sine',.13,0,32);
-      sound(245,.42,'triangle',.075,.06,90);
-      sound(139,.56,'sine',.058,.19,48);
+      sound(58,.57,'sine',.128,0,31);
+      sound(287,.44,'triangle',.072,.055,86);
+      sound(149,.55,'sine',.057,.18,42);
       break;
     case 'mega':
-      sound(104,.23,'sine',.104,0,63);
-      sound(524,.23,'triangle',.058,.034);
-      sound(785,.26,'sine',.039,.12);
+      sound(108,.23,'sine',.101,0,55);
+      sound(548,.23,'triangle',.052,.034,704);
+      sound(834,.27,'sine',.045,.105);
+      sound(1112,.18,'sine',.026,.16);
       break;
     case 'super':
-      sound(131,.16,'sine',.080,0,76);
-      sound(392,.18,'triangle',.050,.025);
-      sound(587,.20,'sine',.036,.105);
+      sound(130,.18,'sine',.076,0,76);
+      sound(393,.17,'triangle',.047,.024);
+      sound(591,.20,'sine',.037,.097);
       break;
-    case 'chain': sound(370,.13,'triangle',.045,0,510); break;
-    case 'combo': sound(330,.105,'triangle',.046,0,424); break;
-    case 'large': sound(146,.19,'triangle',.073,0,74); break;
-    case 'clear': sound(196,.075,'triangle',.039); break;
+    case 'chain':
+    case 'combo': {
+      const pitch=(kind==='chain'?383:330)+tier*31;
+      sound(pitch,.105+tier*.009,'triangle',.039+tier*.003,0,pitch*1.22);
+      if(tier>=2)sound(pitch*.667,.12,'sine',.019+tier*.004,.032);
+      if(tier>=4)sound(pitch*1.5,.11,'sine',.019,.064);
+      break;
+    }
+    case 'large':
+      sound(148,.19,'triangle',.066,0,73);
+      sound(674,.105,'sine',.023,.018);
+      break;
+    case 'clear':
+      sound(233,.068,'triangle',.032,0,175);
+      sound(778,.065,'sine',.017,.007);
+      break;
   }
 }
 function chargeOverdrive(amount){
@@ -756,7 +802,7 @@ function finish(){
   if(settleEvent)settleEvent.remove();
   settleEvent=null;
   updateHud();
-  $('panel').innerHTML='<div class="eyebrow">ARCADE MAYHEM</div><h1>RÉACTEUR <span>CRITIQUE</span></h1><div class="results"><div><span class="stat-label">Score</span><strong>'+score.toLocaleString('fr-FR')+'</strong></div><div><span class="stat-label">Record</span><strong>'+best.toLocaleString('fr-FR')+'</strong></div></div><button id="again">REJOUER</button>';
+  $('panel').innerHTML='<div class="eyebrow">GAME OVER</div><h1>REACTOR <span>MELTDOWN</span></h1><div class="results"><div><span class="stat-label">Score</span><strong>'+score.toLocaleString('en-US')+'</strong></div><div><span class="stat-label">Best</span><strong>'+best.toLocaleString('en-US')+'</strong></div></div><button id="again">PLAY AGAIN</button>';
   $('overlay').dataset.shutdown='true';
   $('overlay').hidden=false;
   $('again').onclick=()=>{$('overlay').hidden=true;start()};
@@ -770,7 +816,7 @@ function changePressure(amount){
   if(pressure>=82&&!critical){
     critical=true;
     cue('critical');
-    flash('PRESSION CRITIQUE','critical');
+    flash('CRITICAL PRESSURE','critical');
   }
   if(pressure<74)critical=false;
 }
@@ -849,7 +895,7 @@ function resolveChain(fall,wave){
     const points=groups.reduce((total,group)=>total+group.length*group.length*5*wave,0);
     const gained=points*(elapsed<overUntil?3:1);
     award(points);
-    flash('CHAÎNE ×'+wave+' · +'+gained,'chain');
+    flash('CHAIN ×'+wave+' · +'+gained,'chain');
     cityImpact=Math.max(cityImpact,.52);
     cue('chain');
     updateHud();
@@ -912,16 +958,16 @@ function tap(x,y){
   changePressure(pressureForGroup(size));
   if(!playing)return;
   if(reward===3){
-    flash('MEGA COMBO ×'+combo+(size>=5?' · +'+(score-previousScore).toLocaleString('fr-FR'):''),'mega');
+    flash('MEGA COMBO ×'+combo+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'mega');
     cue('mega');
   }else if(reward===2){
-    flash('SUPER COMBO ×'+combo+(size>=5?' · +'+(score-previousScore).toLocaleString('fr-FR'):''),'super');
+    flash('SUPER COMBO ×'+combo+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'super');
     cue('super');
   }else if(reward===1){
-    flash('COMBO ×'+combo+(size>=5?' · +'+(score-previousScore).toLocaleString('fr-FR'):''),'combo');
+    flash('COMBO ×'+combo+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'combo');
     cue('combo');
   }else{
-    if(size>=5)flash('+'+(score-previousScore).toLocaleString('fr-FR')+' PTS','clear');
+    if(size>=5)flash('+'+(score-previousScore).toLocaleString('en-US')+' PTS','clear');
     cue(size>=5?'large':'clear');
   }
   if(size>=5||reward>0)cityImpact=Math.max(cityImpact,reward>=2?.87:size>=5?.63:.36);
@@ -995,7 +1041,7 @@ class Game extends Phaser.Scene{
     const crossedRecoveryEnd=elapsed-delta<recoverUntil&&elapsed>=recoverUntil;
     if(crossedOverdriveEnd){
       cityImpact=Math.max(cityImpact,.53);
-      flash('OVERDRIVE · FIN','end');
+      flash('OVERDRIVE ENDED','end');
       sound(220,.24,'triangle',.028);
     }
     if(comboExpired||previousPressure!==Math.floor(pressure)||reactorChanged||crossedOverdriveEnd||crossedRecoveryEnd)updateHud();
@@ -1003,63 +1049,46 @@ class Game extends Phaser.Scene{
       nextDisturbance+=DISTURBANCE_MS;
       for(let i=0;i<3;i++)board[Phaser.Math.Between(0,N-1)][Phaser.Math.Between(0,N-1)]=rand();
       paintBoard();
-      flash('PERTURBATION');
+      flash('REACTOR SHIFT');
       sound(210,.23,'triangle',.025);
     }
   }
   layout(){
     const {width:w,height:h}=this.scale;
-    const landscape=w>=760&&h<=500&&w>h;
+    const landscape=w>=600&&h<=500&&w>h;
     const hud=$('hud').getBoundingClientRect();
     const controls=$('bottom').getBoundingClientRect();
-    const comboBounds=$('combo').getBoundingClientRect();
-    const hudBottom=Math.max(hud.bottom,comboBounds.bottom<h*.45?comboBounds.bottom:0);
-    const controlsTop=controls.top+(this.meterLift||0);
-    // Keep the 3.5 grid budget. The pressure-only panel gives us extra clearance.
-    const priorControlsTop=controlsTop-Math.max(0,75-controls.height);
-    const top=landscape?15:Math.max(hudBottom+11,Math.min(112,h*.23));
-    const bottom=landscape?h-16:Math.max(top+N,Math.min(h-10,priorControlsTop-34));
+    const comboBottom=$('combo').getBoundingClientRect().bottom;
+    const hudBottom=Math.max(hud.bottom,comboBottom<h*.45?comboBottom:0);
     this.w=w;
     this.h=h;
     const insets=getComputedStyle($('game'));
     const safeLeft=parseFloat(insets.getPropertyValue('--safe-left'))||0;
     const safeRight=parseFloat(insets.getPropertyValue('--safe-right'))||0;
-    const rail=Math.min(54,Math.max(24,Math.round(w*.075)));
-    let sideLeft=safeLeft+rail, sideRight=safeRight+rail;
+    const widerPortrait=w>=380&&w<=600&&h>=650&&h>w;
+    const rail=widerPortrait?Math.max(20,Math.round(w*.048)):Math.min(54,Math.max(24,Math.round(w*.075)));
+    let sideLeft=safeLeft+rail,sideRight=safeRight+rail;
     if(landscape){
       sideLeft=Math.max(sideLeft,hud.right+13);
       sideRight=Math.max(sideRight,w-controls.left+13);
     }
+    const stack=$('reactor-stack'), drive=$('overdrive-status');
+    const compact=landscape||h<530;
+    stack.dataset.compact=drive.dataset.compact=String(compact);
     const usableWidth=w-sideLeft-sideRight;
-    this.cell=Math.floor(Math.max(1,Math.min(usableWidth/N,(bottom-top)/N,80)));
-    this.left=Math.floor(sideLeft+(usableWidth-this.cell*N)/2);
-    this.top=Math.floor((top+bottom-this.cell*N)/2);
-    const drive=$('overdrive-status');
-    drive.dataset.compact=String(landscape||h<530);
-    drive.style.setProperty('--drive-width',(landscape?hud.width:this.cell*N)+'px');
-    let height=drive.offsetHeight;
-    if(!landscape){
-      if(this.top-hudBottom<height+17&&drive.dataset.compact==='false'){
-        drive.dataset.compact='true';
-        height=drive.offsetHeight;
-      }
-      const minTop=Math.ceil(hudBottom+height+15);
-      this.top=Math.max(this.top,minTop);
-      if(this.top+this.cell*N+16>controlsTop){
-        // Only a viewport shorter than the combined panels needs a smaller grid.
-        this.cell=Math.max(1,Math.min(this.cell,Math.floor((controlsTop-this.top-16)/N)));
-        this.left=Math.floor(sideLeft+(usableWidth-this.cell*N)/2);
-        drive.style.setProperty('--drive-width',this.cell*N+'px');
-      }
-    }
-    if(!landscape&&h>=700){
-      const room=controlsTop-this.top-this.cell*N-43;
-      this.top+=Math.max(0,Math.min(24,Math.floor(room)));
-    }
-    drive.style.setProperty('--drive-x',(landscape?hud.left:this.left)+'px');
-    drive.style.setProperty('--drive-y',(landscape?hudBottom+12:this.top-height-9)+'px');
-    this.meterLift=landscape?0:Math.max(0,Math.floor(controlsTop-this.top-this.cell*N-43));
-    document.documentElement.style.setProperty('--meter-lift',this.meterLift+'px');
+    const maxCell=Math.floor(Math.min(usableWidth/N,80));
+    stack.style.setProperty('--stack-width',(landscape?hud.width:Math.max(1,maxCell)*N)+'px');
+    const stackHeight=stack.offsetHeight;
+    const minTop=landscape?15:Math.ceil(hudBottom+stackHeight+17);
+    const bottom=landscape?h-16:Math.min(h-16,controls.top-15);
+    this.cell=Math.max(1,Math.min(maxCell,Math.floor((bottom-minTop)/N)));
+    const span=this.cell*N;
+    this.left=Math.floor(sideLeft+(usableWidth-span)/2);
+    this.top=landscape?Math.floor((minTop+bottom-span)/2):
+      Math.floor(Math.max(minTop,Math.min(h*.348,bottom-span)));
+    stack.style.setProperty('--stack-width',(landscape?hud.width:span)+'px');
+    stack.style.setProperty('--stack-x',(landscape?hud.left:this.left)+'px');
+    stack.style.setProperty('--stack-y',(landscape?hudBottom+12:this.top-stackHeight-9)+'px');
     this.positionArcadeFX();
     this.paintReactorFX();
     this.paintCity();
@@ -1128,7 +1157,7 @@ class Game extends Phaser.Scene{
       this.beams[i].setDisplaySize(haloSize*.90,Math.max(14,haloSize*.13));
     }
     this.hotel(w*.05,horizon+32,hotelWidth,hotelWidth*.83,0xeab2ba,0xffa46d,'PALOMA');
-    this.hotel(w-hotelWidth-w*.045,horizon+39,hotelWidth,hotelWidth*.97,0xb8bedb,0x86f8e8,'MARÉE');
+    this.hotel(w-hotelWidth-w*.045,horizon+39,hotelWidth,hotelWidth*.97,0xb8bedb,0x86f8e8,'TIDE');
     city.fillStyle(0x201632,1);
     city.fillRect(w*.68,horizon+39,w*.32,16);
     city.lineStyle(1,0xffa1c7,.55);
@@ -1469,7 +1498,7 @@ class Game extends Phaser.Scene{
     this.edgeElectric.setAlpha(active?(subdued?.62:.77+.09*Math.sin(time/310)):impact*.79);
     this.neonSpill.setAlpha(active?.87:impact*.58);
     this.lightSweep.setVisible(!subdued).setX(time*.025%(this.w+135)-65).setAlpha(.59+impact*.31);
-    this.cityWindows.setAlpha(Math.min(1,lights*(.82+(subdued?0:.16*Math.sin(time/1260)))+impact*.35+(active?.16:0)));
+    this.cityWindows.setAlpha(Math.min(1,lights*(.80+(subdued?0:.12*Math.sin(time/1260)))+night*.21+impact*.35+(active?.16:0)));
     this.sideLights.setAlpha(Math.min(1,lights*(.82+(subdued?0:.18*Math.sin(time/1020)))+impact*.29+(active?.19:0)));
     this.streetGlow.setAlpha(Math.min(1,reflection*(.82+(subdued?0:.17*Math.sin(time/1420)))+impact*.34+(active?.17:0)));
     this.sun.setPosition(depth*2.6*sway,this.sunRadius*sunDrop);
