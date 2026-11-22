@@ -37,6 +37,20 @@ function sanitize(raw){
     if(number(item.stars)>=1&&number(item.stars)<=3)levels[i]={stars:item.stars,score:number(item.score)};
     else break;
   }
+  function ratings(rows){
+    const clean={};
+    for(const [key,value] of Object.entries(record(rows))){
+      if(!/^([1-9]|1[0-9]|20)$/.test(key))continue;
+      const item=record(value);
+      if(number(item.stars)>=1&&number(item.stars)<=3)clean[key]={stars:item.stars,score:number(item.score)};
+    }
+    return clean;
+  }
+  const mastery={};
+  for(const [version,rows] of Object.entries(record(campaign.mastery))){
+    if(/^miami-hard-[0-9]+\.[0-9]+$/.test(version))mastery[version]=ratings(rows);
+  }
+  const legacyLevels=ratings(Object.hasOwn(campaign,'legacyLevels')?campaign.legacyLevels:!Object.keys(mastery).length?levels:{});
   function ledger(rawLedger){
     return Object.fromEntries(Object.entries(record(rawLedger)).filter(([id,stamp])=>/^[a-z0-9:-]{1,80}$/.test(id)&&(stamp===null||number(stamp)>0)));
   }
@@ -44,7 +58,7 @@ function sanitize(raw){
     player:{nickname:validNickname(player.nickname)?player.nickname.trim().normalize('NFC'):'PLAYER',xp:number(player.xp)},
     settings:{language:['en','fr','es'].includes(record(data.settings).language)?data.settings.language:'en'},
     stats:Object.fromEntries(MODES.map(mode=>[mode,Object.fromEntries(METRICS.map(field=>[field,number(record(record(data.stats)[mode])[field])]))])),
-    arcadeBest:number(data.arcadeBest), campaign:{levels,secrets:ledger(campaign.secrets)},
+    arcadeBest:number(data.arcadeBest), campaign:{levels,legacyLevels,mastery,secrets:ledger(campaign.secrets)},
     achievements:ledger(data.achievements),
     legacy:ledger(data.legacy)
   };
@@ -95,7 +109,7 @@ function createStore(storage,legacyBest=0,legacyUnlocks={}){
       mutate(s=>{s.stats[mode].started++;});
       return {mode,crystals:0,combo:0,overdrives:0,moves:0,committed:false};
     },
-    complete(run,{score,elapsed,level=null,stars=0}){
+    complete(run,{score,elapsed,level=null,stars=0,difficulty=null}){
       if(!run||run.committed)return {opened:[],result:false};
       run.committed=true;
       return mutate(state=>{
@@ -106,6 +120,11 @@ function createStore(storage,legacyBest=0,legacyUnlocks={}){
         if(level!==null&&stars&&level<=unlockedLevel(state)){
           const previous=state.campaign.levels[level]||{stars:0,score:0};
           state.campaign.levels[level]={stars:Math.max(previous.stars,stars),score:Math.max(previous.score,score)};
+          if(typeof difficulty==='string'&&/^miami-hard-[0-9]+\.[0-9]+$/.test(difficulty)){
+            const results=state.campaign.mastery[difficulty]??={};
+            const best=results[level]||{stars:0,score:0};
+            results[level]={stars:Math.max(best.stars,stars),score:Math.max(best.score,score)};
+          }
           state.player.xp+=(previous.stars?0:110)+Math.max(0,stars-previous.stars)*30;
         }
         if(run.mode.startsWith('arcade-')&&run.moves>0){

@@ -1,6 +1,14 @@
 (function(root){
 'use strict';
 const words={
+  legacyStars:['Legacy','Historique','Histórico'],
+  hardMode:['Hard Mode','Mode difficile','Modo difícil'],
+  loadingMission:['Loading…','Chargement…','Cargando…'],
+  goalPressureMax:['Finish at {n}% pressure or below','Finir à {n} % de pression ou moins','Termina con presión de {n} % o menos'],
+  shortPressureMax:['Pressure','Pression','Presión'],
+  hardLocks:['Clear adjacent crystals in separate waves. Standard locks need 2 hits, reinforced locks need 4. Dots show remaining durability.','Effacez des cristaux voisins lors de vagues distinctes. Il faut 2 impacts pour un verrou standard et 4 pour un renforcé. Les points indiquent la résistance restante.','Elimina cristales vecinos en oleadas distintas. Los candados normales requieren 2 impactos y los reforzados 4. Los puntos indican la resistencia.'],
+  sealsHelp:['Cyan diamond seals need 2 adjacent hits from a cascade or a manually cleared group of 5 or more.','Les sceaux cyan en losange exigent 2 impacts adjacents par cascade ou par élimination manuelle d’un groupe de 5 cristaux ou plus.','Los sellos cian en rombo requieren 2 impactos adyacentes de una cascada o de un grupo manual de 5 o más cristales.'],
+  hardStarHelp:['Win for ★. For ★★: ≤70% heat, average at least 3.90 crystals per manual clear and keep 12% of each applicable limit. For ★★★: ≤44% heat, average {n} crystals and keep 26% of each applicable limit.','Terminez la mission pour ★. Pour ★★ : pression ≤70 %, moyenne de 3,90 cristaux par coup et 12 % de réserve pour chaque limite applicable. Pour ★★★ : pression ≤44 %, moyenne de {n} cristaux et 26 % de réserve.','Gana la misión para ★. Para ★★: presión ≤70 %, media de 3,90 cristales por jugada y reserva del 12 % de cada límite aplicable. Para ★★★: presión ≤44 %, media de {n} cristales y reserva del 26 %.'],
   starDetails:['Star details','Détails des étoiles','Detalles de estrellas'],
   skipReveal:['Show results','Afficher le résultat','Ver resultados'],
   missionRecord:['New mission record','Nouveau record de mission','Nuevo récord de misión'],

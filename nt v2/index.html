@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="5.1.0">
-<title>REACTOR 5.1.0 · ADVENTURE FOUNDATION</title>
+<meta name="reactor-version" content="5.2.0">
+<title>REACTOR 5.2.0 · MIAMI HARD MODE &amp; NEON POLISH</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -713,6 +713,42 @@ html[data-reduce-motion=true] :is(.impact,#celebration .king-medal,#celebration:
 @keyframes victory-title{from{opacity:.25;transform:translateY(10px) skewX(-7deg)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.victory-board h1{animation:none}}
 html[data-reduce-motion=true] .victory-board h1{animation:none}
+body[data-skin="miami"],#comic,#celebration{
+  --miami-pink:#FF36C7;--miami-cyan:#25E8FF;--miami-night:#100C23;--miami-gold:#FFD36C;
+}
+body[data-skin="miami"] :is(#campaign-menu,#mission-menu,#profile-menu,#adventure-menu),#comic,#celebration{border-color:#ff36c780}
+body[data-skin="miami"] #arcade-menu :is(#main-menu,#campaign-menu,#mission-menu,#profile-menu,#adventure-menu) button,
+body[data-skin="miami"] #panel button,#comic button,#celebration button{
+  min-height:44px;background:var(--miami-night);color:#fff2fc;border:1px solid #ff36c7b3;box-shadow:inset 0 0 10px #ff36c722;
+  font-weight:850;transition:transform .12s,box-shadow .12s,background .12s
+}
+body[data-skin="miami"] #arcade-menu :is(#main-menu,#mission-menu) button.primary{
+  background:var(--miami-pink);color:#190d27;border-color:#ff9edf;box-shadow:0 0 13px #ff36c754
+}
+body[data-skin="miami"] #panel button[data-neon=next]{background:var(--miami-cyan);color:#110b28;border-color:#aafffb;box-shadow:0 0 12px #25e8ff69}
+body[data-skin="miami"] #arcade-menu :is(#campaign-menu,#mission-menu,#adventure-menu,#profile-menu) button.back:not(.primary),
+body[data-skin="miami"] #panel button[data-neon=map],#celebration #king-map{border-color:var(--miami-cyan);box-shadow:inset 0 0 8px #25e8ff24;color:#dcffff}
+#celebration #equip-king{border-color:var(--miami-gold);color:#ffe5a7}
+body[data-skin="miami"] :is(#arcade-menu,#panel) button:focus-visible,#comic button:focus-visible,#celebration button:focus-visible{outline:2px solid #aafffc;outline-offset:2px}
+body[data-skin="miami"] :is(#arcade-menu,#panel) button:active:not(:disabled),#comic button:active,#celebration button:active{transform:translateY(1px);box-shadow:inset 0 0 12px #e19eff}
+body[data-skin="miami"] #arcade-menu button:disabled{opacity:.68;cursor:default}
+body[data-skin="miami"] #arcade-menu button[aria-busy=true]{background:#4c2453;color:#fff2ff;border-color:#d583b7}
+body[data-skin="miami"] #arcade-menu #campaign-menu .level-node{border-color:#25e8ffb7;background:#1d1434}
+body[data-skin="miami"] #arcade-menu #campaign-menu .level-node[data-current=true]{border-color:#ff36c7!important}
+body[data-skin="miami"] #mission-goals li{font-family:"Arial Narrow",system-ui,sans-serif;font-stretch:condensed;border-left-color:var(--miami-cyan)}
+body[data-skin="miami"] #mission-stars,body[data-skin="miami"] .victory-record,#celebration-stars{color:var(--miami-gold)}
+body[data-skin="miami"] #mission-hud{background:var(--miami-night);border-color:#25e8ffbf;font-size:11px;font-variant-numeric:tabular-nums}
+.comic-picture .comic-dialogue{
+  font:500 clamp(18px,4.1vw,24px)/1.35 system-ui,sans-serif;color:#fff9f2;
+  -webkit-text-stroke:0;text-shadow:0 1px 3px #000;
+  padding:14px max(12px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  background:linear-gradient(transparent,#090614bf 58%);text-wrap:pretty
+}
+@media(max-width:360px){.comic-picture .comic-dialogue{-webkit-line-clamp:3}}
+@media(prefers-reduced-motion:reduce){body[data-skin="miami"] button,#comic button,#celebration button{transition:none!important}}
+html[data-reduce-motion=true] :is(body[data-skin="miami"] button,#comic button,#celebration button){transition:none!important}
+body[data-skin="miami"] #arcade-menu #campaign-menu .level-node:active{transform:translate(-50%,-50%) scale(.95)}
+body[data-skin="miami"] #arcade-menu #campaign-menu .level-node[data-mastered=true]{box-shadow:0 0 8px #25e8ffc7,0 3px #127387}
 </style>
 </head>
 <body data-mode="menu">
@@ -822,7 +858,7 @@ html[data-reduce-motion=true] .victory-board h1{animation:none}
       <p id="mission-stars"></p>
       <h3 data-i18n="requirements">Objectives</h3><ul id="mission-goals"></ul>
       <p id="mission-limits"></p><p id="mission-obstacles"></p>
-      <details class="star-details"><summary data-i18n="starDetails">Star details</summary><p data-i18n="starHelp"></p></details>
+      <details class="star-details"><summary data-i18n="starDetails">Star details</summary><p id="mission-star-help"></p></details>
       <p id="mission-locked" role="status"></p>
       <button id="mission-play" class="primary back" data-i18n="play">Play</button>
       <button class="back" data-back-to="campaign" data-back data-i18n="back">Back</button>
@@ -2178,10 +2214,10 @@ function award(points){
 function finish(result='reactor'){
   if(!playing)return;
   const won=result==='win';
-  const previous=adventureRun&&playerProfile.state.campaign.levels[adventureRun.level.number];
+  const previous=adventureRun&&masteryResults()[adventureRun.level.number];
   const earnedStars=won?adventure.stars(adventureRun,elapsed,pressure):0;
   if(adventureRun)adventureRun.settled=true;
-  const progression=playerProfile.complete(sessionRun,{score,elapsed,level:adventureRun?.level.number??null,stars:earnedStars});
+  const progression=playerProfile.complete(sessionRun,{score,elapsed,level:adventureRun?.level.number??null,stars:earnedStars,difficulty:adventureRun?.level.difficulty});
   playing=false;
   busy=false;
   setMode('ended');
@@ -2248,10 +2284,10 @@ function labelComponents(){
   }
   return labels;
 }
-function collapse(groups,intensity=1){
+function collapse(groups,intensity=1,cascade=false){
   pulseGemGroups(groups);
   const labels=labelComponents();
-  if(adventureRun)adventure.applyClear(adventureRun,groups);
+  if(adventureRun)adventure.applyClear(adventureRun,groups,cascade);
   if(sessionRun)sessionRun.crystals+=groups.reduce((total,group)=>total+group.length,0);
   const columns=new Set();
   for(const group of groups){
@@ -2319,7 +2355,7 @@ function resolveChain(fall,wave){
     cityImpact=Math.max(cityImpact,.52);
     cue('chain');
     updateHud();
-    resolveChain(collapse(groups,2),wave+1);
+    resolveChain(collapse(groups,2,true),wave+1);
   });
 }
 function passivePressureBetween(fromMs,toMs){
@@ -2389,7 +2425,7 @@ function tap(x,y){
   if(adventureRun&&(adventureRun.level.time!==null&&adventure.timerUsed(adventureRun,elapsed)>=adventureRun.level.time*1000||
     adventureRun.level.moves!==null&&adventureRun.moves>=adventureRun.level.moves)){checkMission();return;}
   busy=true;
-  if(adventureRun)adventureRun.moves++;
+  if(adventureRun){adventureRun.moves++;adventureRun.manualGems+=size;}
   if(sessionRun)sessionRun.moves++;
   trackAchievement('manualClears',1);
   const reward=updateCombo(size);
@@ -4200,7 +4236,8 @@ const rewardKeys={
   'golden-accent':'goldenAccent','violet-accent':'violetAccent','night-title':'nightTitle',
   'legend-frame':'legendFrame','miami-arcade':'miamiArcade'
 };
-const objectiveKeys={score:'Score',combos:'Combos',fragments:'Fragments',locks:'Locks',overdrive:'Overdrive',survival:'Survival'};
+const objectiveKeys={score:'Score',combos:'Combos',fragments:'Fragments',locks:'Locks',overdrive:'Overdrive',survival:'Survival',pressureMax:'PressureMax'};
+const masteryResults=()=>playerProfile.state.campaign.mastery[adventure.DIFFICULTY]||{};
 function playerNode(tag,text,className){
   const node=document.createElement(tag);
   if(text!==undefined)node.textContent=text;
@@ -4337,7 +4374,7 @@ function chapterArt(theme){
 }
 function renderCampaign(){
   const progress=profiles.totals(playerProfile.state), unlocked=profiles.unlockedLevel(playerProfile.state);
-  $('campaign-progress').textContent=t('levels')+' '+progress.levels+' / 20 · '+progress.stars+' / 60 ★';
+  $('campaign-progress').textContent=t('levels')+' '+progress.levels+' / 20 · '+progress.stars+' / 60 ★ · '+t('hardMode')+' '+Object.values(masteryResults()).reduce((sum,row)=>sum+row.stars,0)+' / 60 ★';
   $('campaign-secret').textContent='';
   $('replay-celebration').hidden=!progress.final;
   const map=$('campaign-map');
@@ -4356,6 +4393,7 @@ function renderCampaign(){
       const button=uiButton('',()=>{selectedLevel=level.number;showScreen('mission');});
       button.className='level-node';
       button.dataset.level=String(level.number);
+      button.dataset.mastered=String(!!masteryResults()[level.number]);
       button.dataset.current=String(level.number===unlocked&&!earned);
       button.dataset.locked=String(locked);
       button.setAttribute('aria-label',t('level',{n:level.number})+' '+level.title+' · '+(locked?t('locked',{n:level.number-1}):t('stars')+' '+earned+' / 3'));
@@ -4404,7 +4442,12 @@ function renderMission(){
   }
   $('mission-family').textContent=t('chapter',{n:level.chapter+1})+' · '+campaign.chapters[level.chapter].name+' / '+t('level',{n:level.number})+' · '+t('family'+level.family);
   const earned=playerProfile.state.campaign.levels[level.number]?.stars||0;
-  $('mission-stars').textContent=t('stars')+' · '+'★'.repeat(earned)+'☆'.repeat(3-earned)+' · '+earned+' / 3';
+  const hard=masteryResults()[level.number]?.stars||0;
+  const legacy=playerProfile.state.campaign.legacyLevels[level.number]?.stars;
+  $('mission-stars').textContent=t('stars')+' · '+'★'.repeat(earned)+'☆'.repeat(3-earned)+' · '+earned+' / 3 · '+t('hardMode')+' '+hard+' / 3'+(legacy?' · '+t('legacyStars')+' '+legacy+' / 3':'');
+  $('mission-star-help').textContent=t('hardStarHelp',{n:formatNumber(adventure.masteryGroup(level))});
+  $('mission-play').removeAttribute('aria-busy');
+  $('mission-play').textContent=t('play');
   const constraints=[
     level.moves!==null?'↪ '+t('moves')+' '+level.moves:'',
     level.time!==null?'◷ '+t('time')+' '+level.time+' s':''
@@ -4412,7 +4455,8 @@ function renderMission(){
   $('mission-limits').replaceChildren(...(constraints.length?constraints:[t('unlimited')]).map(text=>playerNode('span',text)));
   $('mission-goals').replaceChildren(...Object.entries(level.targets).map(([key,target])=>playerNode('li',t('goal'+objectiveKeys[key],{n:formatNumber(target)}))));
   $('mission-obstacles').textContent=[
-    level.blocks.some(block=>block.hp)?t('locksHelp'):'',
+    level.blocks.some(block=>block.hp)?t('hardLocks'):'',
+    level.blocks.some(block=>block.seal)?t('sealsHelp'):'',
     level.fragments.length?t('fragmentsHelp'):'',
     level.blocks.some(block=>block.until)?t('interferenceHelp'):''
   ].filter(Boolean).join(' ');
@@ -4425,6 +4469,8 @@ function launchMission(number){
   pendingMission=campaign.levels[number-1];
   $('overlay').hidden=true;
   $('mission-play').disabled=true;
+  $('mission-play').setAttribute('aria-busy','true');
+  $('mission-play').textContent=t('loadingMission');
   if(!changeTheme(SKINS[campaign.skin])&&scene&&!$('start').disabled)start();
   return true;
 }
@@ -4434,7 +4480,9 @@ function updateMissionHud(){
   hud.hidden=!adventureRun||runMode!=='playing';
   if(hud.hidden)return;
   const {level}=adventureRun;
-  const text=Object.entries(level.targets).map(([key,target])=>t('short'+objectiveKeys[key])+' '+formatNumber(Math.min(target,adventure.value(adventureRun,key,score,elapsed)))+'/'+formatNumber(target));
+  const text=Object.entries(level.targets).map(([key,target])=>key==='pressureMax'?
+    t('shortPressureMax')+' '+Math.ceil(pressure)+'% ≤ '+target+'%':
+    t('short'+objectiveKeys[key])+' '+formatNumber(Math.min(target,adventure.value(adventureRun,key,score,elapsed)))+'/'+formatNumber(target));
   if(level.moves!==null)text.push(t('moves')+' '+Math.max(0,level.moves-adventureRun.moves));
   if(level.time!==null)text.push(t('time')+' '+Math.max(0,Math.ceil(level.time-adventure.timerUsed(adventureRun,elapsed)/1000))+'s');
   const copy=text.join(' · ');
@@ -4464,7 +4512,13 @@ function renderResult(result,stars,previous){
   const actions=playerNode('div',undefined,'victory-actions');
   actions.append(uiButton(t('replay'),()=>{selectedLevel=level.number;returnToMenu('mission');}),
     uiButton(t('campaign'),()=>returnToMenu('campaign')));
-  if(won&&level.number<20)actions.append(uiButton(t('next'),()=>{selectedLevel=level.number+1;returnToMenu('mission');}));
+  actions.children[0].dataset.neon='replay';
+  actions.children[1].dataset.neon='map';
+  if(won&&level.number<20){
+    const next=uiButton(t('next'),()=>{selectedLevel=level.number+1;returnToMenu('mission');});
+    next.dataset.neon='next';
+    actions.append(next);
+  }
   const finale=won&&ReactorCutscenes.finaleLevels.includes(level.number);
   if(finale)actions.append(uiButton(t('replayFilm'),()=>replayChapter(level.number)));
   if(!won){
@@ -4480,7 +4534,7 @@ function renderResult(result,stars,previous){
   row.append(...stamps);
   const skip=uiButton(t('skipReveal'),()=>reveal(true));
   stage.append(playerNode('small',t('score')),tally,row);
-  const recordLabel=previous&&score>previous.score?t('missionRecord'):t('personalBest');
+  const recordLabel=(previous&&score>previous.score?t('missionRecord'):t('personalBest'))+' · '+t('hardMode');
   stage.append(playerNode('p',recordLabel+' · '+formatNumber(Math.max(previous?.score||0,score)),'victory-record'));
   if(level.reward)stage.append(playerNode('p',t('rewards')+' · '+t(rewardKeys[level.reward])));
   stage.append(skip,actions);
@@ -4568,12 +4622,13 @@ function paintMissionMarks(){
   for(const [key,lock] of adventureRun.blocks){
     const x=left+(key%N+.5)*cell,y=top+(Math.floor(key/N)+.5)*cell;
     g.fillStyle(0x0e1431,.60);g.fillRoundedRect(x-cell*.42,y-cell*.42,cell*.84,cell*.84,5);
-    g.lineStyle(2,lock.until?0xcfa1ff:0xffcf70,.95);g.strokeRoundedRect(x-cell*.40,y-cell*.40,cell*.80,cell*.80,4);
+    g.lineStyle(2,lock.until?0xcfa1ff:lock.seal?0x25e8ff:0xffcf70,.95);g.strokeRoundedRect(x-cell*.40,y-cell*.40,cell*.80,cell*.80,4);
     if(lock.until){
       g.fillStyle(0xd6adff,.9);g.fillTriangle(x+3,y-9,x-7,y+2,x+4,y+1);g.fillTriangle(x-3,y+9,x+7,y-2,x-4,y-1);
     }else{
-      g.strokeRoundedRect(x-5,y-8,10,10,4);
-      g.fillStyle(0xffd88b,1);g.fillRoundedRect(x-7,y-2,14,10,2);
+      if(lock.seal)g.strokePoints([{x,y:y-11},{x:x+9,y},{x,y:y+11},{x:x-9,y}],true);
+      else g.strokeRoundedRect(x-5,y-8,10,10,4);
+      g.fillStyle(lock.seal?0x7bfff4:0xffd88b,1);g.fillRoundedRect(x-11,y-2,22,10,2);
       for(let i=0;i<lock.hp;i++){g.fillStyle(0x5b3355,1);g.fillCircle(x+(i-(lock.hp-1)/2)*5,y+3,1.6);}
     }
   }

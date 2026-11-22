@@ -5,51 +5,40 @@ const profile=require('./js/profile.js');
 const locale=require('./js/locale.js');
 const {createSimulation}=require('./pressure.sim.test.cjs');
 const world=adventure.WORLDS['miami-1986'];
-function boardPolicy(sim){
-  const {run}=sim.missionState(), {pressure}=sim.state();
-  const rank=group=>{
-    const cells=sim.findGroup(group.x,group.y,new Set());
-    const locks=new Set();
-    let fragments=0;
-    for(const [x,y] of cells){
-      if(run.fragments.has(y*7+x))fragments++;
-      for(const [a,b] of [[x-1,y],[x+1,y],[x,y-1],[x,y+1]]){
-        if(a>=0&&a<7&&b>=0&&b<7&&run.blocks.get(b*7+a)?.hp)locks.add(b*7+a);
-      }
-    }
-    return group.size*(pressure>75?4:2)+(pressure>88&&group.size<4?-100:0)+
-      locks.size*(run.level.targets.locks?12:0)+fragments*(run.level.targets.fragments?20:0);
-  };
-  return sim.groups().sort((a,b)=>rank(b)-rank(a))[0];
-}
+const balance=require('./miami.balance.cjs');
 function play(sim,level){
   sim.mission(level);
-  let moves=0;
-  for(let frame=0;frame<420&&sim.state().playing;frame++){
-    const group=boardPolicy(sim);
-    if(group&&!sim.state().busy&&!(level.number===19&&sim.state().overUntil>0&&sim.state().elapsed>=sim.state().overUntil&&sim.state().elapsed<sim.state().recoverUntil&&sim.state().pressure<35&&sim.missionState().run.counts.overdrive<2)){
-      sim.tap(group.x,group.y);moves++;
-    }
-    sim.advance(level.number===19?850:480);
+  for(let turn=0;turn<320&&sim.state().playing;turn++){
+    const group=sim.groups().at(-1);
+    if(group&&!sim.state().busy)sim.tap(group.x,group.y);
+    sim.advance(1900);
   }
-  const s=sim.state(),{profile:save,run}=sim.missionState();
-  return {score:s.score,pressure:s.pressure,time:s.elapsed,moves,goals:run.counts,win:adventure.outcome({...run,settled:false},{...s,busy:false})==='win',stars:save.campaign.levels[level.number]?.stars||0};
+  const state=sim.state(),{run}=sim.missionState();
+  return {win:!state.playing&&adventure.outcome({...run,settled:false},{...state,busy:false})==='win',stars:adventure.stars(run,state.elapsed,state.pressure)};
 }
-test('all authored levels validate and can be cleared with multiple seeds',t=>{
+test('every 5.2 mission has a seeded win and a three-star result',()=>{
   assert.equal(adventure.validate(world),true);
-  for(const original of [326,7001,94011]){
-    const sim=createSimulation(original);
-    for(const level of world.levels){
-      const result=play(sim,level);
-      t.diagnostic(JSON.stringify({seed:original,level:level.number,...result}));
-      assert.equal(result.win,true,'seed '+original+' level '+level.number);
-      assert.ok(result.stars>0);
+  for(const level of world.levels){
+    const results=balance.seeds.map(seed=>balance.run(level,seed,'largest'));
+    if(!results.some(result=>result.win&&result.stars===3)){
+      for(const seed of balance.seeds)results.push(balance.run(level,seed,'overdrive'));
     }
-    const save=sim.missionState().profile;
-    assert.equal(profile.totals(save).levels,20);
-    assert.ok(profile.earnedRewards(save).includes('miami-arcade'));
-    assert.ok(save.achievements['miami-legend']);
+    assert.ok(results.some(result=>result.win),'reachable level '+level.number);
+    assert.ok(results.some(result=>result.win&&result.stars===3),'three stars on level '+level.number);
   }
+});
+test('all twenty missions can be earned in sequence without bypassing campaign progress',()=>{
+  const sim=createSimulation(326);
+  for(const level of world.levels){
+    let wins=false;
+    for(let attempt=0;attempt<12&&!wins;attempt++)wins=play(sim,level).win;
+    assert.equal(wins,true,'can clear level '+level.number);
+    assert.ok(sim.missionState().profile.campaign.mastery[adventure.DIFFICULTY][level.number].stars>0);
+  }
+  const save=sim.missionState().profile;
+  assert.equal(profile.totals(save).levels,20);
+  assert.ok(profile.earnedRewards(save).includes('miami-arcade'));
+  assert.ok(save.achievements['miami-legend']);
 });
 test('validation rejects corrupt constraints, coordinates, targets, themes and rewards',()=>{
   const attempt=patch=>{
@@ -168,4 +157,31 @@ test('blocked crystals and invalid taps do not consume moves; timed animation do
   sim.changePressure(100);
   assert.equal(sim.state().playing,false);
   assert.equal(Object.keys(sim.missionState().profile.campaign.levels).length,0);
+});
+
+
+test('hard seals ignore small manual groups and reinforced locks require four separate waves',()=>{
+  const run=adventure.createRun({...world.levels[14],blocks:[{x:1,y:1,hp:2,seal:true},{x:4,y:3,hp:4}],fragments:[]});
+  adventure.applyClear(run,[[[1,0],[2,0]]]);
+  assert.equal(run.blocks.get(8).hp,2);
+  adventure.applyClear(run,[[[1,0],[2,0],[3,0],[4,0],[5,0]]]);
+  assert.equal(run.blocks.get(8).hp,1);
+  adventure.applyClear(run,[[[1,0],[2,0]]],true);
+  assert.equal(run.counts.locks,1);
+  for(let i=0;i<3;i++)adventure.applyClear(run,[[[4,2],[5,3]]]);
+  assert.equal(run.blocks.get(25).hp,1);
+  adventure.applyClear(run,[[[4,2],[5,3]]]);
+  assert.equal(run.counts.locks,2);
+});
+test('legacy stars and rewards remain independent of versioned mastery',()=>{
+  const mem=new Map([['reactor.profile.v2',JSON.stringify({player:{xp:123},campaign:{levels:{1:{stars:3,score:4500}}}})]]);
+  const storage={getItem:key=>mem.get(key),setItem:(key,value)=>mem.set(key,value)};
+  const store=profile.createStore(storage);
+  const run=store.start('adventure-miami');
+  store.complete(run,{level:1,score:22000,elapsed:65000,stars:1,difficulty:adventure.DIFFICULTY});
+  assert.equal(store.state.campaign.levels[1].stars,3);
+  assert.deepEqual(store.state.campaign.legacyLevels[1],{stars:3,score:4500});
+  assert.deepEqual(store.state.campaign.mastery[adventure.DIFFICULTY][1],{stars:1,score:22000});
+  assert.equal(store.state.player.xp,123);
+  assert.equal(profile.createStore(storage).state.campaign.mastery[adventure.DIFFICULTY][1].stars,1);
 });
