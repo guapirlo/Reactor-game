@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="4.4.4">
-<title>REACTOR 4.4.4 · MIAMI BEACH COMPLETE</title>
+<meta name="reactor-version" content="4.4.5">
+<title>REACTOR 4.4.5 · OCEAN DRIVE COMPLETE</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -937,6 +937,7 @@ function tryMenuTrack(fromGesture){
     const track=optionalMenuTrack;
     const fallback=()=>{
       if(optionalMenuFailed||track!==optionalMenuTrack)return;
+      console.warn('[Reactor menu audio] Media load failed:',path,track.error?.message||track.error?.code);
       optionalMenuFailed=true;
       track.pause();
       syncMenuAmbience();
@@ -951,6 +952,8 @@ function tryMenuTrack(fromGesture){
   track.volume=musicVolume();
   if(track.paused)track.play().catch(error=>{
     if(track!==optionalMenuTrack||error.name==='AbortError'||runMode!=='menu'||!musicEnabled||document.hidden)return;
+    if(error.name==='NotAllowedError')return;
+    console.warn('[Reactor menu audio] Playback failed:',path,error.message);
     optionalMenuFailed=true;
     track.pause();
     syncMenuAmbience(fromGesture);
@@ -2000,22 +2003,13 @@ class Game extends Phaser.Scene{
     g.lineStyle(.8,0x75fff0,.7);
     g.lineBetween(0,y+14,w,y+21);
     // Both hotels and the road share the same continuous landmass.
-    fill(0xe9a781,[[0,y+19],[.44,y+26],[1,y+20],[1,h],[.38,h],[.48,h*.88],[.64,h*.79],[.26,h*.68],[0,h*.58]]);
+    this.menuRoadWidth=Math.min(38,Math.max(23,h*.041));
+    const leftShore=Math.max(h*.58,this.menuRoadY(0,1.28)+5);
+    fill(0xe9a781,[[0,y+19],[.44,y+26],[1,y+20],[1,h],[.38,h],[.48,h*.88],[.64,h*.79],[.26,h*.68],[0,leftShore]]);
     fill(0xb88177,[[0,y+27],[1,y+29],[1,h*.57],[.51,h*.65],[0,h*.54]]);
-    fill(0x3c354d,[[0,y+36],[1,y+44],[1,y+75],[.49,y+56],[0,y+52]]);
-    g.lineStyle(1,0xffcfad,.88);
-    g.strokePoints([point(0,y+52),point(.49,y+56),point(1,y+75)],false);
-    for(let i=0;i<11;i++){
-      const x=i*w*.103, py=y+46+i*.85;
-      g.lineStyle(1,0xffd398,.62);
-      g.lineBetween(x,py,x+w*.045,py+.7);
-    }
-    // The beach turnout joins the eastern end of the coastal boulevard.
-    fill(0x46415b,[[.87,y+65],[.99,y+69],[.97,h*.72],[.78,h*.85],[.65,h*.84],[.80,h*.70]]);
-    g.lineStyle(1,0xffd4a6,.67);
-    g.strokePoints([point(.91,y+71),point(.91,h*.71),point(.72,h*.825)],false);
+    this.paintStraightBoulevard(g,fill);
     g.lineStyle(2,0xffefd1,.69);
-    g.strokePoints([point(0,h*.58),point(.26,h*.68),point(.64,h*.79),point(.48,h*.88),point(.38,h)],false);
+    g.strokePoints([point(0,leftShore),point(.26,h*.68),point(.64,h*.79),point(.48,h*.88),point(.38,h)],false);
     for(let i=0;i<14;i++){
       const x=w*(.02+(i%3)*.12), py=h*(.71+i*.019);
       g.lineStyle(1,i%2?0xc6fff1:0xffb6db,.36);
@@ -2037,6 +2031,44 @@ class Game extends Phaser.Scene{
     g.lineBetween(radioX+3,radioY-5,radioX+9,radioY-12);
     g.fillStyle(0xff81ce,1);
     g.fillRect(radioX-5,radioY-2,6,3);
+  }
+  menuRoadY(x,lane=0){
+    return this.horizon+42+x*10+this.menuRoadWidth*lane;
+  }
+  paintStraightBoulevard(g,fill){
+    const {w}=this;
+    const y=(x,lane)=>this.menuRoadY(x,lane);
+    const ribbon=(color,near,far)=>fill(color,[[0,y(0,near)],[1,y(1,near)],[1,y(1,far)],[0,y(0,far)]]);
+    ribbon(0xdda995,-.23,1.24);
+    ribbon(0x39324d,0,1);
+    ribbon(0x52415b,.05,.20);
+    ribbon(0x52415b,.79,.95);
+    const stripe=(color,alpha,lane,width)=>{g.lineStyle(width,color,alpha);g.lineBetween(0,y(0,lane),w,y(1,lane))};
+    stripe(0xffd5b5,.86,0,1);
+    stripe(0xffe2b9,.80,1,1);
+    stripe(0xcb7593,.58,1.26,1);
+    stripe(0x35263b,.57,-.24,1);
+    for(let i=0;i<16;i++){
+      const x=i/16,end=x+.029;
+      if((x>.17&&x<.30)||(x>.79&&x<.89))continue;
+      g.lineStyle(1,0xffd089,.82);
+      g.lineBetween(x*w,y(x,.5),end*w,y(end,.5));
+    }
+    for(const crossing of [.235,.836])for(let step=0;step<5;step++){
+      const x=crossing+(step-2)*.011;
+      g.lineStyle(1.7,0xffdbc0,.79);
+      g.lineBetween(x*w,y(x,.14),(x+.009)*w,y(x+.009,.88));
+    }
+    for(let i=0;i<9;i++){
+      const x=(i+.45)/9, px=x*w, py=y(x,1.06);
+      g.lineStyle(1.25,0x51354f,1);
+      g.lineBetween(px,py,px+1,py-10);
+      g.lineBetween(px+1,py-10,px+5,py-10);
+      const neon=i%2===0?0xff8ac6:0x92fff2;
+      g.fillStyle(neon,.32);g.fillCircle(px+5,py-10,3.2);
+      g.fillStyle(0xffffe2,.93);g.fillRect(px+4,py-11,2.5,1.6);
+      g.fillStyle(neon,.24);g.fillEllipse(px-1,y(x,.82),13,3.4);
+    }
   }
   drawMenuCar(g,x,y,scale,color,direction=1){
     const sx=offset=>x+offset*scale*direction;
@@ -2100,15 +2132,15 @@ class Game extends Phaser.Scene{
       g.fillStyle(0x59436a,1);g.fillRect(x-3*unit,py,13*unit,2*unit);
     }
     // Parked cars face the same road edge; the foreground car sits in the turnout.
-    this.drawMenuCar(g,w*.22,y+48,.53*unit,0xdc699d);
-    this.drawMenuCar(g,w*.71,y+61,.65*unit,0x76cad2,-1);
-    this.menuCarPoint=[w*.72,h*.81];
+    this.drawMenuCar(g,w*.16,this.menuRoadY(.16,.22),.53*unit,0xdc699d);
+    this.drawMenuCar(g,w*.71,this.menuRoadY(.71,.88),.65*unit,0x76cad2,-1);
+    this.menuCarPoint=[w-24,this.menuRoadY(1-24/w,.90)];
     this.drawMenuCar(g,...this.menuCarPoint,.97*unit,0xffb45f,-1);
     this.placeSecret('car',...this.menuCarPoint);
     this.menuCar.clear();
     this.drawMenuCar(this.menuCar,0,0,.62*unit,0xbb8ae6);
     // Traffic signal and faint light reflected on the boulevard.
-    const sx=w*.89,sy=y+61;
+    const sx=w*.89,sy=this.menuRoadY(.89,1.05);
     g.lineStyle(1.3,0x3c304a,1);
     g.lineBetween(sx,sy,sx,sy-18*unit);
     g.fillStyle(0x251e38,1);g.fillRect(sx-3*unit,sy-18*unit,6*unit,11*unit);
@@ -2133,6 +2165,7 @@ class Game extends Phaser.Scene{
     }
     this.paintBeachForeground(g,unit);
     this.paintBeachCrowd(g,unit);
+    this.paintPromenadeDetails(g,unit);
     this.paintBayActivity(g,unit);
     this.umbrellaPoint=[w*.52,h*.91];
     this.placeSecret('umbrella',...this.umbrellaPoint);
@@ -2277,8 +2310,57 @@ class Game extends Phaser.Scene{
       pixels(x+1.7*unit,y,0x704058,1.1,2);
     }
   }
+  paintPromenadeDetails(g,unit){
+    const {w,h}=this;
+    const stalls=[
+      [.32,.56,0x7bfaf3,.50],[.53,.59,0xff81c4,.55],[.74,.565,0xffcf80,.52],
+      [.43,.658,0xffbe90,.58],[.66,.687,0x73fff1,.62],[.82,.735,0xff88cb,.67],
+      [.57,.752,0xffc86c,.63],[.74,.794,0xa8a9fa,.71]
+    ];
+    for(const [nx,ny,color,depth] of stalls){
+      const px=w*nx,py=Math.max(h*ny,this.menuRoadY(nx,1.25)+10*unit),d=unit*depth;
+      const width=12*d;
+      g.fillStyle(0x65445c,.26);g.fillEllipse(px+2*d,py+6*d,width*2,4*d);
+      g.lineStyle(1,0x684352,1);
+      g.lineBetween(px,py-6*d,px,py+7*d);
+      g.fillStyle(color,1);g.fillTriangle(px-width,py,px,py-6*d,px+width,py);
+      g.fillStyle(0xffedc6,.72);g.fillTriangle(px-width*.55,py,px,py-6*d,px+width*.13,py);
+      g.fillStyle(0xf6d4b0,.86);g.fillRect(px+5*d,py+4*d,9*d,2.5*d);
+      g.fillStyle(0x78578c,.94);g.fillRect(px-6*d,py+6*d,4*d,3*d);
+      g.fillStyle(0xc88778,1);g.fillRect(px+8*d,py+2*d,2.4*d,2.2*d);
+    }
+    // Fixed benches, bins, and palms keep the waterfront out of the boulevard lanes.
+    for(const [nx,n] of [[.12,0],[.38,1],[.61,2],[.93,3]]){
+      const x=w*nx,y=this.menuRoadY(nx,1.33)+8*unit;
+      g.lineStyle(1,0x8a566e,.86);
+      g.lineBetween(x-4*unit,y+2*unit,x-4*unit,y-2*unit);
+      g.lineBetween(x+4*unit,y+2*unit,x+4*unit,y-2*unit);
+      g.fillStyle(n%2===0?0x6e546c:0x427779,.88);
+      g.fillRect(x-5*unit,y-3*unit,10*unit,2.2*unit);
+      g.fillRect(x+8*unit,y-1*unit,2.8*unit,4*unit);
+      for(let strip=0;strip<6;strip++){
+        g.fillStyle(strip%2?0xb9788c:0xffdba7,.23);
+        g.fillEllipse(x+strip*4*unit,y+7*unit+strip*.64,3.2*unit,1.3*unit);
+      }
+    }
+    for(const [nx,ny,depth] of [[.43,.58,.54],[.78,.66,.62],[.91,.78,.76]]){
+      const x=w*nx,y=Math.max(h*ny,this.menuRoadY(nx,1.3)+10*unit),d=unit*depth;
+      g.lineStyle(2,0x684853,1);g.lineBetween(x,y,x-4*d,y-25*d);
+      g.fillStyle(0x396760,1);
+      for(let branch=0;branch<6;branch++){
+        const angle=Math.PI+branch*.63,dx=Math.cos(angle)*15*d,dy=Math.sin(angle)*12*d;
+        g.fillTriangle(x-4*d,y-25*d,x-4*d+dx,y-25*d+dy,x-4*d+dx*.69,y-25*d+dy+4*d);
+      }
+    }
+  }
   paintBayActivity(g,unit){
     const {w,h,horizon:y,menuPlane:plane,menuSwimmers:swimmers}=this;
+    // The layered cloud streaks stay in the sky while the larger vessels stay out in the bay.
+    for(const [nx,ny,width] of [[.18,.17,.19],[.80,.195,.25],[.28,.285,.15],[.89,.31,.18]]){
+      g.fillStyle(0xffc4ca,.17);
+      g.fillRoundedRect(w*(nx-width*.5),h*ny,w*width,2.5*unit,1);
+      g.fillRoundedRect(w*(nx-width*.39),h*ny-2*unit,w*width*.64,2.6*unit,1);
+    }
     // Keep distant sails above the land shelf and larger boats in the open left bay.
     for(const [x,py,size] of [[w*.39,y+16,6],[w*.70,y+14,5],[w*.11,h*.715,14],[w*.235,h*.765,12]]){
       const d=unit*size/10;
@@ -2340,7 +2422,7 @@ class Game extends Phaser.Scene{
     this.menuCar.setVisible(!subdued&&roadTime<8800);
     if(this.menuCar.visible){
       const x=roadProgress*(this.w+42)-21;
-      this.menuCar.setPosition(x,this.horizon+45+x/this.w*20);
+      this.menuCar.setPosition(x,this.menuRoadY(x/this.w,.61));
     }
     const birdTime=(time+5200)%21000, birdProgress=birdTime/11200;
     this.menuBirds.setVisible(subdued||birdTime<11200);
