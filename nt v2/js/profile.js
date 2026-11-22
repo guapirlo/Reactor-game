@@ -42,7 +42,10 @@ function sanitize(raw){
     for(const [key,value] of Object.entries(record(rows))){
       if(!/^([1-9]|1[0-9]|20)$/.test(key))continue;
       const item=record(value);
-      if(number(item.stars)>=1&&number(item.stars)<=3)clean[key]={stars:item.stars,score:number(item.score)};
+      if(number(item.stars)>=1&&number(item.stars)<=3){
+        clean[key]={stars:item.stars,score:number(item.score)};
+        for(const flag of ['bonus','coolFinish','noOverdrive'])if(item[flag]===true)clean[key][flag]=true;
+      }
     }
     return clean;
   }
@@ -109,7 +112,7 @@ function createStore(storage,legacyBest=0,legacyUnlocks={}){
       mutate(s=>{s.stats[mode].started++;});
       return {mode,crystals:0,combo:0,overdrives:0,moves:0,committed:false};
     },
-    complete(run,{score,elapsed,level=null,stars=0,difficulty=null}){
+    complete(run,{score,elapsed,level=null,stars=0,difficulty=null,feats={}}){
       if(!run||run.committed)return {opened:[],result:false};
       run.committed=true;
       return mutate(state=>{
@@ -123,7 +126,8 @@ function createStore(storage,legacyBest=0,legacyUnlocks={}){
           if(typeof difficulty==='string'&&/^miami-hard-[0-9]+\.[0-9]+$/.test(difficulty)){
             const results=state.campaign.mastery[difficulty]??={};
             const best=results[level]||{stars:0,score:0};
-            results[level]={stars:Math.max(best.stars,stars),score:Math.max(best.score,score)};
+            results[level]={...best,stars:Math.max(best.stars,stars),score:Math.max(best.score,score)};
+            for(const flag of ['bonus','coolFinish','noOverdrive'])if(feats[flag]===true)results[level][flag]=true;
           }
           state.player.xp+=(previous.stars?0:110)+Math.max(0,stars-previous.stars)*30;
         }
