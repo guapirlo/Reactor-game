@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="5.0">
-<title>REACTOR 5.0 · CLASSIC FOUNDATION</title>
+<meta name="reactor-version" content="5.0.1">
+<title>REACTOR 5.0.1 · NEON HORIZON &amp; WORLDS</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -322,11 +322,6 @@ body:is([data-mode="playing"],[data-mode="ended"]) #arcade-menu{display:none}
 .setting.volume{display:grid;grid-template-columns:1fr auto;gap:3px}
 .setting input[type=range]{grid-column:1/-1;width:100%;min-height:25px;accent-color:var(--hub-accent)}
 .setting output{color:var(--hub-accent);font-variant-numeric:tabular-nums}
-#skin-list{display:grid;gap:8px}
-.skin-tile{display:grid;text-align:left;align-content:center;gap:5px}
-.skin-tile strong{font-size:14px}
-.skin-tile span{font-size:9px;color:#cfe6ec}
-.skin-tile[aria-pressed=true]{box-shadow:inset 2px 0 var(--hub-accent)}
 .filters{display:flex;gap:5px;margin:7px 0}
 .filters button[aria-pressed=true]{color:#181229!important;background:var(--hub-accent)!important}
 #achievement-list{list-style:none;margin:0;padding:0}
@@ -359,12 +354,6 @@ body[data-mode="menu"] #main-menu:not([hidden]) .signature-logo{animation:signat
 #main-menu .hub-actions button::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(111deg,transparent 25%,#dda7ff35 54%,transparent 74%);opacity:.55}
 #main-menu .hub-actions button.primary{border-color:#affff6;background:linear-gradient(100deg,#153d4cd9,#2b2e62bc 53%,#632e61d6);color:#eafffe;box-shadow:inset 1px 0 #cefffa,inset -1px 0 #ffd2f1,0 0 10px #80fff849}
 #main-menu .hub-actions button:is(:active,:focus-visible){transform:translateY(1px);box-shadow:inset 0 0 15px #7cdfff52,0 0 10px #faa3e987}
-#world-list{display:grid;gap:10px}
-.world-group{display:grid;gap:6px}
-.world-group h3{margin:4px 0 0;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#ccdaf5}
-.world-tile{min-height:44px;padding:8px;border:1px solid #a6add365;border-radius:8px;background:#191e37c9;text-align:left}
-.world-tile small{display:block;margin-top:3px;color:#c8bedd}
-#arcade-menu button.world-tile{text-align:left;letter-spacing:.09em}
 @media(min-width:600px) and (max-height:500px) and (orientation:landscape){
   #main-menu{width:min(100%,720px);gap:16px;grid-template-columns:1.23fr 1fr}
   #main-menu .hub-actions{width:min(100%,285px)}
@@ -380,16 +369,6 @@ html[data-reduce-motion="true"] #main-menu .signature-logo{animation:none!import
 #arcade-menu .scene-hotspot{position:absolute;width:48px;height:48px;min-height:48px;padding:0;border:0;border-radius:50%;background:transparent;transform:translate(-50%,-50%);pointer-events:auto;-webkit-tap-highlight-color:transparent}
 #arcade-menu .scene-hotspot:focus-visible{outline:2px solid #bbfff3;background:#6cffff29}
 #radio-caption{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);max-width:88vw;width:max-content;padding:6px 9px;background:#151430ed;border:1px solid #78fff2a6;border-radius:6px;color:#e6fff9;font:800 11px/1.25 ui-monospace,monospace;letter-spacing:.08em;text-align:center}
-#world-menu{width:min(100%,525px)}
-.pixel-map{position:relative;overflow:hidden;aspect-ratio:2;border:1px solid #78e5f8be;background:#13435d;isolation:isolate}
-.pixel-map canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
-.pixel-map::after{content:"";pointer-events:none;position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,transparent 45%,#7bffed31 50%,transparent 55%);animation:map-scan 5s linear infinite}
-@keyframes map-scan{from{transform:translateY(-60%)}to{transform:translateY(60%)}}
-#arcade-menu .map-destination{position:absolute;z-index:2;left:27.72%;top:35.69%;transform:translate(-50%,-50%);height:44px;width:44px;padding:0;border:0;background:transparent;color:#b8fff8;font-size:0}
-.map-destination::before,.map-mystery{display:grid;place-items:center;background:#093646;border:2px solid #99ffec;box-shadow:0 0 7px #50ffed;color:#ecfffa;font:900 8px monospace}
-.map-destination::before{content:"";width:8px;height:8px;margin:auto;transform:rotate(45deg)}
-.map-mystery{position:absolute;width:13px;height:13px;border-color:#ff84d6;box-shadow:0 0 6px #ff68c5;transform:translate(-50%,-50%);pointer-events:none}
-#world-presentation p{font:800 9px ui-monospace,monospace;color:#b5fff6;letter-spacing:.12em;margin:6px 0}
 .filters{flex-wrap:wrap}
 #arcade-fx[data-effect="record"]{--headline:clamp(16px,calc(var(--board-fx-span) * .09),47px);--fx:#77fff5;--hit:#ff67d1;--ink:#a3fff5;--ink-hi:#fff0f9;--ink-low:#f561d0}
 @media(prefers-reduced-motion:reduce){.pixel-map::after,#main-menu .hub-actions button::before{animation:none!important}}
@@ -481,12 +460,11 @@ html[data-reduce-motion="true"] :is(.training-gem,#training-meter #training-fill
 @media(max-height:500px) and (orientation:landscape){
   #main-menu .hub-actions{gap:4px}
 }
-.classic-wordmark,.classic-map{display:none}
+.classic-wordmark{display:none}
 body[data-skin="classic"]{background:#050713}
 body[data-skin="classic"] #arcade-menu{background:linear-gradient(#0406111c,#0b102450 50%,#08091c43)}
 body[data-skin="classic"] #arcade-menu .signature-logo,
 body[data-skin="classic"] #arcade-menu #menu-boombox{display:none}
-body[data-skin="classic"] #arcade-menu .classic-map{display:block}
 body[data-skin="classic"] .classic-wordmark{
   display:block;font:1000 italic clamp(40px,13vw,92px)/1.04 system-ui,sans-serif;
   letter-spacing:-.105em;padding-inline:.02em .18em;
@@ -515,6 +493,33 @@ body[data-skin="classic"] #arcade-fx[data-effect="mega"] #announcement{
 @media(min-width:600px) and (max-height:500px) and (orientation:landscape){
   body[data-skin="classic"] #main-menu .hub-actions{grid-row:1}
   body[data-skin="classic"] .menu-brand{align-self:center}
+}
+#world-menu{width:min(100%,560px);background:linear-gradient(155deg,#12172b,#090c18);border-color:#4a5878}
+#world-menu h2{color:#d6f8ff;letter-spacing:.08em}
+#world-menu .world-intro{color:#b7c8e5;font-size:13px}
+#globe-stage{position:relative;width:min(100%,330px,34svh);aspect-ratio:1;margin:auto;isolation:isolate}
+#world-globe{display:block;width:100%;height:100%;touch-action:pan-y;cursor:grab}
+#globe-stage::before{content:"";position:absolute;inset:10%;z-index:-1;border-radius:50%;box-shadow:0 0 25px #6579fa42,0 0 65px #43b3f42e;pointer-events:none}
+#globe-markers{position:absolute;inset:0;pointer-events:none}
+#arcade-menu .globe-marker{position:absolute;transform:translate(-50%,-50%);width:44px;height:44px;padding:0;border:0;background:none;color:#f2eaff;text-shadow:0 0 4px #7a5ed5,0 0 12px #ac7dff;pointer-events:auto;font:900 13px monospace}
+.globe-marker::before{content:"";position:absolute;inset:13px;border:1px solid #b48bf5;border-radius:50%;background:#171438aa;box-shadow:0 0 8px #a375ec80;z-index:-1}
+#arcade-menu .globe-miami{color:#c5fffc;text-shadow:0 0 10px #46ffec;font-size:15px}
+.globe-miami::before{border-color:#7dffed;box-shadow:0 0 11px #48fff9a0}
+.globe-controls{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:6px}
+#arcade-menu .globe-controls button{padding:5px;border-color:#465f88;background:#171f37}
+.world-card{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-top:9px;padding:10px;border:1px solid #4f6080;border-radius:7px;background:#141d32}
+.world-card h3{margin:0;font-size:15px;letter-spacing:.07em;text-transform:uppercase;color:#d6f8ff}
+#world-menu .world-card p{margin:2px 0;color:#b8c8e5;font-size:11px;text-transform:uppercase}
+#world-menu .world-status{font:800 9px ui-monospace,monospace;color:#8cefe6;text-transform:uppercase}
+@media(max-width:360px){
+  #world-menu .world-card{padding:8px}
+  #world-menu .world-card h3{font-size:13px}
+  #arcade-menu .world-card button{padding-inline:7px;font-size:9px}
+}
+@media(max-height:510px) and (orientation:landscape){
+  #world-menu{width:min(100%,700px)}
+  .world-body{display:grid;grid-template-columns:minmax(200px,1fr) minmax(220px,1fr);gap:14px;align-items:center}
+  #globe-stage{width:min(100%,235px)}
 }
 </style>
 </head>
@@ -574,12 +579,11 @@ body[data-skin="classic"] #arcade-fx[data-effect="mega"] #announcement{
           <path d="M45 132H274L291 139H409L426 132H655M171 141H262L279 148H421L438 141H529" fill="none" stroke="#ffd8e8" stroke-width="2" opacity=".8"/>
         </svg>
       </h1>
-      <p class="menu-city">MIAMI 1986 <span>SKIN 01</span></p>
+      <p class="menu-city">MIAMI 1986 <span>WORLD 01</span></p>
     </div>
     <nav class="hub-actions" aria-label="Main menu">
       <button id="start" class="primary" disabled>Play</button>
-      <button class="classic-map" data-screen="world">World Map</button>
-      <button data-screen="skins">Skins</button>
+      <button data-screen="world">Worlds</button>
       <button data-screen="achievements">Achievements</button>
       <button data-screen="scores">High scores</button>
       <button data-screen="options">Options</button>
@@ -596,12 +600,33 @@ body[data-skin="classic"] #arcade-fx[data-effect="mega"] #announcement{
       <span class="speaker" aria-hidden="true"></span>
     </button>
   </section>
-  <section id="skins-menu" class="hub-page hub-card" hidden>
-    <h2>Skins</h2><div id="skin-list"></div><button class="back" data-screen="world">World Map</button><button class="back" data-back>Back</button>
-  </section>
   <section id="world-menu" class="hub-page hub-card" hidden>
-    <h2>World Map</h2>
-    <div id="world-presentation"></div><div id="world-list"></div><button class="back" data-back-to="skins" data-back>Back</button>
+    <h2>Worlds</h2>
+    <p class="world-intro">Each world has its own look and soundtrack.</p>
+    <div class="world-body">
+      <div>
+        <div id="globe-stage">
+          <canvas id="world-globe" width="460" height="460" role="img" aria-label="Rotating holographic globe"></canvas>
+          <div id="globe-markers"></div>
+        </div>
+        <div class="globe-controls">
+          <button id="globe-left" type="button" aria-label="Rotate globe left">‹</button>
+          <button id="focus-miami" type="button">Locate Miami 1986</button>
+          <button id="globe-right" type="button" aria-label="Rotate globe right">›</button>
+        </div>
+      </div>
+      <div>
+        <article id="destination-panel" class="world-card" hidden>
+          <div><h3 id="destination-name" tabindex="-1"></h3><p id="destination-tagline"></p><span class="world-status" id="destination-status"></span></div>
+          <button id="enter-miami" type="button">Enter World</button>
+        </article>
+        <article class="world-card">
+          <div><h3>Classic Arcade</h3><p>The Core Dimension</p><span class="world-status">Available</span></div>
+          <button id="enter-classic" type="button">Enter Classic</button>
+        </article>
+      </div>
+    </div>
+    <button class="back" data-back>Back</button>
   </section>
   <section id="achievements-menu" class="hub-page hub-card" hidden>
     <h2>Achievements</h2><p id="achievement-count"></p>
@@ -614,7 +639,7 @@ body[data-skin="classic"] #arcade-fx[data-effect="mega"] #announcement{
     <h2>High scores</h2><p>Personal best</p><strong id="saved-best" class="hub-score">0</strong><button class="back" data-back>Back</button>
   </section>
   <section id="options-menu" class="hub-page hub-card" hidden>
-    <h2>Options</h2><p id="classic-audio-note" hidden>Classic’s original soundtrack is pending. Quiet synthesized ambience plays in the meantime.</p>
+    <h2>Options</h2>
     <label class="setting"><span>Music</span><input id="option-music" type="checkbox"></label>
     <label class="setting volume"><span>Music volume</span><output id="music-volume-value" for="music-volume"></output><input id="music-volume" type="range" min="0" max="100"></label>
     <label class="setting"><span>Sound effects</span><input id="option-effects" type="checkbox"></label>
@@ -726,9 +751,8 @@ const SKINS={
     environment:{create:createClassicEnvironment,paint:paintClassicEnvironment,animate:animateClassicEnvironment,reset(){},update(){}},
     gems:{colors:[0xff526d,0x61ee9e,0x58aaff,0xffcb5c],labels:['Red','Green','Blue','Gold'],create:makeClassicTextures},
     palette:{accent:'#8af5ff',hot:'#a389ff'},typography:'system-ui, Arial, sans-serif',animationStyle:'grid',
-    // Configure original Classic tracks here when supplied. Null uses quiet synthesized ambience.
-    music:null,musicLabel:'Classic Arcade soundtrack',sound:miamiCue,
-    menu:{line:'CLASSIC ARCADE',badge:'',music:null,worldMap:drawMiamiMap},
+    music:'./audio/classic-gameplay.mp3',musicLabel:'Neon Underground',sound:miamiCue,
+    menu:{line:'CLASSIC ARCADE',badge:'',music:'./audio/classic-menu.mp3'},
     achievements:[]
   },
   miami:{
@@ -742,7 +766,7 @@ const SKINS={
     palette:{accent:'#83fff1',hot:'#f282dd'},
     typography:'system-ui, Arial, sans-serif',animationStyle:'neon',
     music:'./audio/miami-reactor.mp3',musicLabel:'Miami Reactor soundtrack',sound:kind=>miamiCue(kind),
-    menu:{line:'MIAMI 1986',badge:'SKIN 01',music:'./audio/miami%20reactor%20%282%29.mp3',worldMap:drawMiamiMap},
+    menu:{line:'MIAMI 1986',badge:'WORLD 01',music:'./audio/miami%20reactor%20%282%29.mp3'},
     special:{record:celebrateMiamiRecord},
     achievements:[
       ['welcome','WELCOME TO MIAMI','Start a Miami 1986 game.','started',1],
@@ -760,10 +784,6 @@ const SKINS={
 };
 let activeSkin=SKINS[settings.skin]?.available?SKINS[settings.skin]:SKINS.classic;
 let C=activeSkin.gems.colors;
-const WORLD_CATEGORIES=[
-  {id:'geographic',title:'Geographic destinations',unknown:'Uncharted coast'},
-  {id:'universes',title:'Other universes',unknown:'Unknown universe'}
-];
 const MIAMI_SECRETS=[
   ['the-penthouse','THE PENTHOUSE','Discover the hidden hotel-window interaction.','penthouse',1],
   ['jet-ski-chaser','JET SKI CHASER','Tap the jet ski in the Miami menu.','jet',1],
@@ -948,6 +968,7 @@ function syncMusic(fromGesture=false){
     musicTrack?.pause();
     return;
   }
+  if(activeSkin.id==='classic'&&optionalMenuTrack&&!optionalMenuTrack.paused)return;
   if(typeof Audio!=='function'||(!fromGesture&&(musicFailed||musicNeedsGesture)))return;
   // The same media element handles play, pause and looping for every run.
   const track=getMusicTrack();
@@ -1090,7 +1111,7 @@ function renderBoombox(){
   $('boombox-state').textContent=playing?'MUSIC ON':loading?'LOADING':'MUSIC OFF';
   $('boombox-hint').textContent=playing?'TAP TO PAUSE':loading?'TAP TO CANCEL':audible&&optionalMenuFailed?'TRACK UNAVAILABLE':musicEnabled&&!audible?'VOLUME IS ZERO':'TAP FOR MUSIC';
 }
-function stopMenuAmbience(fadeTrack=false){
+function stopMenuAmbience(fadeTrack=false,onStopped){
   menuTrackPlaying=false;
   renderBoombox();
   stopSynthAmbience();
@@ -1110,6 +1131,7 @@ function stopMenuAmbience(fadeTrack=false){
     else{
       optionalMenuFade=0;
       track.pause();
+      onStopped?.();
     }
   };
   optionalMenuFade=requestAnimationFrame(fade);
@@ -1188,7 +1210,7 @@ function menuClick(event){
   if(button?.id==='start')return;
   if(!button||button.disabled||!effectsEnabled)return;
   unlockEffects();
-  sound(button.classList.contains('world-tile')||button.classList.contains('skin-tile')?587:392,.095,'sine',.045);
+  sound(button.classList.contains('globe-marker')?587:392,.095,'sine',.045);
 }
 function setTension(level){
   if(!tensionBus||level===tensionLevel)return;
@@ -1758,9 +1780,10 @@ function clearEffects(){
 }
 function start(){
   const menuReleasing=menuClock!==0||!!optionalMenuTrack&&!optionalMenuTrack.paused;
+  const classicHandoff=activeSkin.id==='classic'&&!!optionalMenuTrack&&!optionalMenuTrack.paused;
   if(menuWaitingForGameplay)musicTrack?.pause();
   menuWaitingForGameplay=false;
-  stopMenuAmbience(true);
+  stopMenuAmbience(true,classicHandoff?()=>syncMusic(true):undefined);
   musicIntroSilenceUntil=menuReleasing?180:0;
   setMode('playing');
   coolingArmed=false;
@@ -3419,12 +3442,13 @@ function resizeGame(){
 window.addEventListener('resize',resizeGame);
 window.visualViewport?.addEventListener('resize',resizeGame);
 function showScreen(next){
+  stopWorldGlobe?.();
+  stopWorldGlobe=null;
   screen=next;
   syncMiamiHotspots();
-  for(const name of ['main','skins','world','achievements','scores','options','pause'])$(name+'-menu').hidden=name!==next;
+  for(const name of ['main','world','achievements','scores','options','pause'])$(name+'-menu').hidden=name!==next;
   if(next==='options')refreshOptions();
   if(next==='scores')$('saved-best').textContent=best.toLocaleString('en-US');
-  if(next==='skins')renderSkins();
   if(next==='world')renderWorldMap();
   if(next==='achievements')renderAchievements();
   const panel=$(next+'-menu');
@@ -3434,69 +3458,144 @@ function showScreen(next){
 }
 // Public-domain Natural Earth 1:110m land polygons rasterized in equirectangular projection.
 const WORLD_LAND='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF//gD//+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////////8AAAAAAAAAAAMAAAAAAAAAAAAAAAAAAf////////wAA//gB+AAAA/gAAAAAAAAAAAAAAAOf/////////AAAf8AAAAAAAP+AAAAAAAAAAAAAAHvB+/4//////AAAH+AAAAMAAA/4AAAAAAAAAAAAAP/3//gf////+AAAAAAAAf8AD//+AAf+AAAAAAAAA/ux//wAH////AAAAAAAB4AB////zgPsAAAAAAAAA/////8AB///+AAAAAAADwD//////4P8AAAwAfoAA//5+//4D///8AAAADgAD4P/////////8ABAB//9///////8B///8AAAA//gAD///////////9/wP/////////P+A///AAAAH//7////////////////P/////////P/g//wNYAAH////////////////////////////+f/Af/Af4AAP7/////////////////Dz/////////v+Af4AP4AB///////////////////An////////D/+APwAAAAH/P/////////////////AP///////8APyAHwAAAAH/v//////////////7/gAP/8v////8Af/AAAAAAMH/H//////////////z5AAAfgD/////AP/gAAAAAOD+P////////////4APgAAA/AAf////4P/wAAAAAeB+P////////////wAfgAADgAAf///////8AAAAA/B///////////////AfgAAAAAAX/////f/+AAAAB/3///////////////AeAAAAAAAL////////AAAAB/////////////////AMAAAAAAAD///////3AAAAAP////////////////AAAAAAAAAA///////vgAAAAP////////////////gAAAAAAAAAf//////fgAAAAH/////4/////////7AAAAAAAAAAf//////4AAAAAB/////g/////////7AAAAAAAAAAf//////AAAAAA5///zfh/////////jgAAAAAAAAA//////wAAAAAB//9/jPg/////////HwAAAAAAAAAf/////wAAAAAB/5v///wf///////4HAAAAAAAAAAf////+AAAAAAB/hn///w////////4GAAAAAAAAAAf////+AAAAAAB/hPf//w///////5wMAAAAAAAAAAP////8AAAAAAA//2M//4///////84cAAAAAAAAAAH////8AAAAAAAf/wHH/////////w/8AAAAAAAAAAH////wAAAAAAA//wAB/////////4vgAAAAAAAAAAB////gAAAAAAB//+fL/////////8OAAAAAAAAAAAA////AAAAAAAB//////////////8MAAAAAAAAAAAA///ngAAAAAAD//////////////8AAAAAAAAAAAAAf/wDoAAAAAAH//////7///////8AAAAAAAAAAAAAP/wB4AAAAAAP////+/////////wAAAAAAAAAAAAAH/gB4AAAAAAf///////3//////8AAAAAAAAAAAAAD/gH4AAAAAAf/////f/8P/////oAAAAAAAAcAAAAAfw/8AAAAAA//////v/8D////+IAAAAAAAAGAAAAAfx4fwAAAAA//////v/4D/+f/4AAAAAAAAACAAAAAP/wf+AAAAAf/////3/4A/4P+wMAAAAAAAAAAAAAAH/wMmAAAAA//////3/wA/wH/AMAAAAAAAAAAAAAAA/+AAAAAAA//////7+AAfgP/gcAAAAAAAAAAAAAAAD+AAAAAAA///////8AAfAB/gOAAAAAAAAAAAAAAAA+AwAAAAA///////2AAfAB/gPAAAAAAAAAAAAAAAAOH9wAAAAf//////+AAPABvgXAAAAAAAAAAAAAAAAP3/wAAAAP//////8AAPABnA3gAAAAAAAAAAAAAAAD//4AAAAH//////8AAHgBiAngAAAAAAAAAAAAAAAAv/9AAAAH//////4AABgA4BngAAAAAAAAAAAAAAAAP//wAAAB/n////4AABAG4DxAAAAAAAAAAAAAAAAAP//wAAAAgH////wAAAAD4HwAAAAAAAAAAAAAAAAAf//4AAAAAA////wAAAAB8fhQAAAAAAAAAAAAAAAA///4AAAAAA////AAAAAB8//wAAAAAAAAAAAAAAAA///+AAAAAB///+AAAAAA8/+XAAAAAAAAAAAAAAAA////8AAAAA///8AAAAAAefcf+DAAAAAAAAAAAAAB////+AAAAAf//4AAAAAAOPd//jgAAAAAAAAAAAAB/////gAAAAf//4AAAAAAHAeB//QAAAAAAAAAAAAB/////gAAAAP//4AAAAAAD8ABP+cAAAAAAAAAAAAAf////gAAAAP//4AAAAAAA/9gf4HAAAAAAAAAAAAAf////gAAAAP//4AAAAAAAB7ADODgAAAAAAAAAAAAP////AAAAAH//4AAAAAAAAAHjCBgAAAAAAAAAAAAP///+AAAAAP//8MAAAAAAAAPzAAAAAAAAAAAAAAAH///+AAAAAP//8cAAAAAAAB/jgAEAgAAAAAAAAAAH///+AAAAAf//58AAAAAAAD/zgAEBgAAAAAAAAAAA///8AAAAAf//58AAAAAAAH//wAEDAAAAAAAAAAAAf//8AAAAAf//h4AAAAAAAP//4AADAAAAAAAAAAAAf//8AAAAAP//B4AAAAAAB///8AYAAAAAAAAAAAAAf//4AAAAAH//DwAAAAAAH///+AcAAAAAAAAAAAAAf//4AAAAAH//DwAAAAAAH///+AAAAAAAAAAAAAAAf//AAAAAAH//BwAAAAAAH////AAAAAAAAAAAAAAA//8AAAAAAH/8AgAAAAAAH////gAAAAAAAAAAAAAA//8AAAAAAD/8AAAAAAAAD////gAAAAAAAAAAAAAA//8AAAAAAD/8AAAAAAAAD////gAAAAAAAAAAAAAA//4AAAAAAB/4AAAAAAAAD////gAAAAAAAAAAAAAA//wAAAAAAB/wAAAAAAAAB/7//AAAAAAAAAAAAAAA//gAAAAAAA/gAAAAAAAAD+B//AAQAAAAAAAAAAAB//AAAAAAAAQAAAAAAAAABwA/+AAYAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAH+AAcAAAAAAAAAAAD/8AAAAAAAAAAAAAAAAAAAAAH8AAPAAAAAAAAAAAD/gAAAAAAAAAAAAAAAAAAAAAAQAAeAAAAAAAAAAAD/gAAAAAAAAAAAAAAAAAAAAAA4AA8AAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAA4ABwAAAAAAAAAAAD+AAAAAAAAAAAAAAAAAAAAAAAQADwAAAAAAAAAAAD+AAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAH+AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAH+AAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAH4AAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAH4cAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAABwAAAAMEAAgAAAAAAAAAAAAAAAAPgAAAAAAAAAAAP8gA///////wAAAAAAAAAAAAAAAfAAAAAAAAAADH//+D////////wAAAAAAAAAAAAAA/gAAAAAADv7////+//////////AAAAAAAAAAHwAH/gAAAAD////////////////////gAAAAABqAP/8r/wAAAAf////////////////////gAAAAH///P////wAAAA////////////////////+AAAAD/////////AAAB/////////////////////wAAAP/////////gACAf/////////////////////wAAD/////////+AAPw//////////////////////8AAAgH////////n5/wf/////////////////////AAAAH//////////4////////////////////////wAAgB///////////////////////////////////+A////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////';
-function drawMiamiMap(container){
-  const frame=document.createElement('div'), canvas=document.createElement('canvas');
-  frame.className='pixel-map';
-  canvas.width=240;canvas.height=120;
-  canvas.setAttribute('role','img');
-  canvas.setAttribute('aria-label','World map with a playable destination in Miami, Florida');
-  const ctx=canvas.getContext('2d'),land=atob(WORLD_LAND),image=ctx.createImageData(240,120);
-  const isLand=(x,y)=>x>=0&&x<240&&y>=0&&y<120&&(land.charCodeAt(y*30+(x>>3))&(128>>(x&7)))!==0;
-  for(let y=0;y<120;y++)for(let x=0;x<240;x++){
-    const filled=isLand(x,y);
-    const edge=filled&&(!isLand(x+1,y)||!isLand(x-1,y)||!isLand(x,y+1)||!isLand(x,y-1));
-    const grid=x%20===0||y%15===0;
-    const color=edge?[241,87,168]:filled?(grid?[25,37,68]:[13,25,48]):grid?[37,118,147]:[20,86,117];
-    const at=(y*240+x)*4;
-    image.data.set(color,at);
-    image.data[at+3]=255;
+const MIAMI_COORDINATES=[25.7617,-80.1918];
+const GLOBE_MARKERS=[MIAMI_COORDINATES,[47,-120],[-22,-49],[62,21],[19,41],[-32,22],[45,102],[18,142],[-34,151],[-18,-151]];
+const radians=Math.PI/180;
+let stopWorldGlobe=null, globeLand=null;
+function worldPoint(lat,lon){
+  const radius=Math.cos(lat*radians);
+  return [radius*Math.sin(lon*radians),Math.sin(lat*radians),radius*Math.cos(lon*radians)];
+}
+function getGlobeLand(){
+  if(globeLand)return globeLand;
+  const bits=atob(WORLD_LAND);
+  const has=(x,y)=>y>=0&&y<120&&(bits.charCodeAt(y*30+((x+240)%240>>3))&(128>>((x+240)%240&7)));
+  globeLand=[[],[]];
+  for(let y=0;y<120;y+=2)for(let x=0;x<240;x+=2){
+    if(!has(x,y))continue;
+    const edge=!has(x-2,y)||!has(x+2,y)||!has(x,y-2)||!has(x,y+2);
+    globeLand[Number(edge)].push(worldPoint(90-(y+.5)*1.5,(x+.5)*1.5-180));
   }
-  ctx.putImageData(image,0,0);
-  frame.append(canvas);
-  const miami=document.createElement('button');
-  miami.className='map-destination';
-  miami.type='button';
-  miami.setAttribute('aria-label','Select Miami 1986 on the map');
-  miami.onclick=()=>selectSkin(SKINS.miami);
-  frame.append(miami);
-  for(const [x,y] of [[52,29],[72,42],[81,66]]){
-    const node=document.createElement('span');
-    node.className='map-mystery';
-    node.textContent='?';
-    node.setAttribute('aria-hidden','true');
-    node.style.left=x+'%';node.style.top=y+'%';
-    frame.append(node);
-  }
-  const caption=document.createElement('p');
-  caption.textContent='MIAMI 1986 · PLAYABLE   /   ? · UNCHARTED';
-  container.append(frame,caption);
+  return globeLand;
 }
 function renderWorldMap(){
-  const list=$('world-list'),presentation=$('world-presentation');
-  list.replaceChildren();
-  presentation.replaceChildren();
-  activeSkin.menu.worldMap?.(presentation);
-  for(const category of WORLD_CATEGORIES){
-    const group=document.createElement('section'), title=document.createElement('h3');
-    group.className='world-group';
-    title.textContent=category.title;
-    group.append(title);
-    for(const skin of Object.values(SKINS).filter(skin=>skin.worldCategory===category.id)){
-      const tile=document.createElement(skin.available?'button':'div');
-      tile.className='world-tile';
-      const name=document.createElement('strong'), status=document.createElement('small');
-      name.textContent=skin.name;
-      status.textContent=skin.available?(skin===activeSkin?'Playable · Selected':'Playable'):'Planned · Unavailable';
-      tile.append(name,status);
-      if(skin.available)tile.onclick=()=>selectSkin(skin);
-      group.append(tile);
-    }
-    const unknown=document.createElement('div');
-    unknown.className='world-tile';
-    unknown.textContent=category.unknown+' · Unknown';
-    group.append(unknown);
-    list.append(group);
+  const stage=$('globe-stage'), canvas=$('world-globe'), ctx=canvas.getContext('2d');
+  const markers=$('globe-markers'), details=$('destination-panel');
+  markers.replaceChildren();
+  details.hidden=true;
+  let lon=-103,lat=16,zoom=1,target=null,drag=null,frame=0,last=0,lastPaint=-Infinity;
+  const side=canvas.width,center=side/2, points=getGlobeLand();
+  const sphere=ctx.createRadialGradient(center*.74,center*.63,6,center,center,center);
+  sphere.addColorStop(0,'#222955');sphere.addColorStop(.72,'#0b1837');sphere.addColorStop(1,'#070d22');
+  const nodePoints=GLOBE_MARKERS.map(([a,b])=>worldPoint(a,b));
+  const graticules=[];
+  for(let i=-60;i<=60;i+=30)graticules.push(Array.from({length:73},(_,j)=>worldPoint(i,j*5)));
+  for(let i=0;i<360;i+=30)graticules.push(Array.from({length:37},(_,j)=>worldPoint(j*5-90,i)));
+  function choose(index){
+    const [a,b]=GLOBE_MARKERS[index];
+    target={lat:a,lon:lon+((b-lon)%360+540)%360-180,zoom:1.18};
+    details.hidden=false;
+    $('destination-name').textContent=index===0?'Miami 1986':'?';
+    $('destination-tagline').textContent=index===0?'Back to Ocean Drive':'Coming soon';
+    $('destination-status').textContent=index===0?'Unlocked':'Coming soon';
+    $('enter-miami').hidden=index!==0;
+    $('destination-name').focus({preventScroll:true});
+    if(reducedMotion.matches){({lat,lon,zoom}=target);draw();}
   }
+  const nodes=nodePoints.map((_,i)=>{
+    const button=document.createElement('button');
+    button.type='button';
+    button.className=i===0?'globe-marker globe-miami':'globe-marker';
+    button.setAttribute('aria-label',i===0?'Miami 1986 on globe':'Mystery marker '+i+' of 9, coming soon');
+    button.textContent=i===0?'◆':'?';
+    button.onclick=()=>choose(i);
+    markers.append(button);
+    return button;
+  });
+  function draw(){
+    const a=lat*radians,b=lon*radians,r=side*.395*zoom;
+    const sa=Math.sin(a),ca=Math.cos(a),sb=Math.sin(b),cb=Math.cos(b);
+    const rotate=(x,y,z)=>{
+      const forward=z*cb+x*sb;
+      return [center+r*(x*cb-z*sb),center-r*(y*ca-forward*sa),y*sa+forward*ca];
+    };
+    ctx.clearRect(0,0,side,side);
+    ctx.beginPath();
+    ctx.arc(center,center,r,0,Math.PI*2);
+    ctx.fillStyle=sphere;ctx.fill();
+    ctx.save();ctx.clip();
+    ctx.strokeStyle='#7092ee45';ctx.lineWidth=1;
+    ctx.beginPath();
+    for(const line of graticules){
+      let visible=false;
+      for(const position of line){
+        const [x,y,z]=rotate(...position);
+        if(z<0){visible=false;continue;}
+        if(visible)ctx.lineTo(x,y);
+        else ctx.moveTo(x,y);
+        visible=true;
+      }
+    }
+    ctx.stroke();
+    for(const [index,land] of points.entries()){
+      ctx.fillStyle=index?'#80f4f3b8':'#9c8cf29c';
+      ctx.beginPath();
+      for(const position of land){
+        const [x,y,z]=rotate(...position);
+        if(z<0)continue;
+        const size=1.55+z*1.6;
+        ctx.rect(x-size*.5,y-size*.5,size,size);
+      }
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.strokeStyle='#89ccffb8';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(center,center,r,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='#7779ff45';ctx.lineWidth=8;ctx.stroke();
+    nodes.forEach((node,i)=>{
+      const [x,y,z]=rotate(...nodePoints[i]);
+      node.hidden=z<.12;
+      if(node.hidden)return;
+      node.style.left=x/side*100+'%';
+      node.style.top=y/side*100+'%';
+    });
+  }
+  function animate(now){
+    if(document.hidden){last=0;frame=requestAnimationFrame(animate);return;}
+    const delta=last?Math.min(50,now-last):0;
+    last=now;
+    if(!reducedMotion.matches&&!drag&&!stage.contains(document.activeElement)){
+      if(target){
+        const ease=1-Math.exp(-delta/180);
+        lat+=(target.lat-lat)*ease;lon+=(target.lon-lon)*ease;zoom+=(target.zoom-zoom)*ease;
+      }else lon=(lon+delta*.0028)%360;
+    }
+    if(now-lastPaint>=33&&!reducedMotion.matches){draw();lastPaint=now;}
+    frame=requestAnimationFrame(animate);
+  }
+  function rotateBy(degrees){
+    target=null;zoom=1;lon=(lon+degrees)%360;
+    draw();
+  }
+  canvas.onpointerdown=event=>{
+    drag={x:event.clientX,lon};
+    target=null;zoom=1;
+    canvas.setPointerCapture(event.pointerId);
+  };
+  canvas.onpointermove=event=>{
+    if(!drag)return;
+    lon=(drag.lon-(event.clientX-drag.x)*.53)%360;
+    if(reducedMotion.matches)draw();
+  };
+  canvas.onlostpointercapture=()=>{drag=null};
+  $('globe-left').onclick=()=>rotateBy(-45);
+  $('globe-right').onclick=()=>rotateBy(45);
+  $('focus-miami').onclick=()=>choose(0);
+  $('enter-miami').onclick=()=>selectSkin(SKINS.miami);
+  $('enter-classic').onclick=()=>selectSkin(SKINS.classic);
+  draw();
+  frame=requestAnimationFrame(animate);
+  stopWorldGlobe=()=>cancelAnimationFrame(frame);
 }
 function selectSkin(skin){
   if(!skin.available)return;
@@ -3520,25 +3619,8 @@ function selectSkin(skin){
     $('start').disabled=true;
     scene.scene.restart();
   }
-  showScreen('skins');
+  showScreen('main');
   if(changed)syncMenuAmbience(true);
-}
-function renderSkins(){
-  const list=$('skin-list');
-  list.replaceChildren();
-  for(const skin of Object.values(SKINS)){
-    const tile=document.createElement('button');
-    tile.className='skin-tile';
-    tile.type='button';
-    tile.disabled=!skin.available;
-    tile.setAttribute('aria-pressed',String(skin===activeSkin));
-    const name=document.createElement('strong'), detail=document.createElement('span');
-    name.textContent=skin.name;
-    detail.textContent=skin.category+' · '+(skin.available?(skin===activeSkin?'Selected':'Available'):'Coming soon');
-    tile.append(name,detail);
-    if(skin.available)tile.onclick=()=>selectSkin(skin);
-    list.append(tile);
-  }
 }
 function renderAchievements(){
   const definitions=achievementDefinitions(achievementFilter);
@@ -3574,7 +3656,6 @@ function renderAchievements(){
   }
 }
 function refreshOptions(){
-  $('classic-audio-note').hidden=activeSkin.id!=='classic'||!!activeSkin.music;
   $('option-music').checked=musicEnabled;
   $('option-effects').checked=effectsEnabled;
   $('option-motion').checked=settings.reduceMotion;
