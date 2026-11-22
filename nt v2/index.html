@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 3.9 · NEON TAKEOVER</title>
+<title>REACTOR 4.0 · OCEAN DRIVE</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -229,12 +229,28 @@ button{font:inherit;cursor:pointer}
 #arcade-fx.show .fx-seal::before{animation:banner-border var(--fx-time) ease-out both}
 @keyframes banner-border{0%{opacity:0}25%{opacity:1}69%{opacity:.92}100%{opacity:.2}}
 @media(prefers-reduced-motion:reduce){#arcade-fx.show .fx-seal::before{animation:none}}
+#reactor-stack #reactor-meter{border-radius:6px;box-shadow:inset 2px 0 var(--pressure);background:linear-gradient(100deg,color-mix(in srgb,var(--pressure),#1b1429 84%),#16172c);padding:1px 7px}
+#reactor-stack #reactor-meter .bar{height:10px}
+#reactor-meter .meter-label>span:first-child{font-weight:950;color:#fff3f4}
+#reactor-meter #pct{font-size:clamp(15px,4vw,19px);line-height:14px;text-shadow:0 0 6px color-mix(in srgb,var(--pressure),transparent 62%)}
+#reactor-meter[data-danger="critical"],#reactor-meter[data-danger="maximum"],#reactor-meter[data-danger="failed"]{outline:1px solid color-mix(in srgb,var(--pressure),transparent 35%)}
+#reactor-meter[data-danger="maximum"] .meter-label,#reactor-meter[data-danger="failed"] .meter-label{color:#fff3f5}
+#reactor-stack[data-compact="true"] #reactor-meter .bar{height:8px}
+#reactor-stack[data-compact="true"] #reactor-meter #pct{font-size:15px;line-height:13px}
+#arcade-fx .fx-seal{width:100%;padding-inline:3%}
+#arcade-fx .fx-seal::before{inset:0 -2%;background:linear-gradient(110deg,#262363f0,#131330f7 43%,#451a5af0);border-width:2px 0;box-shadow:inset 0 1px 9px #54fff6a5,inset 0 -1px 9px #ff59bdab}
+#arcade-fx[data-effect="super"]{--headline:clamp(12px,calc(var(--board-fx-span) * .089),54px)}
+#arcade-fx[data-effect="mega"]{--headline:clamp(12px,calc(var(--board-fx-span) * .094),64px)}
+#arcade-fx[data-effect="overdrive"]{--headline:clamp(16px,calc(var(--board-fx-span) * .137),74px)}
+#arcade-fx .fx-arc-left{right:80%;background:#68fff2}
+#arcade-fx .fx-arc-right{left:80%;background:#ff73df}
+@media (max-width:360px){#pressure-state{font-size:7px}#reactor-stack #reactor-meter{padding-inline:5px}}
 </style>
 </head>
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>3.9</span></div><div class="subtitle">Neon Takeover</div></div>
+  <div><div class="brand">REACTOR <span>4.0</span></div><div class="subtitle">Ocean Drive</div></div>
   <div class="stats" id="score-module"><div class="score-readout"><span class="stat-label">Score</span><strong id="score">0</strong></div><div class="best-readout"><span class="stat-label">Best</span><strong id="best">0</strong></div></div>
 </header>
 <div id="combo"></div>
@@ -244,7 +260,7 @@ button{font:inherit;cursor:pointer}
   </div>
 </div>
 <div id="reactor-stack" data-overdrive="charge">
-  <div id="reactor-meter" data-danger="stable"><div class="meter-label"><span>REACTOR / PRESSURE</span><span id="pressure-state">STABLE</span><strong id="pct">10%</strong></div><div class="bar"><div id="pfill" class="pressure"></div></div></div>
+  <div id="reactor-meter" data-danger="stable"><div class="meter-label"><span>REACTOR PRESSURE</span><span id="pressure-state">STABLE</span><strong id="pct">10%</strong></div><div class="bar"><div id="pfill" class="pressure"></div></div></div>
 <div id="overdrive-status" data-state="charge"><div class="overdrive-label"><span class="energy-label">OVERDRIVE</span><span id="epct"><span id="drive-mode">CHARGE</span><strong id="drive-value">0%</strong></span></div><div class="bar energy-reservoir" aria-hidden="true"><div id="efill" class="energy"></div></div></div>
 </div>
 <div id="bottom">
@@ -254,7 +270,7 @@ button{font:inherit;cursor:pointer}
   </div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 3.9 · MIAMI 1986</div><h1>NEON <span>TAKEOVER</span></h1>
+  <div class="eyebrow">REACTOR 4.0 · MIAMI 1986</div><h1>OCEAN <span>DRIVE</span></h1>
   <p>Tap a group of two or more gems. Bigger groups cool the reactor. Chain clears to charge OVERDRIVE.</p>
   <button id="start">PLAY</button>
 </div></div>
@@ -276,16 +292,20 @@ const PRESSURE={
   maxGroupCooling:20
 };
 const CITY_TRANSITION_MS=6000;
+const CITY_SCORE_PHASE_COUNT=4;
+const CITY_CYCLE_MS=96000;
+const CITY_CYCLE_STOPS=[[0,3],[10000,3],[24000,4],[40000,0],[58000,1],[73000,2],[87000,3],[CITY_CYCLE_MS,3]];
 const CITY_PHASES=[
   {score:0,sky:['#804875','#f6a089','#ffdb92'],sun:1,lights:.72,night:0,reflection:.65,depth:.65,glow:[0xffa46e,0xffc16e],halo:.31,sea:[0x39d9cd,0x137a9d],sand:0xf6bd83,sunDrop:0},
   {score:5000,sky:['#362f77','#9943af','#ef80ab'],sun:.58,lights:.82,night:.19,reflection:.78,depth:.86,glow:[0xff78d3,0x9fa5ff],halo:.34,sea:[0x609dc6,0x383c89],sand:0xae779f,sunDrop:.72},
   {score:15000,sky:['#192957','#493184','#994da6'],sun:0,lights:.98,night:.38,reflection:.93,depth:1.08,glow:[0xff49c5,0x5dfcff],halo:.39,sea:[0x224f89,0x14184d],sand:0x58538b,sunDrop:1.17},
-  {score:35000,sky:['#0e1a45','#342766','#763784'],sun:0,lights:1,night:.62,reflection:1,depth:1.32,glow:[0xff53df,0x46f5ff],halo:.49,sea:[0x184b7c,0x11143b],sand:0x473879,sunDrop:1.46}
+  {score:35000,sky:['#0e1a45','#342766','#763784'],sun:0,lights:1,night:.62,reflection:1,depth:1.32,glow:[0xff53df,0x46f5ff],halo:.49,sea:[0x184b7c,0x11143b],sand:0x473879,sunDrop:1.46},
+  {sky:['#394684','#da729e','#ffd4a7'],sun:.73,lights:.78,night:.14,reflection:.69,depth:.74,glow:[0xff9c8f,0x8ff3ed],halo:.32,sea:[0x45c3c5,0x246c96],sand:0xe9ac8d,sunDrop:.61}
 ];
 const MAX_PARTICLES=80, FALL_MS=115;
 let board=[],score=0,pressure=PRESSURE.initial,energy=0,combo=0,lastMove=-Infinity;
-let cityPhase=0,phaseStarted=0;
-let cityMix=[1,0,0,0],cityFrom=cityMix.slice();
+let cityPhase=0,phaseStarted=0,cityCycleStart=null;
+let cityMix=[1,0,0,0,0],cityFrom=cityMix.slice();
 let qualityMoves=0,comboTier=0,critical=false;
 let elapsed=0,nextDisturbance=DISTURBANCE_MS,overUntil=0,recoverUntil=0,settleEvent=null;
 let playing=false,busy=false,musicEnabled=true,effectsEnabled=true,scene=null,audio=null,best=0;
@@ -300,9 +320,10 @@ let scoreShown=0, scoreFrom=0, scoreTarget=0, scoreCountAt=0, scoreSurgeUntil=0;
 let surgeDisplayed=false;
 try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
 const MUSIC_PATH='./audio/miami-reactor.mp3';
-const MUSIC_VOLUME=.42;
+const MUSIC_VOLUME=.33;
+const EFFECTS_VOLUME=.98;
 let musicTrack=null, effectsBus=null, musicNeedsGesture=false, musicFailed=false;
-let musicFade=0, tensionBus=null, tensionLevel=0, nextTensionAt=0;
+let musicFade=0, musicDuckUntil=0, tensionBus=null, tensionLevel=0, nextTensionAt=0;
 
 function setMusicStatus(message){
   const button=$('music-toggle');
@@ -357,17 +378,17 @@ function syncMusic(fromGesture=false){
 function resetMusicFade(){
   if(musicFade)cancelAnimationFrame(musicFade);
   musicFade=0;
+  musicDuckUntil=0;
   if(!musicTrack)return;
   musicTrack.volume=MUSIC_VOLUME;
 }
 function stopMusic(){
   if(!musicTrack)return;
-  resetMusicFade();
   if(musicTrack.paused)return;
-  const start=performance.now();
+  const start=performance.now(), volume=musicTrack.volume;
   const fade=now=>{
     const remaining=Math.max(0,1-(now-start)/540);
-    musicTrack.volume=MUSIC_VOLUME*remaining**2;
+    musicTrack.volume=volume*remaining**2;
     if(remaining>0)musicFade=requestAnimationFrame(fade);
     else{
       musicFade=0;
@@ -393,7 +414,7 @@ function unlockEffects(){
     limiter.connect(audio.destination);
   }
   const now=audio.currentTime;
-  effectsBus.gain.setTargetAtTime(.85,now,.026);
+  effectsBus.gain.setTargetAtTime(EFFECTS_VOLUME,now,.026);
   if(audio.state!=='running')audio.resume().catch(()=>{});
 }
 function sound(frequency,duration=.14,type='triangle',volume=.035,offset=0,endFrequency=0,bus=effectsBus){
@@ -535,7 +556,16 @@ function resetAnnouncements(){
   $('announcement').textContent='';
   $('announcement-points').textContent='';
 }
+function updateMusicMix(delta){
+  if(!musicTrack||musicTrack.paused)return;
+  const target=effectsEnabled&&elapsed<musicDuckUntil?MUSIC_VOLUME*.74:MUSIC_VOLUME;
+  const next=musicTrack.volume+(target-musicTrack.volume)*(1-Math.exp(-delta/65));
+  if(Math.abs(next-musicTrack.volume)>.0004)musicTrack.volume=next;
+}
 function cue(kind){
+  if(effectsEnabled&&audio?.state==='running'&&(kind==='super'||kind==='mega'||kind==='overdrive')){
+    musicDuckUntil=Math.max(musicDuckUntil,elapsed+(kind==='overdrive'?510:300));
+  }
   const tier=Math.min(5,Math.max(0,combo-2));
   switch(kind){
     case 'overdrive':
@@ -593,8 +623,22 @@ function chargeOverdrive(amount){
   cue('overdrive');
 }
 function updateCityPhase(){
+  if(cityCycleStart!==null){
+    const time=(elapsed-cityCycleStart)%CITY_CYCLE_MS;
+    let stop=1;
+    while(CITY_CYCLE_STOPS[stop][0]<=time)stop++;
+    const [fromTime,from]=CITY_CYCLE_STOPS[stop-1];
+    const [toTime,to]=CITY_CYCLE_STOPS[stop];
+    const ratio=(time-fromTime)/(toTime-fromTime);
+    const ease=ratio*ratio*(3-2*ratio);
+    cityMix.fill(0);
+    cityMix[from]=1-ease;
+    cityMix[to]+=ease;
+    cityPhase=from;
+    return;
+  }
   let phase=cityPhase;
-  while(phase+1<CITY_PHASES.length&&score>=CITY_PHASES[phase+1].score)phase++;
+  while(phase+1<CITY_SCORE_PHASE_COUNT&&score>=CITY_PHASES[phase+1].score)phase++;
   if(phase!==cityPhase){
     cityFrom=cityMix.slice();
     cityPhase=phase;
@@ -603,6 +647,7 @@ function updateCityPhase(){
   const ratio=Math.min(1,(elapsed-phaseStarted)/CITY_TRANSITION_MS);
   const ease=ratio*ratio*(3-2*ratio);
   for(let i=0;i<cityMix.length;i++)cityMix[i]=cityFrom[i]*(1-ease)+(i===cityPhase?ease:0);
+  if(cityPhase===CITY_SCORE_PHASE_COUNT-1&&ratio===1)cityCycleStart=phaseStarted+CITY_TRANSITION_MS;
 }
 function makeCitySkies(game){
   return CITY_PHASES.map((phase,index)=>{
@@ -618,6 +663,27 @@ function makeCitySkies(game){
     texture.refresh();
     return game.add.image(0,0,key).setOrigin(0).setDepth(-9.8+index*.04);
   });
+}
+function makeBeachWalkers(game){
+  const body=game.make.graphics({add:false});
+  for(let i=0;i<2;i++){
+    body.clear();
+    body.fillStyle(0x130e27,.51);
+    body.fillEllipse(9,21,12,2.5);
+    body.lineStyle(1.6,0x24162c,1);
+    body.lineBetween(8,13,5+i*4,20);
+    body.lineBetween(9,13,12-i*4,20);
+    body.fillStyle(i===0?0xea8b78:0x87dfcb,1);
+    body.fillRoundedRect(5,6,7,9,2);
+    body.lineStyle(1.25,0xd69c9b,1);
+    body.lineBetween(6,8,3+i*2,13);
+    body.lineBetween(11,8,14-i*2,12);
+    body.fillStyle(0xd9a48e,1);
+    body.fillCircle(8.5,4,2.5);
+    body.generateTexture('beach-step-'+i,18,23);
+  }
+  body.destroy();
+  return Array.from({length:4},()=>game.add.image(0,0,'beach-step-0').setOrigin(.5,1).setDepth(-7.4));
 }
 function makeNeonHalos(game){
   const texture=game.textures.createCanvas('neon-halo',64,64);
@@ -757,8 +823,9 @@ function start(){
   score=0;
   cityPhase=0;
   phaseStarted=0;
-  cityMix=[1,0,0,0];
+  cityMix=[1,0,0,0,0];
   cityFrom=cityMix.slice();
+  cityCycleStart=null;
   cityImpact=0;
   lastReactorTick=0;
   resetAnnouncements();
@@ -990,6 +1057,8 @@ class Game extends Phaser.Scene{
     this.coasts=CITY_PHASES.map((_,i)=>this.add.graphics().setDepth(-8.95+i*.02));
     this.surf=this.add.graphics().setDepth(-8.84);
     this.promenade=this.add.graphics().setDepth(-8.1);
+    this.beachLife=this.add.graphics().setDepth(-7.9);
+    this.walkers=makeBeachWalkers(this);
     this.stars=this.add.graphics().setDepth(-9.2);
     this.cityShade=this.add.graphics().setDepth(-7.8);
     this.cityWindows=this.add.graphics().setDepth(-7.7);
@@ -1032,6 +1101,7 @@ class Game extends Phaser.Scene{
     changePressure(passivePressureBetween(elapsed-delta,elapsed));
     if(!playing)return;
     updateTension();
+    updateMusicMix(delta);
     const comboExpired=combo>0&&elapsed-lastMove>=COMBO_MS;
     if(comboExpired)combo=0;
     const reactorTick=elapsed<recoverUntil?Math.floor((elapsed<overUntil?overUntil-elapsed:recoverUntil-elapsed)/100):0;
@@ -1101,7 +1171,7 @@ class Game extends Phaser.Scene{
     const span=this.cell*N;
     const overlay=$('arcade-fx').style;
     overlay.setProperty('--board-center-x',canvas.left+(this.left+span/2)*sx+'px');
-    overlay.setProperty('--board-center-y',canvas.top+(this.top+span/2)*sy+'px');
+    overlay.setProperty('--board-center-y',canvas.top+(this.top+span*.39)*sy+'px');
     overlay.setProperty('--board-fx-span',span*sx+'px');
     const shutdown=$('overlay').style;
     shutdown.setProperty('--shutdown-x',canvas.left+this.left*sx+'px');
@@ -1199,22 +1269,24 @@ class Game extends Phaser.Scene{
       layer.clear();
       layer.fillGradientStyle(phase.sea[0],phase.sea[0],phase.sea[1],phase.sea[1]);
       layer.fillRect(0,horizon,w,h-horizon);
-      layer.lineStyle(1,i<2?0xd4fff3:0x8faeff,i<2?.60:.36);
+      layer.lineStyle(1,phase.sun>.5?0xd4fff3:0x8faeff,phase.sun>.5?.60:.36);
       layer.lineBetween(0,horizon+1,w,horizon+1);
       layer.fillStyle(phase.sand,1);
       layer.fillPoints([{x:w*.82,y:horizon+15},{x:w,y:horizon+6},{x:w,y:h},
-        {x:w*.19,y:h},{x:w*.57,y:boardFoot+55}],true);
+        {x:w*.04,y:h},{x:w*.30,y:boardFoot+(h-boardFoot)*.70},
+        {x:w*.45,y:boardFoot+(h-boardFoot)*.43},{x:w*.57,y:boardFoot+20}],true);
       // Long, broken highlights form a reflection path without animating the whole ocean.
       for(let n=0;n<41;n++){
         const row=n/40, y=horizon+8+(h-horizon-12)*row**1.45;
         const center=w*(.48-.18*row);
         const x=center+(((n*53)%89)/89-.5)*w*(.12+row*.43);
-        const tint=i<2?(n%3===0?phase.glow[0]:0xffeaaa):phase.glow[n%2];
+        const tint=phase.sun>.5?(n%3===0?phase.glow[0]:0xffeaaa):phase.glow[n%2];
         layer.fillStyle(tint,(i<2?.26:.36)*(1-row*.59));
         layer.fillEllipse(x,y,9+(n*19)%39+row*23,1+row*1.5);
       }
-      layer.lineStyle(2,i<2?0xffffcf:phase.glow[1],.53);
-      layer.strokePoints([{x:w*.82,y:horizon+15},{x:w*.57,y:boardFoot+55},{x:w*.19,y:h}],false);
+      layer.lineStyle(2,phase.sun>.5?0xffffcf:phase.glow[1],.53);
+      layer.strokePoints([{x:w*.82,y:horizon+15},{x:w*.57,y:boardFoot+20},
+        {x:w*.45,y:boardFoot+(h-boardFoot)*.43},{x:w*.30,y:boardFoot+(h-boardFoot)*.70},{x:w*.04,y:h}],false);
     }
     surf.clear();
     for(let i=0;i<14;i++){
@@ -1226,15 +1298,15 @@ class Game extends Phaser.Scene{
       surf.lineBetween(x+13+i*2,y-2,x+22+i*3,y-4);
     }
     promenade.clear();
-    const foot=Math.max(horizon+25,boardFoot+10);
+    const foot=this.beachPathStart=Math.max(horizon+25,boardFoot+16);
     promenade.fillStyle(0x201936,.88);
     promenade.fillPoints([{x:w*.95,y:horizon+18},{x:w,y:horizon+20},{x:w,y:h},
-      {x:w*.43,y:h},{x:w*.73,y:foot}],true);
+      {x:w*.56,y:h},{x:w*.77,y:foot}],true);
     promenade.lineStyle(2,0xeaaeb4,.65);
-    promenade.strokePoints([{x:w*.95,y:horizon+18},{x:w*.73,y:foot},{x:w*.43,y:h}],false);
+    promenade.strokePoints([{x:w*.95,y:horizon+18},{x:w*.77,y:foot},{x:w*.56,y:h}],false);
     for(let i=0;i<9;i++){
       const t=i/9,y=foot+(h-foot)*t;
-      const x=w*(.73-.30*t);
+      const x=w*(.77-.21*t);
       promenade.lineStyle(1,0xbb90b0,.32);
       promenade.lineBetween(x+6,y+2,Math.min(w,x+w*(.12+t*.29)),y+12);
       if(i%2===0){
@@ -1244,6 +1316,37 @@ class Game extends Phaser.Scene{
         promenade.fillStyle(0xffc38e,.8);
         promenade.fillCircle(x,y-height,1+t*1.3);
       }
+    }
+    this.paintBeachLife();
+  }
+  paintBeachLife(){
+    const {w,h,beachLife:g,beachPathStart:foot}=this;
+    g.clear();
+    const height=h-foot;
+    if(height<64)return;
+    const parasols=[[.51,.31,0xff709d],[.52,.54,0x77fff0],[.36,.76,0xffcf7b]];
+    for(const [horizontal,depth,color] of parasols){
+      const x=w*horizontal,y=foot+height*depth;
+      const size=Math.min(14,w*.037)*(0.77+depth*.49);
+      g.fillStyle(0x221736,.25);
+      g.fillEllipse(x+size*.4,y+size*.6,size*2.1,size*.50);
+      g.lineStyle(1.3,0x7c5169,1);
+      g.lineBetween(x,y+size*.53,x,y-size*.45);
+      g.fillStyle(color,1);
+      g.fillTriangle(x-size,y,x,y-size*.51,x+size,y);
+      g.fillStyle(0xffedd8,.67);
+      g.fillTriangle(x-size*.58,y,x,y-size*.51,x+size*.12,y);
+      g.fillStyle(0xaf627a,.64);
+      g.fillEllipse(x,y,size*2,size*.16);
+      g.fillStyle(0x32334a,.82);
+      g.fillRoundedRect(x+size*.53,y+size*.48,size*.71,size*.18,2);
+      g.fillStyle(0xb47474,1);
+      g.fillCircle(x+size*.64,y+size*.46,size*.13);
+    }
+    for(let i=0;i<4;i++){
+      const depth=.28+i*.19, x=w*(.77-.21*depth)+6, y=foot+height*depth;
+      g.fillStyle(i%2?0x604166:0xeeae8a,.65);
+      g.fillRoundedRect(x,y,6+depth*6,2+depth*2,1);
     }
   }
   paintSideCity(){
@@ -1502,7 +1605,22 @@ class Game extends Phaser.Scene{
     this.sideLights.setAlpha(Math.min(1,lights*(.82+(subdued?0:.18*Math.sin(time/1020)))+impact*.29+(active?.19:0)));
     this.streetGlow.setAlpha(Math.min(1,reflection*(.82+(subdued?0:.17*Math.sin(time/1420)))+impact*.34+(active?.17:0)));
     this.sun.setPosition(depth*2.6*sway,this.sunRadius*sunDrop);
-    this.surf.setX(subdued?0:Math.sin(time/2600)*3).setAlpha(.65+night*.32);
+    this.surf.setPosition(subdued?0:Math.sin(time/2300)*4,subdued?0:Math.sin(time/3200)*2)
+      .setAlpha(.64+night*.26+(subdued?0:.07*Math.sin(time/1850)));
+    this.beachLife.setAlpha(1-night*.44);
+    const waterfront=this.h-this.beachPathStart;
+    this.walkers.forEach((walker,i)=>{
+      const progress=subdued?(i+1)/5:(time/(13000+i*2200)+i*.27)%1;
+      const depth=i%2===0?progress:1-progress;
+      const scale=.38+depth*.48;
+      const direction=i%2===0?-1:1;
+      walker.setVisible(waterfront>=64)
+        .setPosition(this.w*(.79-.21*depth)+(i%2)*17,this.beachPathStart+waterfront*(.12+.72*depth))
+        .setScale(scale*direction,scale)
+        .setAlpha((1-night*.37)*Math.min(1,progress*8,(1-progress)*8));
+      const step=subdued?0:Math.floor((time+i*83)/180)%2;
+      if(walker.texture.key!=='beach-step-'+step)walker.setTexture('beach-step-'+step);
+    });
     this.city.setX(depth*1.2*sway);
     this.cityShade.setX(this.city.x);
     this.cityWindows.setX(this.city.x);
