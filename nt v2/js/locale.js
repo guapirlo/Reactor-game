@@ -1,6 +1,21 @@
 (function(root){
 'use strict';
 const words={
+  goalWaves:['Trigger {n} cascade waves','Déclenchez {n} vagues de cascade','Activa {n} oleadas de cascada'],
+  shortWaves:['Waves','Vagues','Oleadas'],
+  goalGrandGroups:['Clear {n} groups of 8 or more','Éliminez {n} groupes de 8 ou plus','Elimina {n} grupos de 8 o más'],
+  shortGrandGroups:['Large groups','Grands groupes','Grupos grandes'],
+  bonusGoal:['Optional bonus · {goal}','Bonus facultatif · {goal}','Bono opcional · {goal}'],
+  bonusComplete:['Optional bonus complete','Bonus facultatif réussi','Bono opcional completado'],
+  impulseInfo:['Groups of {n}+ can hit extra durability on adjacent reinforced locks and qualified seals.','Les groupes de {n}+ peuvent infliger un impact supplémentaire aux verrous renforcés et aux sceaux adjacents admissibles.','Los grupos de {n}+ pueden causar un impacto extra a candados reforzados y sellos adyacentes válidos.'],
+  masteryThreeStars:['Three-star missions','Missions à trois étoiles','Misiones de tres estrellas'],
+  masteryTitle:['Miami mastery','Maîtrise de Miami','Maestría de Miami'],
+  masteryBonus:['Optional bonuses','Bonus facultatifs','Bonos opcionales'],
+  masteryCool:['Wins at 35% pressure or less','Victoires à 35 % de pression ou moins','Victorias con 35 % de presión o menos'],
+  masteryNoDrive:['Wins without Overdrive','Victoires sans Overdrive','Victorias sin Overdrive'],
+  groupCrystals:['{n} CRYSTALS','{n} CRISTAUX','{n} CRISTALES'],
+  groupPulse:['PULSE ×{n}','IMPULSION ×{n}','PULSO ×{n}'],
+
   sunsetCongrats:['Congratulations','Félicitations','Felicidades'],
   sunsetReplay:['Replay drive','Revoir la balade','Repetir el paseo'],
   legacyStars:['Legacy','Historique','Histórico'],

@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="5.2.1">
-<title>REACTOR 5.2.1 · MIAMI SUNSET FINALE</title>
+<meta name="reactor-version" content="5.3.0">
+<title>REACTOR 5.3.0 · ARCADE MASTERY</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -803,6 +803,24 @@ html[data-reduce-motion=true] #mission-fill{transition:none}
   #celebration-name{font-size:23px}
   .comic-picture{max-height:min(73dvh,calc(100dvh - 92px))}
 }
+
+#mission-secondary{display:flex;flex-wrap:wrap;gap:2px 4px}
+.mission-chip{display:inline-flex;align-items:center;gap:3px;padding:0 4px;line-height:1.35;border:1px solid #554474;border-radius:4px;background:#1e1635;font-size:clamp(9px,2.6vw,11px);white-space:nowrap}
+.mission-chip>span{color:#64f5ff}
+.mission-chip:is([data-kind=moves],[data-kind=time]){border-color:#b54899;color:#fff3fc}
+.mission-chip[data-done=true]>span{color:#ffdb83}
+#group-preview{position:fixed;z-index:20;transform:translateX(-50%);pointer-events:none;padding:3px 9px;border:1px solid #71fcff;border-radius:5px;background:#100c23ed;color:#fff;font:750 11px system-ui;text-align:center}
+#campaign-mastery,#mission-bonus{border-left:2px solid #ffd36c;background:#21162f;color:#ffe5aa;padding:8px 12px}
+#campaign-mastery{margin:10px 12px;border-radius:8px}
+#campaign-mastery p{margin:4px 0}
+.level-node .map-stars{display:flex;justify-content:center;gap:1px;font-size:clamp(13px,4vw,17px);font-weight:900;white-space:nowrap;color:#a99cb9}
+.map-stars [data-earned=true]{color:#ffd36c;text-shadow:0 -1px #fff7ba,0 1px #7b4027,0 0 5px #ff913d}
+body[data-skin=miami] #mission-goals li{border-radius:4px 8px 8px 4px;box-shadow:inset 0 1px #bfa4ff25}
+body[data-skin=miami] #panel button[data-neon=next]{background:linear-gradient(#98faff,#25e8ff 62%,#29c5e4)}
+@media (prefers-reduced-motion:no-preference){
+  html:not([data-reduce-motion=true]) #mission-hud[data-complete=true] .mission-gauge{animation:goal-lock 440ms ease-out}
+}
+@keyframes goal-lock{35%{box-shadow:0 0 12px #ffd36c}}
 </style>
 </head>
 <body data-mode="menu">
@@ -813,6 +831,7 @@ html[data-reduce-motion=true] #mission-fill{transition:none}
   <div id="mission-secondary"></div>
 </div>
 <div id="board-input" aria-hidden="true"></div>
+<output id="group-preview" hidden></output>
 <div id="tap-hint" role="status" hidden></div>
 <svg id="tap-target" viewBox="0 0 32 32" aria-hidden="true" hidden><path d="M11 18V6a2.5 2.5 0 0 1 5 0v8l2-1 2 2 2-1 3 2v7l-4 6h-8l-7-9c-1-2 1-4 3-2l2 2Z" fill="#e8ffff" stroke="#121529" stroke-width="1.5"/></svg>
 <header id="hud">
@@ -904,6 +923,7 @@ html[data-reduce-motion=true] #mission-fill{transition:none}
     <div class="campaign-tools"><button id="current-level" data-i18n="current">Current level</button><button id="replay-celebration" data-i18n="celebrate" hidden>Replay celebration</button></div>
     <p id="campaign-secret" role="status"></p>
     <div id="campaign-map"></div>
+    <aside id="campaign-mastery" hidden></aside>
     <div id="chapter-films" class="campaign-tools archive-films" hidden></div>
     <button class="back" data-back-to="adventure" data-back data-i18n="back">Back</button>
   </section>
@@ -914,7 +934,7 @@ html[data-reduce-motion=true] #mission-fill{transition:none}
     </header>
     <div class="mission-body">
       <p id="mission-stars"></p>
-      <h3 data-i18n="requirements">Objectives</h3><ul id="mission-goals"></ul>
+      <h3 data-i18n="requirements">Objectives</h3><ul id="mission-goals"></ul><p id="mission-bonus"></p>
       <p id="mission-limits"></p><p id="mission-obstacles"></p>
       <details class="star-details"><summary data-i18n="starDetails">Star details</summary><p id="mission-star-help"></p></details>
       <p id="mission-locked" role="status"></p>
@@ -2180,7 +2200,7 @@ function clearEffects(){
   scene.gemLinkSignature=null;
   for(const item of [...scene.particles,...scene.gems])scene.tweens.killTweensOf(item);
   for(const item of scene.particles)item.setVisible(false);
-  for(const layer of [scene.gemLinks,scene.gemPulse]){
+  for(const layer of [scene.gemLinks,scene.gemPulse,scene.missionImpact]){
     if(!layer)continue;
     scene.tweens.killTweensOf(layer);
     layer.clear().setVisible(false);
@@ -2284,7 +2304,12 @@ function finish(result='reactor'){
   const previous=adventureRun&&masteryResults()[adventureRun.level.number];
   const earnedStars=won?adventure.stars(adventureRun,elapsed,pressure):0;
   if(adventureRun)adventureRun.settled=true;
-  const progression=playerProfile.complete(sessionRun,{score,elapsed,level:adventureRun?.level.number??null,stars:earnedStars,difficulty:adventureRun?.level.difficulty});
+  const feats=won&&adventureRun?{
+    bonus:adventure.bonusMet(adventureRun,score,elapsed,pressure),
+    coolFinish:pressure<=35,
+    noOverdrive:adventureRun.counts.overdrive===0
+  }:{};
+  const progression=playerProfile.complete(sessionRun,{score,elapsed,level:adventureRun?.level.number??null,stars:earnedStars,difficulty:adventureRun?.level.difficulty,feats});
   playing=false;
   busy=false;
   setMode('ended');
@@ -2354,7 +2379,7 @@ function labelComponents(){
 function collapse(groups,intensity=1,cascade=false){
   pulseGemGroups(groups);
   const labels=labelComponents();
-  if(adventureRun)adventure.applyClear(adventureRun,groups,cascade);
+  const hits=adventureRun?adventure.applyClear(adventureRun,groups,cascade):[];
   if(sessionRun)sessionRun.crystals+=groups.reduce((total,group)=>total+group.length,0);
   const columns=new Set();
   for(const group of groups){
@@ -2367,6 +2392,7 @@ function collapse(groups,intensity=1,cascade=false){
   }
   const moved=adventureRun?adventure.settle(adventureRun,board,labels,columns,rand):settleColumns(board,labels,columns,rand);
   paintBoard(moved);
+  paintMissionHits(hits);
   return {labels,moved};
 }
 function settleColumns(grid,labels,columns,nextGem){
@@ -2592,6 +2618,7 @@ class Game extends Phaser.Scene{
     this.boardFrame=this.add.graphics().setDepth(0);
     this.gemLinks=this.add.graphics().setDepth(.5).setVisible(false);
     this.missionMarks=this.add.graphics().setDepth(1.3);
+    this.missionImpact=this.add.graphics().setDepth(1.6);
     this.gemPulse=this.add.graphics().setDepth(1.5).setVisible(false);
     this.gems=Array.from({length:N*N},()=>this.add.image(0,0,gemTexture(0)).setDepth(1).setVisible(false));
     this.particles=Array.from({length:MAX_PARTICLES},()=>this.add.circle(0,0,2.5,0xffffff).setDepth(2).setVisible(false));
@@ -4304,7 +4331,8 @@ const rewardKeys={
   'golden-accent':'goldenAccent','violet-accent':'violetAccent','night-title':'nightTitle',
   'legend-frame':'legendFrame','miami-arcade':'miamiArcade'
 };
-const objectiveKeys={score:'Score',combos:'Combos',fragments:'Fragments',locks:'Locks',overdrive:'Overdrive',survival:'Survival',pressureMax:'PressureMax'};
+const objectiveKeys={score:'Score',combos:'Combos',fragments:'Fragments',locks:'Locks',overdrive:'Overdrive',survival:'Survival',pressureMax:'PressureMax',waves:'Waves',grandGroups:'GrandGroups'};
+const objectiveIcons={score:'◆',combos:'⤮',fragments:'◇',locks:'▣',overdrive:'ϟ',survival:'◷',pressureMax:'◉',waves:'≋',grandGroups:'✦',moves:'↪',time:'◷'};
 const masteryResults=()=>playerProfile.state.campaign.mastery[adventure.DIFFICULTY]||{};
 function playerNode(tag,text,className){
   const node=document.createElement(tag);
@@ -4436,7 +4464,7 @@ function chapterArt(theme){
     midnight:'<path d="M0 395v-70h23v-44h21v37h17v-36h32v40h19v56h44v-42h22v-50h24v68h37v-50h27v-29h27v55h21v-31h46v96z" fill="#171c37" stroke="#766bd2"/><path class="map-storefront" d="M30 310v33m47-46v37m111-29v46m85-55v50m55-24v29" stroke="#f584ef" stroke-width="4" stroke-dasharray="3 7"/><path d="M319 267l-34 57 21-8-22 43 48-59-22 9z" fill="#d3baff" opacity=".65"/>'
   };
   g.innerHTML='<rect width="360" height="530" fill="'+sky+'"/><circle cx="309" cy="58" r="41" fill="'+trim+'" opacity=".69"/><path d="'+land+'" fill="'+sea+'"/><path d="'+shore+'" fill="#241f45" opacity=".5"/>'+areas[theme]+hotels+palms+
-    '<path transform="translate(0 560) scale(1 -1)" d="'+route+'" stroke="#fd9adc" stroke-opacity=".42" stroke-width="30" fill="none"/><path transform="translate(0 560) scale(1 -1)" d="'+route+'" stroke="#271d41" stroke-width="25" fill="none"/><path transform="translate(0 560) scale(1 -1)" d="'+route+'" stroke="#ffc49c" stroke-width="1.4" stroke-dasharray="5 5" fill="none"/><g class="map-car"><rect x="316" y="181" width="23" height="8" rx="3" fill="#ff9fce"/><path d="M319 181l4-4h10l4 4" fill="#92fff5"/><path d="M340 184h7" stroke="#ffe4aa"/></g>';
+    '<path transform="translate(0 560) scale(1 -1)" d="'+route+'" stroke="#fd9adc" stroke-opacity=".42" stroke-width="30" fill="none"/><path transform="translate(0 560) scale(1 -1)" d="'+route+'" stroke="#17152e" stroke-width="25" fill="none"/><path transform="translate(0 560) scale(1 -1)" d="'+route+'" stroke="#ffc49c" stroke-width="1.4" stroke-dasharray="5 5" fill="none"/><g class="map-car"><rect x="316" y="181" width="23" height="8" rx="3" fill="#ff9fce"/><path d="M319 181l4-4h10l4 4" fill="#92fff5"/><path d="M340 184h7" stroke="#ffe4aa"/></g>';
   if(theme==='midnight')g.insertAdjacentHTML('beforeend','<g transform="translate(77 60)"><path d="M-22 20V1h9v-7h26v7h10v19z" fill="#281d45" stroke="#ffd78f" stroke-width="2"/><path d="M-14 3h28M-13 10h26" stroke="#ff85d7"/></g>');
   return g;
 }
@@ -4474,7 +4502,16 @@ function renderCampaign(){
       sign.setAttribute('aria-hidden','true');
       button.append(sign);
       if(locked)button.append(playerNode('span','🔒','level-lock'));
-      else button.append(playerNode('small','★'.repeat(earned)+'☆'.repeat(3-earned)));
+      else{
+        const stars=playerNode('small',undefined,'map-stars');
+        stars.setAttribute('aria-hidden','true');
+        for(let i=0;i<3;i++){
+          const star=playerNode('span',i<earned?'★':'☆');
+          star.dataset.earned=String(i<earned);
+          stars.append(star);
+        }
+        button.append(stars);
+      }
       route.append(button);
     }
     const scenery=playerNode('div',undefined,'campaign-landmarks');
@@ -4495,6 +4532,13 @@ function renderCampaign(){
   const node=map.querySelector('[data-current="true"]')||map.querySelector('.level-node');
   $('current-level').onclick=()=>node?.scrollIntoView({block:'center',behavior:reducedMotion.matches?'instant':'smooth'});
   requestAnimationFrame(()=>{if(screen==='campaign')node?.scrollIntoView({block:'center',behavior:'instant'});});
+  const mastery=$('campaign-mastery');
+  mastery.hidden=!progress.final;
+  const records=Object.values(masteryResults());
+  const feats=[['masteryThreeStars',records.filter(row=>row.stars===3).length],
+    ...[['masteryBonus','bonus'],['masteryCool','coolFinish'],['masteryNoDrive','noOverdrive']].map(([key,flag])=>[key,records.filter(row=>row.feats?.[flag]).length])];
+  mastery.replaceChildren(playerNode('h3',t('masteryTitle'),'miami-letter'),
+    ...feats.map(([key,n])=>playerNode('p',t(key)+' · '+n+' / 20')));
   const archive=$('chapter-films');
   archive.replaceChildren();
   for(const level of ReactorCutscenes.finaleLevels){
@@ -4513,7 +4557,7 @@ function renderMission(){
     const art=['chapter1_ocean_drive','chapter2_marina','chapter3_club','chapter4_finale'][level.chapter];
     document.querySelector('.mission-banner').style.setProperty('--mission-art','url("./assets/cutscenes/miami/'+art+'.webp")');
   }
-  $('mission-family').textContent=t('chapter',{n:level.chapter+1})+' · '+campaign.chapters[level.chapter].name+' / '+t('level',{n:level.number})+' · '+t('family'+level.family);
+  $('mission-family').textContent=t('chapter',{n:level.chapter+1})+' · '+campaign.chapters[level.chapter].name+' / '+t('level',{n:level.number})+' · '+t('family'+level.family)+(level.signature?' · '+level.signature:'');
   const earned=playerProfile.state.campaign.levels[level.number]?.stars||0;
   const hard=masteryResults()[level.number]?.stars||0;
   const legacy=playerProfile.state.campaign.legacyLevels[level.number]?.stars;
@@ -4527,7 +4571,9 @@ function renderMission(){
   ].filter(Boolean);
   $('mission-limits').replaceChildren(...(constraints.length?constraints:[t('unlimited')]).map(text=>playerNode('span',text)));
   $('mission-goals').replaceChildren(...Object.entries(level.targets).map(([key,target])=>playerNode('li',t('goal'+objectiveKeys[key],{n:formatNumber(target)}))));
+  $('mission-bonus').textContent=t('bonusGoal',{goal:t('goal'+objectiveKeys[level.bonus.key],{n:formatNumber(level.bonus.goal)})});
   $('mission-obstacles').textContent=[
+    level.impulses.length?t('impulseInfo',{n:level.impulses.join(' / ')}):'',
     level.blocks.some(block=>block.hp)?t('hardLocks'):'',
     level.blocks.some(block=>block.seal)?t('sealsHelp'):'',
     level.fragments.length?t('fragmentsHelp'):'',
@@ -4550,6 +4596,7 @@ function launchMission(number){
 function updateMissionHud(){
   if(!document.body)return;
   const hud=$('mission-hud');
+  if(!playing||runMode!=='playing'||elapsed>=groupPreviewUntil)$('group-preview').hidden=true;
   hud.hidden=!adventureRun||runMode!=='playing';
   if(hud.hidden)return;
   const {level}=adventureRun;
@@ -4559,7 +4606,7 @@ function updateMissionHud(){
   const complete=primary==='pressureMax'?current<=target:current>=target;
   const ratio=primary==='pressureMax'?(complete?1:target/current):Math.min(1,current/target);
   const percent=complete?100:Math.floor(ratio*100);
-  const title=t('short'+objectiveKeys[primary]);
+  const title=objectiveIcons[primary]+' '+t('short'+objectiveKeys[primary]);
   const label=primary==='pressureMax'?title+' '+current+'% ≤ '+target+'%':
     title+' '+formatNumber(current)+' / '+formatNumber(target);
   if($('mission-target').textContent!==label)$('mission-target').textContent=label;
@@ -4570,13 +4617,27 @@ function updateMissionHud(){
   const gauge=hud.querySelector('[role="progressbar"]');
   gauge.setAttribute('aria-label',title);
   gauge.setAttribute('aria-valuenow',String(percent));
-  const rest=Object.entries(level.targets).filter(([key])=>key!==primary).map(([key,goal])=>key==='pressureMax'?
-    t('shortPressureMax')+' '+Math.ceil(pressure)+'% ≤ '+goal+'%':
-    t('short'+objectiveKeys[key])+' '+formatNumber(Math.min(goal,adventure.value(adventureRun,key,score,elapsed,pressure)))+'/'+formatNumber(goal));
-  if(level.moves!==null)rest.push(t('moves')+' '+Math.max(0,level.moves-adventureRun.moves));
-  if(level.time!==null)rest.push(t('time')+' '+Math.max(0,Math.ceil(level.time-adventure.timerUsed(adventureRun,elapsed)/1000))+'s');
-  const copy=rest.join(' · ');
-  if($('mission-secondary').textContent!==copy)$('mission-secondary').textContent=copy;
+  const rest=Object.entries(level.targets).filter(([key])=>key!==primary).map(([key,goal])=>{
+    const current=adventure.value(adventureRun,key,score,elapsed,pressure);
+    const done=key==='pressureMax'?current<=goal:current>=goal;
+    const readout=key==='pressureMax'?Math.ceil(current)+'% ≤ '+goal+'%':formatNumber(Math.min(goal,current))+'/'+formatNumber(goal);
+    return [key,t('short'+objectiveKeys[key])+' '+readout,done];
+  });
+  if(level.moves!==null)rest.push(['moves',t('moves')+' '+Math.max(0,level.moves-adventureRun.moves),false]);
+  if(level.time!==null)rest.push(['time',t('time')+' '+Math.max(0,Math.ceil(level.time-adventure.timerUsed(adventureRun,elapsed)/1000))+'s',false]);
+  const secondary=$('mission-secondary'), summary=JSON.stringify(rest);
+  if(secondary.dataset.summary!==summary){
+    secondary.dataset.summary=summary;
+    secondary.replaceChildren(...rest.map(([key,caption,done])=>{
+      const chip=playerNode('span',undefined,'mission-chip');
+      chip.dataset.kind=key;
+      chip.dataset.done=String(done);
+      const icon=playerNode('span',done?'✓':objectiveIcons[key]);
+      icon.setAttribute('aria-hidden','true');
+      chip.append(icon,document.createTextNode(caption));
+      return chip;
+    }));
+  }
 }
 function checkMission(){
   if(!adventureRun||!playing)return false;
@@ -4626,6 +4687,7 @@ function renderResult(result,stars,previous){
   stage.append(playerNode('small',t('score')),tally,row);
   const recordLabel=(previous&&score>previous.score?t('missionRecord'):t('personalBest'))+' · '+t('hardMode');
   stage.append(playerNode('p',recordLabel+' · '+formatNumber(Math.max(previous?.score||0,score)),'victory-record'));
+  if(adventure.bonusMet(completed,score,elapsed,pressure))stage.append(playerNode('p',t('bonusComplete'),'victory-record'));
   if(level.reward)stage.append(playerNode('p',t('rewards')+' · '+t(rewardKeys[level.reward])));
   stage.append(skip,actions);
   actions.hidden=true;
@@ -4725,6 +4787,17 @@ function refreshMedal(){
   $('equip-king').textContent=t(equipped?'equippedMedal':'equipMedal');
   $('equip-king').setAttribute('aria-pressed',String(equipped));
 }
+function paintMissionHits(hits){
+  if(!hits.length||!scene?.missionImpact||reducedMotion.matches)return;
+  const {missionImpact:layer,left,top,cell}=scene;
+  scene.tweens.killTweensOf(layer);
+  layer.clear().setAlpha(.92).setVisible(true);
+  for(const {key} of hits){
+    layer.lineStyle(2,adventureRun.blocks.has(key)?0xffd36c:0x25e8ff);
+    layer.strokeRoundedRect(left+(key%N+.12)*cell,top+(Math.floor(key/N)+.12)*cell,cell*.76,cell*.76,5);
+  }
+  scene.tweens.add({targets:layer,alpha:0,duration:160,onComplete:()=>layer.clear().setVisible(false)});
+}
 function paintMissionMarks(){
   if(!scene?.missionMarks)return;
   const g=scene.missionMarks;
@@ -4739,7 +4812,10 @@ function paintMissionMarks(){
       g.fillStyle(0xd6adff,.9);g.fillTriangle(x+3,y-9,x-7,y+2,x+4,y+1);g.fillTriangle(x-3,y+9,x+7,y-2,x-4,y-1);
     }else{
       if(lock.seal)g.strokePoints([{x,y:y-11},{x:x+9,y},{x,y:y+11},{x:x-9,y}],true);
-      else g.strokeRoundedRect(x-5,y-8,10,10,4);
+      else{
+        g.strokeRoundedRect(x-5,y-8,10,10,4);
+        if(lock.kind==='R')g.strokeRoundedRect(x-9,y-12,18,17,5);
+      }
       g.fillStyle(lock.seal?0x7bfff4:0xffd88b,1);g.fillRoundedRect(x-11,y-2,22,10,2);
       for(let i=0;i<lock.hp;i++){g.fillStyle(0x5b3355,1);g.fillCircle(x+(i-(lock.hp-1)/2)*5,y+3,1.6);}
     }
@@ -4773,7 +4849,7 @@ function trackClassicClear(size,reward,priorPressure,atDanger){
     if(classicRun.reached75&&pressure<30)trackAchievement('coreStabilized',1,'classic');
   }
 }
-let boardGesture=null, tapHintUntil=0, nextSwipeHint=0;
+let boardGesture=null, tapHintUntil=0, nextSwipeHint=0, groupPreviewUntil=0;
 function clearTapHint(){
   tapHintUntil=0;
   if(document.body)$('tap-hint').hidden=$('tap-target').hidden=true;
@@ -4803,13 +4879,17 @@ function showTapHint(message){
 function installBoardGestures(){
   const surface=$('board-input');
   const cancel=event=>{
-    if(boardGesture?.id===event.pointerId)boardGesture=null;
+    if(boardGesture?.id===event.pointerId){
+      boardGesture=null;
+      $('group-preview').hidden=true;
+    }
   };
   function classify(event){
     const gesture=boardGesture;
     if(!gesture||gesture.id!==event.pointerId)return null;
     if(!gesture.swipe&&Math.hypot(event.clientX-gesture.x,event.clientY-gesture.y)>gesture.threshold){
       gesture.swipe=true;
+      $('group-preview').hidden=true;
       if(playing&&runMode==='playing'&&elapsed>=nextSwipeHint){
         nextSwipeHint=elapsed+4500;
         showTapHint(t('swipeHint'));
@@ -4826,6 +4906,18 @@ function installBoardGestures(){
     surface.setPointerCapture(event.pointerId);
     boardGesture={id:event.pointerId,x:event.clientX,y:event.clientY,cellX:x,cellY:y,
       threshold:Math.max(11,Math.min(18,size*.32)),swipe:false};
+    if(adventureRun){
+      const group=findGroup(x,y,new Set());
+      if(group.length<2)return;
+      const strikes=adventure.pulseTargets(adventureRun,group).length;
+      const preview=$('group-preview');
+      preview.textContent=t('groupCrystals',{n:group.length})+(strikes?' · '+t('groupPulse',{n:strikes}):'');
+      preview.style.left=bounds.left+bounds.width/2+'px';
+      preview.style.top=bounds.top+6+'px';
+      preview.hidden=false;
+      groupPreviewUntil=elapsed+580;
+      pulseGemGroups([group],true);
+    }
   };
   surface.onpointermove=classify;
   surface.onpointerup=event=>{

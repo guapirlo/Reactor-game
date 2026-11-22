@@ -16,7 +16,7 @@ function play(sim,level){
   const state=sim.state(),{run}=sim.missionState();
   return {win:!state.playing&&adventure.outcome({...run,settled:false},{...state,busy:false})==='win',stars:adventure.stars(run,state.elapsed,state.pressure)};
 }
-test('every 5.2 mission has a seeded win and a three-star result',()=>{
+test('every 5.3 mission has a seeded win and a three-star result',()=>{
   assert.equal(adventure.validate(world),true);
   for(const level of world.levels){
     const results=balance.seeds.map(seed=>balance.run(level,seed,'largest'));
@@ -184,4 +184,46 @@ test('legacy stars and rewards remain independent of versioned mastery',()=>{
   assert.deepEqual(store.state.campaign.mastery[adventure.DIFFICULTY][1],{stars:1,score:22000});
   assert.equal(store.state.player.xp,123);
   assert.equal(profile.createStore(storage).state.campaign.mastery[adventure.DIFFICULTY][1].stars,1);
+});
+
+test('large manual groups add limited, distinct lock impacts in configured missions',()=>{
+  const level={...world.levels[14],blocks:[
+    {x:1,y:2,hp:4,kind:'R'},
+    {x:3,y:2,hp:2,kind:'X',seal:true},
+    {x:5,y:2,hp:2,kind:'S'}
+  ]};
+  const group=Array.from({length:12},(_,i)=>[i%6,Math.floor(i/6)]);
+  const eight=group.slice(0,8);
+  assert.deepEqual(adventure.pulseTargets(adventure.createRun(level),eight),[15]);
+  const run=adventure.createRun(level);
+  assert.deepEqual(adventure.pulseTargets(run,group),[15,17]);
+  const impacts=adventure.applyClear(run,[group]);
+  assert.deepEqual(impacts.map(hit=>hit.amount),[2,2,1]);
+  assert.equal(run.counts.locks,1);
+  assert.equal(run.counts.grandGroups,1);
+  const cascade=adventure.createRun(level);
+  assert.ok(adventure.applyClear(cascade,[group],true).every(hit=>hit.amount===1));
+  assert.equal(cascade.counts.waves,1);
+  assert.equal(cascade.counts.grandGroups,0);
+  assert.deepEqual(adventure.pulseTargets(adventure.createRun({...level,impulses:[]}),group),[]);
+});
+
+test('optional feats do not affect victory and persist only for completed missions',()=>{
+  const level=world.levels[0],run=adventure.createRun(level);
+  const score=level.targets.score,elapsed=1000,pressure=20;
+  assert.equal(adventure.bonusMet(run,score,elapsed,pressure),false);
+  assert.equal(adventure.outcome(run,{score,elapsed,pressure,busy:false}),'win');
+  run.counts.grandGroups=2;
+  assert.equal(adventure.bonusMet(run,score,elapsed,pressure),true);
+  const stored=new Map();
+  const opts={getItem:key=>stored.get(key),setItem:(key,value)=>stored.set(key,value)};
+  const player=profile.createStore(opts);
+  const attempt=player.start('adventure-miami');
+  player.complete(attempt,{score,elapsed,level:1,stars:2,difficulty:'miami-hard-5.2'});
+  player.complete(player.start('adventure-miami'),{score,elapsed,level:1,stars:1,difficulty:adventure.DIFFICULTY,feats:{bonus:true}});
+  player.complete(player.start('adventure-miami'),{score,elapsed,level:1,stars:0,difficulty:adventure.DIFFICULTY,feats:{noOverdrive:true}});
+  const save=profile.createStore(opts).state.campaign;
+  assert.equal(save.levels[1].stars,2);
+  assert.equal(save.mastery['miami-hard-5.2'][1].stars,2);
+  assert.deepEqual(save.mastery[adventure.DIFFICULTY][1],{stars:1,score,bonus:true});
 });
