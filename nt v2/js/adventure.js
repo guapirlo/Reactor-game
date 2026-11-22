@@ -7,38 +7,41 @@ const CHAPTERS=[
   {name:'Neon Nights',theme:'neon',reward:'night-title'},
   {name:'Miami After Dark',theme:'midnight',reward:'legend-frame'}
 ];
-const positions=[[1,5],[3,5],[5,5],[1,2],[3,2],[5,2]];
+const DIFFICULTY='miami-hard-5.2';
+const positions=[[1,5],[3,5],[5,5],[1,2],[3,2],[5,2],[2,0],[4,4]];
 const fragments=[[0,6],[2,6],[4,6],[6,6],[3,3]];
-const row=(title,targets,moves=null,time=null,locks=0,items=0,reinforced=false,storm=false)=>({title,targets,moves,time,locks,items,reinforced,storm});
+const row=(title,targets,{moves=null,time=null,locks='',items=0,storm=false}={})=>({title,targets,moves,time,locks,items,storm});
 const LEVELS=[
-  row('Welcome to Miami',{score:2500}),
-  row('Ocean Drive',{score:5000}),
-  row('Palm Beach Fever',{score:6000},30),
-  row('Sunset Boulevard',{score:7500,combos:3}),
-  row('The Golden Hour',{score:10000},35),
-  row('Purple Haze',{locks:4},null,null,4),
-  row('Collins Avenue',{score:10500},34),
-  row('Neon Boulevard',{locks:6,score:8000},35,null,6),
-  row('Vice City Lights',{score:12000},null,150),
-  row('Midnight Calling',{fragments:3},35,null,0,3),
-  row('After Sunset',{fragments:4},null,null,0,4),
-  row('Electric Paradise',{score:18000},35),
-  row('South Beach Underground',{locks:4,fragments:2},44,null,4,2,true),
-  row('Neon Overload',{overdrive:1,score:15000},null,180),
-  row('Miami Heat',{score:25000,locks:6},45,null,6),
-  row('The Last Drive',{score:30000},40),
-  row('Nightfall Protocol',{fragments:5,locks:6},48,null,6,5),
-  row('Electric Storm',{score:35000},null,210,0,0,false,true),
-  row('The Final Overdrive',{overdrive:2,score:40000},70,null,0,0,false,true),
-  row('Miami 1986: LEGEND',{score:45000,fragments:5,locks:6,overdrive:1},null,null,6,5,true,true)
+  row('Welcome to Miami',{score:22000}),
+  row('Ocean Drive',{score:27000,combos:15}),
+  row('Palm Beach Fever',{score:28000},{moves:66}),
+  row('Sunset Boulevard',{score:33000,combos:22,pressureMax:65}),
+  row('The Golden Hour',{score:38000,overdrive:2},{moves:88}),
+  row('Purple Haze',{locks:4,score:41000},{locks:'SSSS'}),
+  row('Collins Avenue',{score:47000},{moves:106}),
+  row('Neon Boulevard',{locks:6,score:49000},{moves:116,locks:'SSSSSR'}),
+  row('Vice City Lights',{score:53000},{time:169}),
+  row('Midnight Calling',{fragments:4,score:57000},{time:196,items:4}),
+  row('After Sunset',{fragments:5,score:62000,combos:35},{items:5}),
+  row('Electric Paradise',{score:68000},{moves:142}),
+  row('South Beach Underground',{locks:6,fragments:3,score:66000},{moves:148,locks:'RRRSSS',items:3}),
+  row('Neon Overload',{overdrive:3,score:74000},{time:242}),
+  row('Miami Heat',{score:83000,locks:7},{moves:175,locks:'SSSRRRX'}),
+  row('The Last Drive',{score:94000},{moves:176}),
+  row('Nightfall Protocol',{fragments:5,locks:8,score:98000},{moves:202,locks:'SSRRRSXX',items:5}),
+  row('Electric Storm',{score:103000,pressureMax:64},{time:296,storm:true}),
+  row('The Final Overdrive',{overdrive:4,score:110000,pressureMax:63},{moves:212,storm:true}),
+  row('Miami 1986: LEGEND',{score:124000,fragments:5,locks:8,overdrive:4,pressureMax:65},
+    {moves:230,time:440,locks:'SRXRRSSX',items:5,storm:true})
 ].map((config,index)=>{
   const chapter=Math.floor(index/5);
-  const {locks,items,reinforced,storm,title,targets,moves,time}=config;
+  const {locks,items,storm,title,targets,moves,time}=config;
   return {
-    id:'miami-'+String(index+1).padStart(2,'0'),number:index+1,chapter,title,targets,moves,time,
-    family:moves!==null?(Object.keys(targets).length>1||items?'D':'B'):time!==null?'C':index===19?'D':'A',
+    id:'miami-'+String(index+1).padStart(2,'0'),number:index+1,chapter,title,targets,moves,time,difficulty:DIFFICULTY,
+    family:moves!==null?(time!==null||Object.keys(targets).length>1?'D':'B'):time!==null?'C':'A',
     theme:CHAPTERS[chapter].theme,
-    blocks:positions.slice(0,locks).map(([x,y])=>({x,y,hp:reinforced?2:1})).concat(storm?[{x:6,y:0,until:3500}]:[]),
+    blocks:[...locks].map((type,i)=>({x:positions[i][0],y:positions[i][1],hp:type==='R'?4:2,seal:type==='X'}))
+      .concat(storm?[{x:6,y:0,until:3500}]:[]),
     fragments:fragments.slice(0,items),
     reward:(index+1)%5===0?CHAPTERS[chapter].reward:null
   };
@@ -50,7 +53,7 @@ const WORLDS={
     fallback:'./audio/miami-reactor.mp3',rewards:REWARDS},
   ouagadougou:{name:'Ouagadougou',available:false}
 };
-const OBJECTIVES=['score','combos','fragments','locks','overdrive','survival'];
+const OBJECTIVES=['score','combos','fragments','locks','overdrive','survival','pressureMax'];
 function validate(world){
   const ids=new Set();
   for(const [index,level] of world.levels.entries()){
@@ -63,32 +66,44 @@ function validate(world){
     for(const limit of [level.moves,level.time])if(limit!==null&&(!Number.isInteger(limit)||limit<1))invalid('invalid constraint');
     const coordinates=[...level.blocks.map(({x,y})=>[x,y]),...level.fragments];
     if(coordinates.some(pair=>pair.length!==2||pair.some(v=>!Number.isInteger(v)||v<0||v>=WIDTH))||new Set(coordinates.map(String)).size!==coordinates.length)invalid('invalid or overlapping coordinates');
-    if(level.blocks.some(({hp,until})=>until?(!Number.isFinite(until)||until<1):hp!==1&&hp!==2))invalid('invalid obstacle durability');
+    if(level.blocks.some(({hp,until,seal})=>until?(!Number.isFinite(until)||until<1):![1,2,4].includes(hp)||(seal&&hp!==2)))invalid('invalid obstacle durability');
+    if(level.targets.pressureMax>99)invalid('pressure target exceeds reactor capacity');
     if((level.targets.fragments||0)>level.fragments.length||(level.targets.locks||0)>level.blocks.filter(x=>x.hp).length)invalid('unreachable item target');
     if(level.time!==null&&(level.targets.survival||0)>level.time)invalid('survival exceeds deadline');
     if(level.time!==null&&((level.targets.overdrive||0)-1)*21>=level.time)invalid('Overdrive recovery exceeds deadline');
     if(level.moves!==null&&(level.targets.combos||0)>=level.moves)invalid('combo count exceeds possible moves');
     const fixed=new Set(level.blocks.filter(x=>x.hp).map(({x,y})=>y*WIDTH+x));
-    for(const block of level.blocks.filter(x=>x.hp)){
-      const {x,y}=block;
-      if(![[x-1,y],[x+1,y],[x,y-1],[x,y+1]].some(([a,b])=>a>=0&&a<WIDTH&&b>=0&&b<WIDTH&&!fixed.has(b*WIDTH+a)))invalid('lock lacks an accessible neighbor');
+    const reachable=(x,y)=>{
+      const cells=new Set(),queue=[[x,y]];
+      while(queue.length){
+        const [a,b]=queue.pop(),key=b*WIDTH+a;
+        if(a<0||b<0||a>=WIDTH||b>=WIDTH||fixed.has(key)||cells.has(key))continue;
+        cells.add(key);
+        queue.push([a-1,b],[a+1,b],[a,b-1],[a,b+1]);
+      }
+      return cells.size;
+    };
+    for(const {x,y,seal} of level.blocks.filter(x=>x.hp)){
+      if(![[x-1,y],[x+1,y],[x,y-1],[x,y+1]].some(([a,b])=>reachable(a,b)>=(seal?5:2)))invalid('no reachable qualifying group by lock');
     }
+    for(const [x,y] of level.fragments)if(reachable(x,y)<2)invalid('fragment cannot join a group');
   }
   return true;
 }
 function createRun(level,world=WORLDS['miami-1986']){
   return {level,blocks:new Map(level.blocks.map(item=>[item.y*WIDTH+item.x,{...item}])),
     fragments:new Set(level.fragments.map(([x,y])=>y*WIDTH+x)),counts:{combos:0,fragments:0,locks:0,overdrive:0},
-    moves:0,animationMs:0,settled:false,music:world.music[level.chapter]||world.fallback,fallback:world.fallback};
+    moves:0,manualGems:0,recoveries:0,animationMs:0,settled:false,music:world.music[level.chapter]||world.fallback,fallback:world.fallback};
 }
-function applyClear(run,groups){
+function applyClear(run,groups,cascade=false){
   const hit=new Set();
   for(const group of groups)for(const [x,y] of group){
     if(run.fragments.delete(y*WIDTH+x))run.counts.fragments++;
     for(const [a,b] of [[x-1,y],[x+1,y],[x,y-1],[x,y+1]]){
       if(a<0||a>=WIDTH||b<0||b>=WIDTH)continue;
       const index=b*WIDTH+a;
-      if(run.blocks.get(index)?.hp)hit.add(index);
+      const lock=run.blocks.get(index);
+      if(lock?.hp&&(!lock.seal||cascade||group.length>=5))hit.add(index);
     }
   }
   for(const index of hit){
@@ -155,9 +170,11 @@ function recovery(run,grid){
   }
   if(!pair)return false;
   grid[pair.b][pair.a]=grid[pair.y][pair.x];
+  run.recoveries++;
   return true;
 }
-function value(run,key,score,elapsed){
+function value(run,key,score,elapsed,pressure){
+  if(key==='pressureMax')return Math.ceil(pressure);
   if(key==='score')return score;
   if(key==='survival')return Math.floor(elapsed/1000);
   return run.counts[key]||0;
@@ -169,20 +186,32 @@ function outcome(run,{score,elapsed,pressure,busy}){
   if(busy)return null;
   const {moves,time,targets}=run.level;
   const effectiveTime=time===null?elapsed:Math.min(elapsed,time*1000);
-  if(Object.entries(targets).every(([key,target])=>value(run,key,score,effectiveTime)>=target))return 'win';
+  if(Object.entries(targets).every(([key,target])=>key==='pressureMax'?pressure<=target:value(run,key,score,effectiveTime)>=target))return 'win';
   if(moves!==null&&run.moves>=moves)return 'moves';
   if(time!==null&&timerUsed(run,elapsed)>=time*1000)return 'time';
   return null;
 }
+function masteryGroup(level){
+  if(level.number===8)return 4.35;
+  return Number(([4.95,4.60,4.55,4.35][level.chapter]-(level.targets.locks||level.targets.fragments?0.18:0)).toFixed(2));
+}
 function stars(run,elapsed,pressure){
   const {moves,time}=run.level;
-  const margins=[1-pressure/100];
-  if(moves!==null)margins.push(1-run.moves/moves);
-  if(time!==null)margins.push(1-timerUsed(run,elapsed)/(time*1000));
-  return 1+Number(margins.every(x=>x>=.18))+Number(margins.every(x=>x>=.33));
+  if(run.level.difficulty!==DIFFICULTY){
+    const margins=[1-pressure/100];
+    if(moves!==null)margins.push(1-run.moves/moves);
+    if(time!==null)margins.push(1-timerUsed(run,elapsed)/(time*1000));
+    return 1+Number(margins.every(x=>x>=.18))+Number(margins.every(x=>x>=.33));
+  }
+  const mean=run.moves?run.manualGems/run.moves:0;
+  const qualifies=(heat,margin,group)=>{
+    return pressure<=heat&&mean>=group&&(moves===null||run.moves<=moves*(1-margin))&&
+      (time===null||timerUsed(run,elapsed)<=time*1000*(1-margin));
+  };
+  return 1+Number(qualifies(70,.12,3.90))+Number(qualifies(44,.26,masteryGroup(run.level)));
 }
 validate(WORLDS['miami-1986']);
-const api={WORLDS,validate,createRun,applyClear,expire,settle,prepare,recovery,value,timerUsed,outcome,stars};
+const api={DIFFICULTY,WORLDS,validate,createRun,applyClear,expire,settle,prepare,recovery,value,timerUsed,outcome,stars,masteryGroup};
 if(typeof module==='object'&&module.exports)module.exports=api;
 else root.ReactorAdventure=Object.freeze(api);
 })(globalThis);
