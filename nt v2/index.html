@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 4.0 · OCEAN DRIVE</title>
+<title>REACTOR 4.1 · RISING HEAT</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -245,12 +245,27 @@ button{font:inherit;cursor:pointer}
 #arcade-fx .fx-arc-left{right:80%;background:#68fff2}
 #arcade-fx .fx-arc-right{left:80%;background:#ff73df}
 @media (max-width:360px){#pressure-state{font-size:7px}#reactor-stack #reactor-meter{padding-inline:5px}}
+/* Reserve the larger pressure display for layouts with vertical clearance. */
+#reactor-stack #reactor-meter .bar{height:17px}
+#reactor-stack #reactor-meter .pressure{box-shadow:0 0 11px var(--pressure),inset 0 1px #fff8}
+#reactor-meter #pct{font-size:clamp(18px,5vw,24px);line-height:20px}
+#reactor-meter[data-danger="warning"] .bar{border-color:#ffbe7c}
+#reactor-meter[data-danger="hot"],#reactor-meter[data-danger="critical"],#reactor-meter[data-danger="maximum"],#reactor-meter[data-danger="failed"]{box-shadow:inset 2px 0 var(--pressure),0 0 9px color-mix(in srgb,var(--pressure),transparent 68%)}
+#reactor-stack[data-compact="true"] #reactor-meter .bar{height:11px}
+#reactor-stack[data-compact="true"] #reactor-meter #pct{font-size:16px;line-height:15px}
+#arcade-fx[data-effect="combo"]{--headline:clamp(13px,calc(var(--board-fx-span) * .127),63px)}
+#arcade-fx[data-effect="super"]{--headline:clamp(15px,calc(var(--board-fx-span) * .145),72px)}
+#arcade-fx[data-effect="mega"]{--headline:clamp(17px,calc(var(--board-fx-span) * .160),80px)}
+#arcade-fx[data-effect="overdrive"]{--headline:clamp(15px,calc(var(--board-fx-span) * .132),78px)}
+#arcade-fx.show #announcement{line-height:.96}
+#arcade-fx .fx-arc-right{background:#ff5cdf}
+#arcade-fx .fx-arc-left{background:#56fff2}
 </style>
 </head>
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>4.0</span></div><div class="subtitle">Ocean Drive</div></div>
+  <div><div class="brand">REACTOR <span>4.1</span></div><div class="subtitle">Rising Heat</div></div>
   <div class="stats" id="score-module"><div class="score-readout"><span class="stat-label">Score</span><strong id="score">0</strong></div><div class="best-readout"><span class="stat-label">Best</span><strong id="best">0</strong></div></div>
 </header>
 <div id="combo"></div>
@@ -270,7 +285,7 @@ button{font:inherit;cursor:pointer}
   </div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 4.0 · MIAMI 1986</div><h1>OCEAN <span>DRIVE</span></h1>
+  <div class="eyebrow">REACTOR 4.1 · MIAMI 1986</div><h1>RISING <span>HEAT</span></h1>
   <p>Tap a group of two or more gems. Bigger groups cool the reactor. Chain clears to charge OVERDRIVE.</p>
   <button id="start">PLAY</button>
 </div></div>
@@ -285,6 +300,10 @@ const PRESSURE={
   passiveStartPerSecond:.30,
   passiveMaxPerSecond:.75,
   rampMs:4*60*1000,
+  lateScoreStart:200000,
+  lateScoreCap:300000,
+  lateMaxBonusPerSecond:.02,
+  lateRateResponseMs:7000,
   manualBySize:[0,0,4,2,-1,-5,-9],
   largeGroupMinSize:7,
   largeGroupBaseCooling:12,
@@ -304,6 +323,7 @@ const CITY_PHASES=[
 ];
 const MAX_PARTICLES=80, FALL_MS=115;
 let board=[],score=0,pressure=PRESSURE.initial,energy=0,combo=0,lastMove=-Infinity;
+let latePressureBonus=0;
 let cityPhase=0,phaseStarted=0,cityCycleStart=null;
 let cityMix=[1,0,0,0,0],cityFrom=cityMix.slice();
 let qualityMoves=0,comboTier=0,critical=false;
@@ -311,8 +331,8 @@ let elapsed=0,nextDisturbance=DISTURBANCE_MS,overUntil=0,recoverUntil=0,settleEv
 let playing=false,busy=false,musicEnabled=true,effectsEnabled=true,scene=null,audio=null,best=0;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const ANNOUNCEMENTS={
-  combo:[1,460],clear:[2,520],chain:[3,570],super:[4,720],
-  critical:[6,680],mega:[7,880],end:[8,580],overdrive:[9,1050],notice:[2,550]
+  combo:[1,410],clear:[2,520],chain:[3,570],super:[4,570],
+  critical:[6,680],mega:[7,680],end:[8,580],overdrive:[9,820],notice:[2,550]
 };
 let currentAnnouncement=null,announcementQueue=[],cityImpact=0,lastReactorTick=0;
 const SCORE_COUNT_MS=300, SCORE_SURGE_MIN=900;
@@ -511,7 +531,8 @@ function showAnnouncement(event){
   overlay.dataset.effect=event.style;
   const [title,points]=event.message.split(' · +');
   $('announcement').textContent=title;
-  $('announcement-points').textContent=points?'+'+points+' PTS':'';
+  const chain=event.comboLevel>1?'×'+event.comboLevel:'';
+  $('announcement-points').textContent=[chain,points?'+'+points+' PTS':''].filter(Boolean).join('  ·  ');
   overlay.style.setProperty('--fx-time',event.duration+'ms');
   overlay.style.setProperty('--combo-growth',String(event.growth));
   void overlay.offsetWidth;
@@ -521,8 +542,9 @@ function showAnnouncement(event){
 function flash(message,style='notice'){
   const [priority,duration]=ANNOUNCEMENTS[style];
   const escalating=style==='combo'||style==='super'||style==='mega'||style==='chain';
-  const growth=escalating?Math.min(1.24,1+Math.max(0,combo-2)*.026):1;
-  const event={message,style,priority,duration,growth,expires:elapsed+1750};
+  const growth=escalating?Math.min(1.28,1+Math.max(0,combo-2)*.03):1;
+  const comboLevel=style==='combo'||style==='super'||style==='mega'?combo:0;
+  const event={message,style,priority,duration,growth,comboLevel,expires:elapsed+1750};
   if(!currentAnnouncement||priority>currentAnnouncement.priority){
     if(currentAnnouncement&&currentAnnouncement.style==='mega'){
       announcementQueue=announcementQueue.filter(item=>item.style!==currentAnnouncement.style);
@@ -618,7 +640,7 @@ function chargeOverdrive(amount){
   energy=0;
   overUntil=elapsed+OVERDRIVE_MS;
   recoverUntil=overUntil+RECOVERY_MS;
-  flash('OVERDRIVE','overdrive');
+  flash('OVERDRIVE!','overdrive');
   cityImpact=1;
   cue('overdrive');
 }
@@ -831,6 +853,7 @@ function start(){
   resetAnnouncements();
   resetScoreDisplay();
   pressure=PRESSURE.initial;
+  latePressureBonus=0;
   energy=0;
   combo=0;
   qualityMoves=0;
@@ -978,6 +1001,21 @@ function passivePressureBetween(fromMs,toMs){
     (PRESSURE.passiveMaxPerSecond-PRESSURE.passiveStartPerSecond)*averageRampFraction;
   return (averageRampRate*(rampTo-rampFrom)+PRESSURE.passiveMaxPerSecond*(toMs-fromMs-rampTo+rampFrom))/1000;
 }
+function latePressureTarget(points){
+  const fraction=(points-PRESSURE.lateScoreStart)/(PRESSURE.lateScoreCap-PRESSURE.lateScoreStart);
+  return PRESSURE.lateMaxBonusPerSecond*Math.max(0,Math.min(1,fraction));
+}
+function latePressureFor(delta){
+  // Ease toward the score-based bonus so even a large clear cannot jump the pressure rate.
+  const target=latePressureTarget(score)*Math.min(1,elapsed/PRESSURE.rampMs);
+  const previous=latePressureBonus;
+  if(target===0&&previous===0)return 0;
+  const response=PRESSURE.lateRateResponseMs;
+  const blend=-Math.expm1(-delta/response);
+  latePressureBonus=previous+(target-previous)*blend;
+  // Integrate the easing curve over the frame.
+  return (target*delta+(previous-target)*response*blend)/1000;
+}
 function pressureForGroup(size){
   if(size<PRESSURE.largeGroupMinSize)return PRESSURE.manualBySize[size];
   const extra=size-PRESSURE.largeGroupMinSize;
@@ -1025,13 +1063,13 @@ function tap(x,y){
   changePressure(pressureForGroup(size));
   if(!playing)return;
   if(reward===3){
-    flash('MEGA COMBO ×'+combo+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'mega');
+    flash('MEGA!'+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'mega');
     cue('mega');
   }else if(reward===2){
-    flash('SUPER COMBO ×'+combo+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'super');
+    flash('SUPER!'+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'super');
     cue('super');
   }else if(reward===1){
-    flash('COMBO ×'+combo+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'combo');
+    flash('COMBO!'+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'combo');
     cue('combo');
   }else{
     if(size>=5)flash('+'+(score-previousScore).toLocaleString('en-US')+' PTS','clear');
@@ -1098,7 +1136,7 @@ class Game extends Phaser.Scene{
     updateDashboardLight();
     this.animateCity(time);
     const previousPressure=Math.floor(pressure);
-    changePressure(passivePressureBetween(elapsed-delta,elapsed));
+    changePressure(passivePressureBetween(elapsed-delta,elapsed)+latePressureFor(delta));
     if(!playing)return;
     updateTension();
     updateMusicMix(delta);
