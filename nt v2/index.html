@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="4.4.1">
-<title>REACTOR 4.4.1 · MIAMI DIRECTOR'S CUT</title>
+<meta name="reactor-version" content="4.4.2">
+<title>REACTOR 4.4.2 · MIAMI ALIVE</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -394,6 +394,7 @@ html[data-reduce-motion="true"] #main-menu .signature-logo{animation:none!import
 #arcade-fx[data-effect="record"]{--headline:clamp(16px,calc(var(--board-fx-span) * .09),47px);--fx:#77fff5;--hit:#ff67d1;--ink:#a3fff5;--ink-hi:#fff0f9;--ink-low:#f561d0}
 @media(prefers-reduced-motion:reduce){.pixel-map::after,#main-menu .hub-actions button::before{animation:none!important}}
 html[data-reduce-motion="true"] .pixel-map::after,html[data-reduce-motion="true"] #main-menu .hub-actions button::before{animation:none!important}
+body[data-mode="menu"] #arcade-menu{background:linear-gradient(180deg,#130d284f 0%,#15112b12 30%,#100b2969 100%)}
 </style>
 </head>
 <body data-mode="menu">
@@ -428,6 +429,8 @@ html[data-reduce-motion="true"] .pixel-map::after,html[data-reduce-motion="true"
     <button id="secret-penthouse" class="scene-hotspot" type="button" aria-label="Inspect the lit hotel window"></button>
     <button id="secret-jet" class="scene-hotspot" type="button" aria-label="Tap the jet ski"></button>
     <button id="secret-radio" class="scene-hotspot" type="button" aria-label="Tune the waterfront radio"></button>
+    <button id="secret-umbrella" class="scene-hotspot" type="button" aria-label="Tap the pink beach umbrella"></button>
+    <button id="secret-car" class="scene-hotspot" type="button" aria-label="Tap the parked retro car"></button>
     <div id="radio-caption" role="status" hidden></div>
   </div>
   <section id="main-menu" class="hub-page">
@@ -670,6 +673,21 @@ function discoverMiami(stat,caption){
   if(radioTimer)clearTimeout(radioTimer);
   radioTimer=setTimeout(()=>{output.hidden=true;radioTimer=0},2100);
   scene?.pulseMenuSecret(stat);
+}
+function playMenuDetail(kind){
+  if(runMode!=='menu'||screen!=='main'||activeSkin.id!=='miami'||!scene?.menuDetails.visible)return;
+  unlockEffects();
+  if(kind==='umbrella'){
+    sound(523,.11,'triangle',.034);sound(698,.16,'sine',.033,.095);
+  }else{
+    sound(285,.11,'triangle',.041);sound(238,.13,'triangle',.035,.125);
+  }
+  const caption=$('radio-caption');
+  caption.textContent=kind==='umbrella'?'BEACH PARTY!':'OCEAN DRIVE!';
+  caption.hidden=false;
+  if(radioTimer)clearTimeout(radioTimer);
+  radioTimer=setTimeout(()=>{caption.hidden=true;radioTimer=0},1250);
+  scene.playMenuDetail(kind);
 }
 function trackMiamiProgress(){
   if(activeSkin.id!=='miami')return;
@@ -1640,6 +1658,15 @@ class Game extends Phaser.Scene{
     this.streetGlow=this.add.graphics().setDepth(-4);
     this.menuLights=this.add.graphics().setDepth(-4.5);
     this.menuTerrain=this.add.graphics().setDepth(-8.7);
+    this.menuDetails=this.add.graphics().setDepth(-4.65);
+    this.menuFacadeLights=this.add.graphics().setDepth(-4.63);
+    this.menuFoam=this.add.graphics().setDepth(-4.62);
+    this.menuPalms=Array.from({length:3},()=>this.add.graphics().setDepth(-4.6));
+    this.menuCar=this.add.graphics().setDepth(-4.58);
+    this.menuBirds=this.add.graphics().setDepth(-4.57);
+    this.menuWalkers=Array.from({length:4},()=>this.add.image(0,0,'beach-step-0').setOrigin(.5,1).setDepth(-4.56));
+    this.menuDetailEffect=this.add.graphics().setDepth(-3.85).setVisible(false);
+    this.menuDetailStarted=0;
     this.jetWake=this.add.graphics().setDepth(-4.41).setVisible(false);
     this.jetSki=this.add.graphics().setDepth(-4.4).setVisible(false);
     this.secretPulse=this.add.graphics().setDepth(-3.9).setVisible(false);
@@ -1878,7 +1905,13 @@ class Game extends Phaser.Scene{
     for(const sign of this.signs)sign.homeX=sign.x;
     this.paintStreetGlow();
     this.menuLights.setVisible(menu);
-    if(menu)this.paintSignatureBackdrop();
+    for(const layer of [this.menuDetails,this.menuFacadeLights,this.menuFoam,this.menuCar,this.menuBirds,...this.menuPalms,...this.menuWalkers]){
+      layer.setVisible(menu);
+    }
+    if(menu){
+      this.paintSignatureBackdrop();
+      this.paintMenuLife(hotelWidth);
+    }else this.menuDetailEffect.setVisible(false);
     this.palms.forEach((p,i)=>this.drawPalm(p,i,horizon));
     this.paintGlass();
   }
@@ -1922,6 +1955,10 @@ class Game extends Phaser.Scene{
       g.lineStyle(1,0xffd398,.62);
       g.lineBetween(x,py,x+w*.045,py+.7);
     }
+    // The beach turnout joins the eastern end of the coastal boulevard.
+    fill(0x46415b,[[.87,y+65],[.99,y+69],[.97,h*.72],[.78,h*.85],[.65,h*.84],[.80,h*.70]]);
+    g.lineStyle(1,0xffd4a6,.67);
+    g.strokePoints([point(.91,y+71),point(.91,h*.71),point(.72,h*.825)],false);
     g.lineStyle(2,0xffefd1,.69);
     g.strokePoints([point(0,h*.58),point(.26,h*.68),point(.64,h*.79),point(.48,h*.88),point(.38,h)],false);
     for(let i=0;i<14;i++){
@@ -1945,6 +1982,175 @@ class Game extends Phaser.Scene{
     g.lineBetween(radioX+3,radioY-5,radioX+9,radioY-12);
     g.fillStyle(0xff81ce,1);
     g.fillRect(radioX-5,radioY-2,6,3);
+  }
+  drawMenuCar(g,x,y,scale,color,direction=1){
+    const sx=offset=>x+offset*scale*direction;
+    const sy=offset=>y+offset*scale;
+    g.fillStyle(0x281b3d,.43);
+    g.fillEllipse(x,sy(2),35*scale,7*scale);
+    g.fillStyle(0x16172a,1);
+    g.fillCircle(sx(-10),sy(1),3.6*scale);g.fillCircle(sx(10),sy(1),3.6*scale);
+    g.fillStyle(color,1);
+    g.fillRoundedRect(x-17*scale,sy(-6),34*scale,7*scale,2*scale);
+    g.fillPoints([{x:sx(-11),y:sy(-6)},{x:sx(-5),y:sy(-12)},{x:sx(6),y:sy(-12)},{x:sx(12),y:sy(-6)}],true);
+    g.fillStyle(0x212945,1);
+    g.fillPoints([{x:sx(-7),y:sy(-7)},{x:sx(-3),y:sy(-11)},{x:sx(5),y:sy(-11)},{x:sx(9),y:sy(-7)}],true);
+    g.fillStyle(0xffe6b8,.95);
+    g.fillRect(sx(15)-scale,sy(-5),2*scale,2*scale);
+    g.fillStyle(0xff5e89,1);
+    g.fillRect(sx(-15)-scale,sy(-5),2*scale,2*scale);
+  }
+  paintMenuLife(hotelWidth){
+    const {w,h,horizon:y,menuDetails:g,menuFacadeLights:lights,menuFoam:foam}=this;
+    const unit=Phaser.Math.Clamp(Math.min(w/410,h/660),.47,1.25);
+    g.clear();lights.clear();foam.clear();
+    // Art Deco detailing follows the two existing hotel footprints.
+    for(const [x,base,height,neon] of [[w*.05,y+32,hotelWidth*.83,0xff6ec4],[w-hotelWidth-w*.045,y+39,hotelWidth*.97,0x72fff1]]){
+      const roof=base-height;
+      g.lineStyle(1,0xf2c7bd,.78);
+      g.lineBetween(x+4,roof+19,x+hotelWidth-4,roof+19);
+      for(let floor=0;floor<3;floor++){
+        const py=roof+height*(.33+.17*floor);
+        g.lineStyle(1,0x8f537a,.82);
+        g.lineBetween(x+8,py+8,x+hotelWidth-8,py+8);
+        for(let column=0;column<4;column++){
+          const px=x+hotelWidth*(.16+column*.19);
+          g.lineBetween(px,py+5,px,py+8);
+          lights.fillStyle((floor+column)%3===0?neon:0xffd9a0,.68);
+          lights.fillRect(px-2,py,4*unit,3*unit);
+        }
+      }
+      lights.lineStyle(3,neon,.22);
+      lights.lineBetween(x+3,base-9,x+hotelWidth-4,base-9);
+      lights.lineStyle(1,neon,.91);
+      lights.lineBetween(x+3,base-9,x+hotelWidth-4,base-9);
+    }
+    // Small boats sit against the waterline below the raised causeway.
+    for(const [x,py,size] of [[w*.23,y+19,8],[w*.58,y+17,6]]){
+      g.fillStyle(0xffe0c6,.86);
+      g.fillTriangle(x,py-8*unit,x,py,x+size*unit,py);
+      g.fillStyle(0x59436a,1);g.fillRect(x-3*unit,py,13*unit,2*unit);
+    }
+    // Parked cars face the same road edge; the foreground car sits in the turnout.
+    this.drawMenuCar(g,w*.22,y+48,.53*unit,0xdc699d);
+    this.drawMenuCar(g,w*.71,y+61,.65*unit,0x76cad2,-1);
+    this.menuCarPoint=[w*.72,h*.81];
+    this.drawMenuCar(g,...this.menuCarPoint,.97*unit,0xffb45f,-1);
+    this.placeSecret('car',...this.menuCarPoint);
+    this.menuCar.clear();
+    this.drawMenuCar(this.menuCar,0,0,.62*unit,0xbb8ae6);
+    // Traffic signal and faint light reflected on the boulevard.
+    const sx=w*.89,sy=y+61;
+    g.lineStyle(1.3,0x3c304a,1);
+    g.lineBetween(sx,sy,sx,sy-18*unit);
+    g.fillStyle(0x251e38,1);g.fillRect(sx-3*unit,sy-18*unit,6*unit,11*unit);
+    g.fillStyle(0xff7d94,1);g.fillCircle(sx,sy-15*unit,1.25*unit);
+    g.fillStyle(0x98ffdc,.85);g.fillCircle(sx,sy-9*unit,1.25*unit);
+    lights.fillStyle(0x9dfff8,.20);lights.fillEllipse(sx,sy+5*unit,28*unit,4*unit);
+    // A clear strip of sand lies between the foam and the turnout.
+    const parasols=[[.77,.86,0x7dfff0,.73],[.67,.925,0xffc56b,.91],[.52,.91,0xff6fbd,1.04]];
+    for(const [nx,ny,color,depth] of parasols){
+      const x=w*nx,py=h*ny,size=11*unit*depth;
+      g.fillStyle(0x57364f,.29);g.fillEllipse(x+size*.31,py+size*.7,size*2,4*unit);
+      g.lineStyle(1.1,0x6b4a59,1);g.lineBetween(x,py-size*.33,x,py+size*.78);
+      g.fillStyle(color,1);g.fillTriangle(x-size,py,x,py-size*.56,x+size,py);
+      g.fillStyle(0xfff1db,.68);g.fillTriangle(x-size*.48,py,x,py-size*.56,x+size*.14,py);
+      g.fillStyle(0x965a6e,.84);g.fillRect(x+size*.44,py+size*.44,size*.82,3*unit);
+      g.fillStyle(0xfcd39f,1);g.fillRect(x+size*.42,py+size*.39,3*unit,3*unit);
+      g.fillStyle(color,.82);g.fillRect(x-size*.82,py+size*.53,size*.46,3*unit);
+    }
+    this.umbrellaPoint=[w*.52,h*.91];
+    this.placeSecret('umbrella',...this.umbrellaPoint);
+    const vx=w*.69,vy=h*.96;
+    g.lineStyle(1,0xffffdc,.73);
+    g.strokePoints([{x:vx-18*unit,y:vy-4*unit},{x:vx+16*unit,y:vy-7*unit},
+      {x:vx+25*unit,y:vy+6*unit},{x:vx-14*unit,y:vy+10*unit}],true);
+    g.lineBetween(vx-2*unit,vy-10*unit,vx+5*unit,vy+8*unit);
+    g.lineBetween(vx+1*unit,vy-12*unit,vx+7*unit,vy+4*unit);
+    g.fillStyle(0xfff2b1,1);g.fillCircle(vx+14*unit,vy,1.7*unit);
+    const tx=w*.574,ty=h*.745;
+    g.lineStyle(1.25,0x704c68,1);
+    g.lineBetween(tx-5*unit,ty+15*unit,tx+1*unit,ty);
+    g.lineBetween(tx+8*unit,ty+15*unit,tx+6*unit,ty);
+    g.lineBetween(tx-4*unit,ty+12*unit,tx+7*unit,ty+4*unit);
+    g.fillStyle(0xe47c9b,1);g.fillRect(tx-4*unit,ty-4*unit,15*unit,8*unit);
+    g.fillStyle(0xffd5a1,1);g.fillRect(tx-6*unit,ty-6*unit,19*unit,2*unit);
+    // Foam follows the same shoreline points as the underlying terrain.
+    for(const [fx,fy] of [[.135,.648],[.343,.714],[.557,.766],[.573,.819],[.47,.877],[.417,.937]]){
+      foam.lineStyle(1.2,0xd7fff2,.69);
+      foam.lineBetween(w*fx-10*unit,h*fy,w*fx+5*unit,h*fy-2*unit);
+      foam.lineStyle(.7,0x9dffee,.50);
+      foam.lineBetween(w*fx-15*unit,h*fy+4*unit,w*fx-9*unit,h*fy+3*unit);
+    }
+    this.menuPalms.forEach((p,i)=>{
+      const [px,py,depth]=[[.19,.55,.45],[.92,.67,.67],[.96,.91,1]][i];
+      const scale=unit*depth;
+      p.clear();p.setPosition(w*px,h*py).setScale(scale);
+      p.lineStyle(3,0x443047,1);p.lineBetween(0,0,-7,-40);
+      p.lineStyle(1,0x975974,.6);p.lineBetween(1,-3,-6,-38);
+      p.fillStyle(0x333247,1);
+      for(let branch=0;branch<6;branch++){
+        const angle=Math.PI+branch*.57, dx=Math.cos(angle)*22,dy=Math.sin(angle)*17;
+        p.fillPoints([{x:-7,y:-39},{x:-7+dx*.64,y:-43+dy*.65},{x:-7+dx,y:-37+dy},{x:-7+dx*.55,y:-38+dy*.5}],true);
+      }
+    });
+    this.menuBirds.clear();
+    for(let i=0;i<3;i++){
+      const x=i*13*unit,by=(i%2)*5*unit;
+      this.menuBirds.lineStyle(1.15,0x3f3050,1);
+      this.menuBirds.strokePoints([{x:x-4*unit,y:by-2*unit},{x,y:by},{x:x+4*unit,y:by-2*unit}],false);
+    }
+  }
+  playMenuDetail(kind){
+    const g=this.menuDetailEffect;
+    g.clear();
+    if(kind==='umbrella'){
+      for(let i=0;i<8;i++){
+        const angle=i*Math.PI/4,dx=Math.cos(angle),dy=Math.sin(angle);
+        g.fillStyle([0xff84ca,0x7ffff1,0xffda83][i%3],.95);
+        g.fillRect(dx*17-1,dy*13-1,3,3);
+      }
+      g.setPosition(...this.umbrellaPoint);
+    }else{
+      g.fillStyle(0xffeebb,.32);g.fillTriangle(-12,-4,-58,-13,-58,5);
+      g.fillStyle(0xc2fff6,1);g.fillRect(-16,-5,4,3);
+      g.setPosition(...this.menuCarPoint);
+    }
+    g.setScale(1).setAlpha(1).setVisible(true);
+    this.menuDetailStarted=this.time.now;
+  }
+  animateMenuLife(time,subdued){
+    const dusk=subdued?.42:(1-Math.cos(time/6600))*.5;
+    this.menuFacadeLights.setAlpha(.58+dusk*.39);
+    this.menuFoam.setPosition(subdued?0:Math.sin(time/1350)*2.4,subdued?0:Math.sin(time/1870)*1.5)
+      .setAlpha(subdued?.75:.60+.23*Math.sin(time/1740));
+    for(let i=0;i<this.menuPalms.length;i++)this.menuPalms[i].setRotation(subdued?0:Math.sin(time/2400+i)*.034);
+    const roadTime=(time+1600)%14000, roadProgress=roadTime/8800;
+    this.menuCar.setVisible(!subdued&&roadTime<8800);
+    if(this.menuCar.visible){
+      const x=roadProgress*(this.w+42)-21;
+      this.menuCar.setPosition(x,this.horizon+45+x/this.w*20);
+    }
+    const birdTime=(time+5200)%21000, birdProgress=birdTime/11200;
+    this.menuBirds.setVisible(subdued||birdTime<11200);
+    if(this.menuBirds.visible)this.menuBirds.setPosition(subdued?this.w*.64:birdProgress*(this.w+56)-27,
+      this.h*.225+(subdued?0:Math.sin(time/1200)*5));
+    for(let i=0;i<this.menuWalkers.length;i++){
+      const progress=subdued?(i+1)/5:(time/(i===3?6900:11500+i*1700)+i*.31)%1;
+      const x=i%2===0?.62+progress*.23:.85-progress*.22;
+      const y=i<2?.875+(i%2)*.05:.94+(i%2)*.025;
+      const scale=(i<2?.43:.58)*Math.min(1,this.h/620);
+      const walker=this.menuWalkers[i];
+      walker.setPosition(this.w*x,this.h*y).setScale(scale*(i%2===0?1:-1),scale)
+        .setAlpha(Math.min(1,progress*8,(1-progress)*8));
+      const step=subdued?0:Math.floor((time+i*61)/(i===3?105:185))%2;
+      if(walker.texture.key!=='beach-step-'+step)walker.setTexture('beach-step-'+step);
+    }
+    if(this.menuDetailEffect.visible){
+      const portion=(time-this.menuDetailStarted)/560;
+      if(portion>=1)this.menuDetailEffect.setVisible(false);
+      else this.menuDetailEffect.setAlpha(1-portion).setScale(subdued?1:1+portion*.26);
+    }
   }
   paintJetSki(){
     const g=this.jetSki;
@@ -2365,6 +2571,7 @@ class Game extends Phaser.Scene{
     if(runMode==='menu'){
       this.menuLights.setAlpha(subdued?.86:.82+.12*Math.sin(time/2100));
       this.animateMiamiMenu(time,subdued);
+      this.animateMenuLife(time,subdued);
     }
     if(this.recordFireworks.visible){
       const ratio=(elapsed-this.fireworksAt)/940;
@@ -2691,6 +2898,8 @@ if(document.body){
   $('secret-penthouse').onclick=()=>discoverMiami('penthouse','WELCOME TO MIAMI!');
   $('secret-jet').onclick=()=>discoverMiami('jet','NICE CATCH!');
   $('secret-radio').onclick=()=>discoverMiami('radio','THE CITY IS YOURS!');
+  $('secret-umbrella').onclick=()=>playMenuDetail('umbrella');
+  $('secret-car').onclick=()=>playMenuDetail('car');
   syncMiamiHotspots();
   for(const button of document.querySelectorAll('[data-screen]'))button.onclick=()=>{
     if(button.dataset.screen==='options')optionsBack=screen;
