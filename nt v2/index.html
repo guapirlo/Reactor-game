@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 3.6 · NEON OVERLOAD</title>
+<title>REACTOR 3.7 · MIAMI SOUNDTRACK</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -202,7 +202,7 @@ button{font:inherit;cursor:pointer}
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>3.6</span></div><div class="subtitle">Neon Overload</div></div>
+  <div><div class="brand">REACTOR <span>3.7</span></div><div class="subtitle">Neon Overload</div></div>
   <div class="stats" id="score-module"><div class="score-readout"><span class="stat-label">Score</span><strong id="score">0</strong></div><div class="best-readout"><span class="stat-label">Best</span><strong id="best">0</strong></div></div>
 </header>
 <div id="combo"></div>
@@ -220,7 +220,7 @@ button{font:inherit;cursor:pointer}
   </div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 3.6 · MIAMI 1986</div><h1>NEON <span>OVERLOAD</span></h1>
+  <div class="eyebrow">REACTOR 3.7 · MIAMI 1986</div><h1>NEON <span>OVERLOAD</span></h1>
   <p>Touche un groupe de deux cristaux ou plus. Les grands groupes réduisent la pression. Enchaîne les coups pour charger OVERDRIVE.</p>
   <button id="start">JOUER</button>
 </div></div>
@@ -254,7 +254,7 @@ let cityPhase=0,phaseStarted=0;
 let cityMix=[1,0,0,0],cityFrom=cityMix.slice();
 let qualityMoves=0,comboTier=0,critical=false;
 let elapsed=0,nextDisturbance=DISTURBANCE_MS,overUntil=0,recoverUntil=0,settleEvent=null;
-let playing=false,busy=false,musicEnabled=true,effectsEnabled=true,scene=null,audio=null,musicClock=null,best=0;
+let playing=false,busy=false,musicEnabled=true,effectsEnabled=true,scene=null,audio=null,best=0;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const ANNOUNCEMENTS={
   combo:[1,460],clear:[2,520],chain:[3,570],super:[4,720],
@@ -265,275 +265,95 @@ const SCORE_COUNT_MS=300, SCORE_SURGE_MIN=900;
 let scoreShown=0, scoreFrom=0, scoreTarget=0, scoreCountAt=0, scoreSurgeUntil=0;
 let surgeDisplayed=false;
 try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
-// Temporary procedural prototype. Set this to a local stem pack when the original production is ready.
-const STEM_PACK=null;
-// Example: {bars:16,files:['audio/foundation.ogg','audio/violet.ogg','audio/neon.ogg',
-//   'audio/after-dark.ogg','audio/overdrive.ogg']}. All stems share the same downbeat and length.
-const STEM_FADE_SECONDS=1.15;
-const STEP=60/104/4;
-const HARMONY=[[33,57,60,64,71],[29,53,56,60,67],[34,53,58,62,65],[28,52,56,62,65]];
-const PROGRESSION=[0,1,2,3,0,0,1,3];
-const KICK_PATTERNS=[[0,6,11],[0,3,9,14],[0,5,7,12,15],[0,3,6,10,13,15]];
-const MOTIF=[
-  [[1,69,3],[6,76,2],[11,72,3]],
-  [[3,68,3],[8,72,2],[13,65,2]],
-  [[1,70,2],[6,77,2],[9,74,3],[14,70,1]],
-  [[2,71,3],[7,68,2],[11,65,2],[15,68,1]]
-];
-let musicBus,effectsBus,musicLevel,samples,musicStep=0,nextNote=0;
-let stemRequest,stemPack,stemVoices=[],musicPhase=0,overdriveAudio=false;
-let fallbackFrom=0,fallbackFadeAt=0;
-const hz=note=>440*2**((note-69)/12);
+const MUSIC_PATH='./audio/miami-reactor.mp3';
+const MUSIC_VOLUME=.42;
+let musicTrack=null, effectsBus=null, musicNeedsGesture=false, musicFailed=false;
 
-function synth(frequency,when,duration,type,volume,bus,filterHz=0,attack=.021){
+function setMusicStatus(message){
+  const button=$('music-toggle');
+  button.title=message;
+  button.setAttribute('aria-description',message);
+}
+function reportMusicError(){
+  if(musicFailed)return;
+  musicFailed=true;
+  musicNeedsGesture=false;
+  const message='Bande-son indisponible. Vérifiez le fichier audio/miami-reactor.mp3.';
+  setMusicStatus(message);
+  if(playing)flash('MUSIQUE INDISPONIBLE','notice');
+}
+function getMusicTrack(){
+  if(musicTrack)return musicTrack;
+  const track=new Audio();
+  track.preload='none';
+  track.loop=true;
+  track.volume=MUSIC_VOLUME;
+  track.addEventListener('error',reportMusicError);
+  track.addEventListener('playing',()=>{
+    musicNeedsGesture=false;
+    musicFailed=false;
+    setMusicStatus('Bande-son Miami Reactor');
+  });
+  track.src=MUSIC_PATH;
+  musicTrack=track;
+  return track;
+}
+function syncMusic(fromGesture=false){
+  if(!playing||!musicEnabled||document.hidden){
+    musicTrack?.pause();
+    return;
+  }
+  if(typeof Audio!=='function'||(!fromGesture&&(musicFailed||musicNeedsGesture)))return;
+  // The same media element handles play, pause and looping for every run.
+  const track=getMusicTrack();
+  if(!track.paused)return;
+  if(musicFailed){
+    musicFailed=false;
+    track.load();
+  }
+  track.play().catch(error=>{
+    if(!playing||!musicEnabled||document.hidden||error.name==='AbortError')return;
+    if(error.name==='NotAllowedError'){
+      musicNeedsGesture=true;
+      setMusicStatus('Touchez le jeu pour reprendre la musique.');
+    }else reportMusicError();
+  });
+}
+function stopMusic(){
+  if(!musicTrack)return;
+  musicTrack.pause();
+  musicTrack.currentTime=0;
+}
+function unlockEffects(){
+  if(!effectsEnabled)return;
+  const Context=window.AudioContext||window.webkitAudioContext;
+  if(!Context)return;
+  if(!audio){
+    audio=new Context();
+    effectsBus=audio.createGain();
+    const limiter=audio.createDynamicsCompressor();
+    limiter.threshold.value=-12;
+    limiter.ratio.value=5;
+    effectsBus.connect(limiter);
+    limiter.connect(audio.destination);
+  }
+  const now=audio.currentTime;
+  effectsBus.gain.setTargetAtTime(.85,now,.026);
+  if(audio.state!=='running')audio.resume().catch(()=>{});
+}
+function sound(frequency,duration=.14,type='triangle',volume=.035,offset=0){
+  if(!audio||!effectsEnabled||audio.state!=='running')return;
+  const when=audio.currentTime+.004+offset;
   const oscillator=audio.createOscillator();
   const gain=audio.createGain();
   oscillator.type=type;
   oscillator.frequency.setValueAtTime(frequency,when);
   gain.gain.setValueAtTime(.0001,when);
-  gain.gain.exponentialRampToValueAtTime(volume,when+Math.min(attack,duration*.4));
+  gain.gain.exponentialRampToValueAtTime(volume,when+Math.min(.021,duration*.4));
   gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
-  if(filterHz){
-    const filter=audio.createBiquadFilter();
-    filter.type='lowpass';
-    filter.frequency.value=filterHz;
-    oscillator.connect(filter).connect(gain);
-  }else oscillator.connect(gain);
-  gain.connect(bus);
+  oscillator.connect(gain).connect(effectsBus);
   oscillator.start(when);
   oscillator.stop(when+duration+.01);
-}
-function sound(frequency,duration=.14,type='triangle',volume=.035,offset=0){
-  if(!audio||!effectsEnabled||audio.state!=='running')return;
-  synth(frequency,audio.currentTime+.004+offset,duration,type,volume,effectsBus);
-}
-function buildKit(){
-  const kit={};
-  let seed=72821;
-  const noise=()=>{
-    seed=(Math.imul(seed,1664525)+1013904223)>>>0;
-    return seed/2147483648-1;
-  };
-  const render=(name,duration,signal)=>{
-    const buffer=audio.createBuffer(1,Math.ceil(audio.sampleRate*duration),audio.sampleRate);
-    const data=buffer.getChannelData(0);
-    for(let i=0;i<data.length;i++)data[i]=signal(i/audio.sampleRate)*Math.min(1,i/24,(data.length-1-i)/135);
-    kit[name]=buffer;
-  };
-  const wave=(f,t)=>Math.sin(2*Math.PI*f*t);
-  render('kick',.29,t=>Math.tanh(1.6*(Math.sin(2*Math.PI*(48*t+2.1*(1-Math.exp(-t*57))))+
-    wave(211,t)*.27*Math.exp(-t*97)))*Math.exp(-t*18));
-  render('sub',1.35,t=>Math.tanh((1.6+1.1*Math.exp(-t*6))*Math.sin(2*Math.PI*(55*t+
-    .68*(1-Math.exp(-t*39)))))*Math.exp(-t*2.25));
-  let last=0;
-  const highNoise=()=>{
-    const sample=noise(), value=(sample-last)*.5;
-    last=sample;
-    return value;
-  };
-  render('snare',.23,t=>highNoise()*.74*Math.exp(-t*23)+wave(186,t)*.47*Math.exp(-t*28));
-  render('clap',.22,t=>highNoise()*(.78*Math.exp(-t*35)+.34*Math.exp(-Math.abs(t-.018)*92)+.23*Math.exp(-Math.abs(t-.033)*87)));
-  render('knock',.12,t=>(wave(136,t)+.27*wave(297,t))*Math.exp(-t*47));
-  render('riser',.45,t=>highNoise()*Math.min(1,t/.42)**1.6);
-  render('hat',.11,t=>highNoise()*Math.exp(-t*48));
-  render('openHat',.28,t=>highNoise()*Math.exp(-t*18));
-  render('shaker',.15,t=>highNoise()*(.6+.4*wave(41,t))*Math.exp(-t*24));
-  render('wood',.11,t=>(wave(642,t)*.58+wave(1087,t)*.25+highNoise()*.17)*Math.exp(-t*46));
-  return kit;
-}
-function hit(name,when,volume,rate=1,length=0){
-  const source=audio.createBufferSource(), gain=audio.createGain();
-  source.buffer=samples[name];
-  source.playbackRate.value=rate;
-  gain.gain.setValueAtTime(volume,when);
-  if(length){
-    gain.gain.setValueAtTime(volume,when+length-.028);
-    gain.gain.exponentialRampToValueAtTime(.0001,when+length);
-  }
-  source.connect(gain).connect(musicBus);
-  source.start(when);
-  if(length)source.stop(when+length);
-}
-// Four eight-bar phrases with an opening, a drop, a break and a final build.
-function arrangeStep(step,when,intensity=musicPhase,active=overdriveAudio){
-  const bar=Math.floor(step/16)%32, pulse=step%16;
-  const phrase=Math.floor(bar/8), slot=bar%8, harmony=PROGRESSION[slot];
-  const [root,...chord]=HARMONY[harmony];
-  const energyLevel=Math.min(3,Math.floor(intensity+.25));
-  const breakdown=phrase===2&&slot<3;
-  const turnaround=slot===7&&pulse>=12;
-  const drums=KICK_PATTERNS[Math.min(3,energyLevel+(phrase===1||phrase===3?1:0))];
-  const swing=pulse%2?.012:0;
-  if(pulse===0){
-    for(const note of chord){
-      synth(hz(note),when,breakdown?2.5:1.76,'triangle',.014+intensity*.002,musicBus,940,.14);
-      if(phrase>=2&&energyLevel>=2)synth(hz(note+12),when,1.5,'sine',.007,musicBus,1710,.16);
-    }
-  }
-  if(!breakdown&&drums.includes(pulse)&&!(turnaround&&pulse>13&&phrase===0)){
-    hit('kick',when,.215+intensity*.013+(pulse===0?.025:0));
-    if(energyLevel>=1||active)hit('knock',when+.002,.034+intensity*.012);
-    const next=drums.find(value=>value>pulse)??16;
-    const bassNote=root+((pulse>=10&&slot%4===3)?7:0);
-    hit('sub',when+.016,.129+intensity*.025,hz(bassNote)/55,(next-pulse)*STEP-.025);
-  }
-  if(pulse===4||pulse===12){
-    hit('snare',when+.007,breakdown?.063:.151);
-    hit('clap',when+.015,.037+intensity*.019);
-  }
-  if(!breakdown&&pulse%2===0){
-    hit(pulse===14&&slot%2===1?'openHat':'hat',when,.017+((bar*13+pulse*7)%11)*.0024,1+(pulse%6)*.017);
-  }
-  if(energyLevel>=1&&(pulse===3||pulse===11))hit('hat',when+swing,.019,1.12);
-  if((energyLevel>=2||active)&&(pulse===5||pulse===15)){
-    const rolls=pulse===15&&(energyLevel===3||active)?4:2;
-    for(let roll=0;roll<rolls;roll++)hit('hat',when+roll*STEP/(rolls+1),.017+roll*.004,1+roll*.07);
-  }
-  if(pulse===7||pulse===15)hit('wood',when+swing,.050+(slot%3)*.007,harmony%2===0?1:1.21);
-  if(pulse===3||pulse===10)hit('shaker',when+swing,.043,pulse===3?.89:1.13);
-  if((turnaround&&pulse===13)||(active&&pulse===13&&slot%2===1))hit('riser',when,active?.053:.035);
-  if(turnaround&&(pulse===14||pulse===15)&&phrase!==0)hit('snare',when,.039+(pulse-14)*.025,1.08);
-  for(const [on,note,beats] of MOTIF[harmony]){
-    if(pulse!==on||(breakdown&&on>8))continue;
-    const pitch=phrase===3&&on>10?note+12:note;
-    const voice=energyLevel>=2?'sawtooth':'triangle';
-    synth(hz(pitch),when,beats*STEP+.19,voice,.051,musicBus,energyLevel>=2?1530:1910,.015);
-    if(slot%2===0)synth(hz(pitch-12),when+STEP*3,.33,'sine',.018,musicBus);
-  }
-  if((energyLevel>=2||active)&&pulse%4===2&&!breakdown){
-    const note=chord[(pulse>>2)%chord.length]+(active?24:12);
-    synth(hz(note),when,.23,'triangle',active?.039:.020,musicBus,2090);
-  }
-  if(active&&(pulse===3||pulse===11)){
-    hit('clap',when+swing,.065);
-    hit('knock',when+swing,.072);
-  }
-}
-function loadStemPack(){
-  if(!STEM_PACK||stemRequest)return;
-  const {bars,files}=STEM_PACK;
-  stemRequest=Promise.resolve().then(async()=>{
-    if(!Number.isInteger(bars)||bars<1||files.length!==5)throw Error('Expected five stems and a positive bar count');
-    const duration=bars*16*STEP;
-    const buffers=await Promise.all(files.map(async file=>{
-      const url=new URL(file,document.baseURI);
-      if(url.origin!==location.origin)throw Error('Music stems must be local');
-      const response=await fetch(url);
-      if(!response.ok)throw Error('Missing stem: '+file);
-      const buffer=await audio.decodeAudioData(await response.arrayBuffer());
-      if(buffer.duration<duration||buffer.duration>duration+.12)throw Error('Invalid stem loop length: '+file);
-      return buffer;
-    }));
-    stemPack={duration,buffers};
-  }).catch(error=>console.warn('Using the ARCADE MAYHEM audio prototype:',error.message));
-}
-function stopStems(){
-  for(const {source,gain} of stemVoices){
-    source.stop();
-    source.disconnect();
-    gain.disconnect();
-  }
-  stemVoices=[];
-}
-function startStems(when){
-  const offset=(musicStep*STEP)%stemPack.duration;
-  stemVoices=stemPack.buffers.map(buffer=>{
-    const source=audio.createBufferSource(), gain=audio.createGain();
-    source.buffer=buffer;
-    source.loop=true;
-    source.loopEnd=stemPack.duration;
-    gain.gain.value=0;
-    source.connect(gain).connect(musicLevel);
-    source.start(when,offset);
-    return {source,gain};
-  });
-  musicBus.gain.setTargetAtTime(0,when,.13);
-  mixStems(when);
-}
-function mixStems(when){
-  for(let i=0;i<stemVoices.length;i++){
-    const gain=stemVoices[i].gain.gain;
-    const target=i<4?(i<=musicPhase?1:0):(overdriveAudio?1:0);
-    gain.setTargetAtTime(target,when,STEM_FADE_SECONDS/3);
-  }
-}
-function scheduleMusic(){
-  if(!playing||audio.state!=='running')return;
-  const now=audio.currentTime;
-  if(nextNote<now)nextNote=now+.012;
-  while(nextNote<now+.09){
-    const downbeat=musicStep%16===0, beat=musicStep%4===0;
-    if(downbeat&&musicPhase!==cityPhase){
-      fallbackFrom=musicPhase;
-      musicPhase=cityPhase;
-      fallbackFadeAt=nextNote;
-      if(stemVoices.length)mixStems(nextNote);
-    }
-    if(beat&&overdriveAudio!==(elapsed<overUntil)){
-      overdriveAudio=elapsed<overUntil;
-      if(stemVoices.length)mixStems(nextNote);
-    }
-    if(downbeat&&stemPack&&!stemVoices.length)startStems(nextNote);
-    if(!stemVoices.length&&musicEnabled){
-      const blend=Math.min(1,(nextNote-fallbackFadeAt)/STEM_FADE_SECONDS);
-      const intensity=fallbackFrom+(musicPhase-fallbackFrom)*blend;
-      arrangeStep(musicStep,nextNote,intensity,overdriveAudio);
-    }
-    musicStep++;
-    nextNote+=STEP;
-  }
-}
-function syncAudio(){
-  if(!audio)return;
-  const now=audio.currentTime;
-  musicLevel.gain.setTargetAtTime(musicEnabled&&playing?.85:0,now,.055);
-  effectsBus.gain.setTargetAtTime(effectsEnabled?.85:0,now,.026);
-}
-function music(){
-  const Audio=window.AudioContext||window.webkitAudioContext;
-  if(!Audio)return;
-  if(!audio){
-    audio=new Audio();
-    musicLevel=audio.createGain();
-    effectsBus=audio.createGain();
-    musicLevel.gain.value=0;
-    const limiter=audio.createDynamicsCompressor();
-    limiter.threshold.value=-12;
-    limiter.ratio.value=5;
-    musicLevel.connect(limiter);
-    effectsBus.connect(limiter);
-    limiter.connect(audio.destination);
-    samples=buildKit();
-    resetMusicRun();
-    loadStemPack();
-    musicClock=setInterval(scheduleMusic,25);
-  }
-  syncAudio();
-  if(audio.state!=='running')audio.resume().catch(()=>{});
-}
-function resetMusicRun(){
-  musicStep=0;
-  nextNote=0;
-  musicPhase=0;
-  fallbackFrom=0;
-  fallbackFadeAt=0;
-  overdriveAudio=false;
-  if(!audio)return;
-  stopStems();
-  if(musicBus)musicBus.disconnect();
-  musicBus=audio.createGain();
-  musicBus.connect(musicLevel);
-}
-function stopMusic(){
-  if(!musicLevel)return;
-  musicLevel.gain.setTargetAtTime(0,audio.currentTime,.075);
-  for(const {source,gain} of stemVoices){
-    source.onended=()=>{
-      source.disconnect();
-      gain.disconnect();
-    };
-    source.stop(audio.currentTime+.33);
-  }
 }
 function pressureState(value){
   if(value>=100)return ['failed','ARRÊT'];
@@ -850,12 +670,12 @@ function start(){
   nextDisturbance=DISTURBANCE_MS;
   overUntil=0;
   recoverUntil=0;
-  resetMusicRun();
   playing=true;
   busy=false;
   updateHud();
   paintBoard();
-  music();
+  unlockEffects();
+  syncMusic(true);
 }
 function award(points){
   score+=points*(elapsed<overUntil?3:1);
@@ -1556,16 +1376,26 @@ function resizeGame(){
 }
 window.addEventListener('resize',resizeGame);
 window.visualViewport?.addEventListener('resize',resizeGame);
-$('start').onclick=()=>{$('overlay').hidden=true;start()};$('music-toggle').onclick=()=>{
+$('start').onclick=()=>{$('overlay').hidden=true;start()};
+$('music-toggle').onclick=()=>{
   musicEnabled=!musicEnabled;
   $('music-toggle').setAttribute('aria-pressed',String(musicEnabled));
-  music();
+  syncMusic(true);
 };
 $('effects-toggle').onclick=()=>{
   effectsEnabled=!effectsEnabled;
   $('effects-toggle').setAttribute('aria-pressed',String(effectsEnabled));
-  music();
+  if(effectsEnabled)unlockEffects();
+  else if(effectsBus)effectsBus.gain.setTargetAtTime(0,audio.currentTime,.026);
 };
+window.addEventListener('visibilitychange',()=>syncMusic());
+window.addEventListener('pagehide',()=>musicTrack?.pause());
+window.addEventListener('pageshow',()=>syncMusic());
+window.addEventListener('pointerdown',event=>{
+  if(!playing||event.target.closest?.('button'))return;
+  if(effectsEnabled&&audio?.state!=='running')unlockEffects();
+  if(musicTrack?.paused&&musicEnabled&&!musicFailed)syncMusic(true);
+},true);
 
 })();
 </script></body></html>
