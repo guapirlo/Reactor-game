@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="4.4.3">
-<title>REACTOR 4.4.3 · MIAMI FINAL TOUCH</title>
+<meta name="reactor-version" content="4.4.4">
+<title>REACTOR 4.4.4 · MIAMI BEACH COMPLETE</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -819,7 +819,7 @@ function stopMusic(duration=540,onStopped){
   musicFade=requestAnimationFrame(fade);
 }
 let menuBus=null, menuClock=0, menuNoteAt=0, menuPhrase=0, menuAudioUnlocked=false;
-let optionalMenuTrack=null, optionalMenuFailed=false;
+let optionalMenuTrack=null, optionalMenuFailed=false, optionalMenuFade=0;
 const MENU_BEAT=60/82, menuVoices=new Set();
 const MENU_CHORDS=[
   [130.81,261.63,329.63,392,493.88],[110,220,261.63,329.63,392],
@@ -890,8 +890,7 @@ function scheduleMenuAmbience(){
   });
   menuNoteAt+=MENU_BEAT*4;
 }
-function stopMenuAmbience(){
-  optionalMenuTrack?.pause();
+function stopSynthAmbience(){
   if(menuClock){
     clearInterval(menuClock);
     menuClock=0;
@@ -903,6 +902,28 @@ function stopMenuAmbience(){
     for(const oscillator of menuVoices)oscillator.stop(now+.17);
     menuVoices.clear();
   }
+}
+function stopMenuAmbience(fadeTrack=false){
+  stopSynthAmbience();
+  if(optionalMenuFade)cancelAnimationFrame(optionalMenuFade);
+  optionalMenuFade=0;
+  const track=optionalMenuTrack;
+  if(!track||track.paused)return;
+  if(!fadeTrack){
+    track.pause();
+    return;
+  }
+  const start=performance.now(),volume=track.volume;
+  const fade=now=>{
+    const left=Math.max(0,1-(now-start)/165);
+    track.volume=volume*left**2;
+    if(left>0)optionalMenuFade=requestAnimationFrame(fade);
+    else{
+      optionalMenuFade=0;
+      track.pause();
+    }
+  };
+  optionalMenuFade=requestAnimationFrame(fade);
 }
 function tryMenuTrack(fromGesture){
   const path=activeSkin.menu.music;
@@ -923,10 +944,15 @@ function tryMenuTrack(fromGesture){
     optionalMenuTrack.addEventListener('error',fallback);
     optionalMenuTrack.src=path;
   }
-  optionalMenuTrack.volume=musicVolume();
-  if(optionalMenuTrack.paused)optionalMenuTrack.play().catch(error=>{
-    if(error.name==='AbortError'||runMode!=='menu'||!musicEnabled||document.hidden)return;
+  if(optionalMenuFade)cancelAnimationFrame(optionalMenuFade);
+  optionalMenuFade=0;
+  if(menuClock)stopSynthAmbience();
+  const track=optionalMenuTrack;
+  track.volume=musicVolume();
+  if(track.paused)track.play().catch(error=>{
+    if(track!==optionalMenuTrack||error.name==='AbortError'||runMode!=='menu'||!musicEnabled||document.hidden)return;
     optionalMenuFailed=true;
+    track.pause();
     syncMenuAmbience(fromGesture);
   });
   return true;
@@ -1359,10 +1385,10 @@ function clearEffects(){
   scene.cameras.main.resetFX();
 }
 function start(){
-  const menuReleasing=menuClock!==0;
+  const menuReleasing=menuClock!==0||!!optionalMenuTrack&&!optionalMenuTrack.paused;
   if(menuWaitingForGameplay)musicTrack?.pause();
   menuWaitingForGameplay=false;
-  stopMenuAmbience();
+  stopMenuAmbience(true);
   musicIntroSilenceUntil=menuReleasing?180:0;
   setMode('playing');
   coolingArmed=false;
@@ -1679,6 +1705,10 @@ class Game extends Phaser.Scene{
     this.menuPalms=Array.from({length:3},()=>this.add.graphics().setDepth(-4.6));
     this.menuCar=this.add.graphics().setDepth(-4.58);
     this.menuBirds=this.add.graphics().setDepth(-4.57);
+    this.menuPlane=this.add.graphics().setDepth(-7.4).setVisible(false);
+    this.menuSwimmers=this.add.graphics().setDepth(-4.64);
+    this.menuSecondSki=this.add.graphics().setDepth(-4.42).setVisible(false);
+    this.menuSecondWake=this.add.graphics().setDepth(-4.43).setVisible(false);
     this.menuWalkers=Array.from({length:4},()=>this.add.image(0,0,'beach-step-0').setOrigin(.5,1).setDepth(-4.56));
     this.menuDetailEffect=this.add.graphics().setDepth(-3.85).setVisible(false);
     this.menuDetailStarted=0;
@@ -1874,6 +1904,7 @@ class Game extends Phaser.Scene{
       this.placeSecret('penthouse',...this.penthousePoint);
       this.placeSecret('radio',...this.radioPoint);
       this.paintJetSki();
+      this.paintJetSki(this.menuSecondSki,this.menuSecondWake,0x51f4ec);
     }
     const span=this.cell*N, boardBottom=this.foregroundFoot;
     const haloSize=Math.min(w*.57,255);
@@ -1920,7 +1951,7 @@ class Game extends Phaser.Scene{
     for(const sign of this.signs)sign.homeX=sign.x;
     this.paintStreetGlow();
     this.menuLights.setVisible(menu);
-    for(const layer of [this.menuDetails,this.menuFacadeLights,this.menuFoam,this.menuCar,this.menuBirds,...this.menuPalms,...this.menuWalkers]){
+    for(const layer of [this.menuDetails,this.menuFacadeLights,this.menuFoam,this.menuCar,this.menuBirds,this.menuPlane,this.menuSwimmers,this.menuSecondSki,this.menuSecondWake,...this.menuPalms,...this.menuWalkers]){
       layer.setVisible(menu);
     }
     if(menu){
@@ -2101,6 +2132,8 @@ class Game extends Phaser.Scene{
       g.fillStyle(color,.82);g.fillRect(x-size*.82,py+size*.53,size*.46,3*unit);
     }
     this.paintBeachForeground(g,unit);
+    this.paintBeachCrowd(g,unit);
+    this.paintBayActivity(g,unit);
     this.umbrellaPoint=[w*.52,h*.91];
     this.placeSecret('umbrella',...this.umbrellaPoint);
     const vx=w*.69,vy=h*.96;
@@ -2199,6 +2232,86 @@ class Game extends Phaser.Scene{
       pixel(x-2*unit,y,0x48a58a,4*depth,1,.8);
     }
   }
+  paintBeachCrowd(g,unit){
+    const {w,h}=this;
+    const pixels=(x,y,color,width,height,opacity=1)=>{
+      g.fillStyle(color,opacity);
+      g.fillRect(Math.round(x),Math.round(y),Math.max(1,width*unit),Math.max(1,height*unit));
+    };
+    // Clubs are grouped on the wide dry strip. Nearby rows grow with distance from the bay.
+    const clubs=[
+      [.655,.867,.58,0x78f5e4],[.735,.927,.71,0xff75c3],[.555,.947,.82,0xffd77d],
+      [.628,.975,.91,0xa7b3ff],[.445,.982,.87,0x6deee0],[.887,.915,.61,0xffb2d2]
+    ];
+    for(const [nx,ny,scale,color] of clubs){
+      const x=w*nx,y=h*ny,d=unit*scale;
+      g.fillStyle(0x634663,.24);g.fillEllipse(x+2*d,y+7*d,22*d,6*d);
+      g.lineStyle(1,0x865e67,1);
+      g.lineBetween(x,y-2*d,x,y+10*d);
+      g.fillStyle(color,1);g.fillTriangle(x-10*d,y,x,y-6*d,x+10*d,y);
+      g.fillStyle(0xfff0ca,.82);g.fillTriangle(x-6*d,y,x,y-6*d,x+d,y);
+      for(const sign of [-1,1]){
+        const sx=x+sign*7*d,sy=y+8*d;
+        pixels(sx,sy,0x654359,7*scale,4*scale,.48);
+        pixels(sx,sy-d,sign<0?0xf4b2d1:0x91ffed,6*scale,3*scale);
+        pixels(sx+d,sy-d,0xffd49b,2*scale,2*scale);
+      }
+      pixels(x+12*d,y+3*d,0x6b7db0,3*scale,3*scale);
+      pixels(x+12*d,y+2*d,0xf2ffff,3*scale,1.3*scale,.89);
+    }
+    // Sand texture follows the shoreline in broken, perspective-scaled patches.
+    for(let row=0;row<6;row++){
+      const depth=row/5, y=h*(.865+depth*.122);
+      const left=.53-.14*depth;
+      for(let dot=0;dot<9;dot++){
+        const x=w*(left+(.89-left)*(dot+.24+(row%2)*.18)/9);
+        pixels(x,y+(dot%3)*unit, dot%3?0x9e6275:0xffe2ac,1+depth,1,.26);
+      }
+    }
+    // Beachgoers at the volleyball sideline and surf station face shared activities.
+    for(const [nx,ny,color] of [[.635,.947,0x80579c],[.732,.968,0x3a9ea9],[.792,.958,0xea7a8f],[.594,.877,0xb15686]]){
+      const x=w*nx,y=h*ny;
+      pixels(x,y-6*unit,0xffc595,2,2);
+      pixels(x-unit*.5,y-4*unit,color,3,3.5);
+      pixels(x,y,0x704058,1.4,2);
+      pixels(x+1.7*unit,y,0x704058,1.1,2);
+    }
+  }
+  paintBayActivity(g,unit){
+    const {w,h,horizon:y,menuPlane:plane,menuSwimmers:swimmers}=this;
+    // Keep distant sails above the land shelf and larger boats in the open left bay.
+    for(const [x,py,size] of [[w*.39,y+16,6],[w*.70,y+14,5],[w*.11,h*.715,14],[w*.235,h*.765,12]]){
+      const d=unit*size/10;
+      g.fillStyle(0x8adfdf,.28);g.fillEllipse(x-4*d,py+3*d,24*d,2*d);
+      g.fillStyle(0x423557,1);g.fillPoints([{x:x-9*d,y:py},{x:x+11*d,y:py},
+        {x:x+6*d,y:py+3*d},{x:x-5*d,y:py+3*d}],true);
+      g.lineStyle(1,0xf6e6cb,.9);g.lineBetween(x,py,x,py-11*d);
+      g.fillStyle(0xffeac9,.94);g.fillTriangle(x-d,py-10*d,x-7*d,py-d,x-d,py-d);
+      g.fillStyle(0xff91bf,.84);g.fillTriangle(x+d,py-8*d,x+d,py-d,x+6*d,py-d);
+    }
+    const bx=w*.09,by=h*.80;
+    g.fillStyle(0xffd9bb,.95);
+    g.fillPoints([{x:bx-14*unit,y:by},{x:bx+17*unit,y:by},{x:bx+8*unit,y:by+4*unit},
+      {x:bx-10*unit,y:by+4*unit}],true);
+    g.fillRoundedRect(bx-7*unit,by-5*unit,16*unit,5*unit,2*unit);
+    g.fillStyle(0x426280,.92);g.fillRect(bx-5*unit,by-4*unit,10*unit,2*unit);
+    g.lineStyle(1,0xaafff8,.52);g.lineBetween(bx-22*unit,by+3*unit,bx-16*unit,by+3*unit);
+    swimmers.clear();
+    for(const [nx,ny,color] of [[.165,.853,0xffbf94],[.21,.872,0xd98479],[.083,.955,0xf0aa89],[.275,.928,0xd9978e]]){
+      const x=w*nx,py=h*ny;
+      swimmers.fillStyle(0x7bfff1,.55);swimmers.fillEllipse(x,py+2*unit,10*unit,3*unit);
+      swimmers.fillStyle(color,.95);swimmers.fillCircle(x,py,1.9*unit);
+      swimmers.lineStyle(1,0xb9fff2,.66);
+      swimmers.lineBetween(x-7*unit,py+3*unit,x-4*unit,py+3*unit);
+    }
+    plane.clear();
+    plane.fillStyle(0x453653,1);plane.fillRect(-14,-1,28,3);
+    plane.fillRect(-10,-5,4,5);plane.fillRect(-5,1,11,3);
+    plane.fillStyle(0xffc4dc,1);plane.fillRect(-7,-2,20,2);
+    plane.fillRect(11,0,4,1);plane.fillRect(-1,2,8,1);
+    plane.fillStyle(0xc8fff6,1);plane.fillRect(7,-1,3,1);
+    plane.setScale(Math.max(.66,unit*.84));
+  }
   playMenuDetail(kind){
     const g=this.menuDetailEffect;
     g.clear();
@@ -2244,23 +2357,36 @@ class Game extends Phaser.Scene{
       const step=subdued?0:Math.floor((time+i*61)/(i===3?105:185))%2;
       if(walker.texture.key!=='beach-step-'+step)walker.setTexture('beach-step-'+step);
     }
+    const planeCycle=(time+4700)%42000;
+    this.menuPlane.setVisible(!subdued&&planeCycle<11300);
+    if(this.menuPlane.visible)this.menuPlane.setPosition(this.w*(planeCycle/11300)-18,
+      this.h*.156+Math.sin(time/1400)*2);
+    this.menuSwimmers.setPosition(subdued?0:Math.sin(time/1460)*1.5,subdued?0:Math.sin(time/970)*.85);
+    const skiCycle=(time+3500)%23000;
+    const skiVisible=!subdued&&screen==='main'&&skiCycle<9600;
+    this.menuSecondSki.setVisible(skiVisible);
+    this.menuSecondWake.setVisible(skiVisible);
+    if(skiVisible){
+      const x=this.w*(.46-skiCycle/9600*.31),y=this.h*.823+Math.sin(time/190)*1.2;
+      this.menuSecondSki.setPosition(x,y).setScale(-.73,.73);
+      this.menuSecondWake.setPosition(x+1,y).setScale(-.86,.75)
+        .setAlpha(.70+.22*Math.sin(time/200));
+    }
     if(this.menuDetailEffect.visible){
       const portion=(time-this.menuDetailStarted)/560;
       if(portion>=1)this.menuDetailEffect.setVisible(false);
       else this.menuDetailEffect.setAlpha(1-portion).setScale(subdued?1:1+portion*.26);
     }
   }
-  paintJetSki(){
-    const g=this.jetSki;
+  paintJetSki(g=this.jetSki,wake=this.jetWake,color=0xff58bc){
     g.clear();
-    const wake=this.jetWake;
     wake.clear();
     wake.fillStyle(0x9afbef,.55);
     for(let i=0;i<5;i++)wake.fillRect(-12-i*5,2+i%2*2,5+i,1);
     wake.fillStyle(0xd6ffff,.91);
     wake.fillRect(-10,1,18,2);wake.fillRect(-17,4,4,1);wake.fillRect(-22,1,3,1);
     wake.fillRect(-13,-2,2,1);wake.fillRect(-19,-4,1,1);
-    g.fillStyle(0xff58bc,1);
+    g.fillStyle(color,1);
     g.fillRect(-6,-3,14,3);g.fillRect(4,-5,5,2);
     g.fillStyle(0x252548,1);
     g.fillRect(-3,-8,6,5);
