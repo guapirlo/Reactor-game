@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 4.1 · RISING HEAT</title>
+<meta name="reactor-version" content="4.2">
+<title>REACTOR 4.2 · REACTOR COCKPIT</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -260,12 +261,43 @@ button{font:inherit;cursor:pointer}
 #arcade-fx.show #announcement{line-height:.96}
 #arcade-fx .fx-arc-right{background:#ff5cdf}
 #arcade-fx .fx-arc-left{background:#56fff2}
+/* The dark instrument faces keep the pressure colors independent of the environment. */
+#hud{padding-block:5px;border-radius:10px;background:linear-gradient(110deg,#261e3a,#101727 70%);box-shadow:inset 0 1px #d9d8ff35,0 3px 9px #080a19a3}
+#hud .brand{font-size:clamp(16px,4.1vw,22px);line-height:1;letter-spacing:.13em;font-style:italic}
+#score-module{height:32px;padding-block:1px;background:linear-gradient(150deg,#182134,#0b1020);border-color:#968bb757}
+#score{line-height:19px;font-size:clamp(17px,5.2vw,25px)}
+#combo{top:calc(58px + env(safe-area-inset-top))}
+#reactor-stack{--cockpit-warm:#ffa46e;--cockpit-cool:#ffc16e;gap:5px;padding:4px;border-radius:12px;border-color:#8087a565;background:linear-gradient(153deg,#232940,#101326 65%);box-shadow:inset 0 1px #e3edf653,0 3px 0 #090a19,0 0 9px #9b86d348}
+#reactor-stack #reactor-meter{position:relative;overflow:hidden;padding:3px 7px 4px;border:1px solid #b2b8e04d;border-radius:7px;background:linear-gradient(105deg,color-mix(in srgb,var(--pressure),#101421 86%),#101221 65%);box-shadow:inset 2px 0 var(--pressure),inset 0 1px #ffffff29}
+#reactor-meter[data-danger="warning"]{--pressure:#ffdd8d;--pressure-tail:#bd7924}
+#reactor-meter[data-danger="hot"]{--pressure:#ffad70;--pressure-tail:#d65239}
+#reactor-meter[data-danger="critical"]{--pressure:#ff7896;--pressure-tail:#df3864}
+#reactor-meter[data-danger="maximum"],#reactor-meter[data-danger="failed"]{--pressure:#ff8398;--pressure-tail:#ec2351}
+#reactor-stack #reactor-meter[data-danger="critical"],#reactor-stack #reactor-meter[data-danger="maximum"],#reactor-stack #reactor-meter[data-danger="failed"]{border-color:color-mix(in srgb,var(--pressure),#57132a 25%);box-shadow:inset 2px 0 var(--pressure),inset 0 0 12px color-mix(in srgb,var(--pressure),transparent 79%)}
+#reactor-meter .meter-label{margin-bottom:3px}
+#reactor-meter #pressure-label{font-size:clamp(9px,2.7vw,12px);font-weight:950;letter-spacing:.13em;color:#f6f2ff}
+#reactor-meter #pct{font-size:clamp(20px,5.5vw,27px);line-height:22px;color:#fff;font-weight:950;text-shadow:0 0 8px color-mix(in srgb,var(--pressure),transparent 45%)}
+#reactor-stack #reactor-meter .bar{height:17px;border-radius:3px;border-color:color-mix(in srgb,var(--pressure),#111726 43%);background:linear-gradient(#0a0f1d,#1c2439)}
+#reactor-stack #reactor-meter .pressure{background:linear-gradient(180deg,#fff7,transparent 43%,#120f2355),linear-gradient(90deg,var(--pressure-tail),var(--pressure));box-shadow:0 0 7px var(--pressure)}
+#reactor-meter .bar::after{background:repeating-linear-gradient(90deg,transparent 0 calc(8.333% - 1px),#0b1125 calc(8.333% - 1px) 8.333%);border-right:2px solid #ff829b}
+.pressure-footer{display:flex;justify-content:space-between;gap:4px;margin-top:3px;line-height:9px;font-size:7px;font-weight:800;letter-spacing:.10em;color:#d5cce7;white-space:nowrap}
+#reactor-meter #pressure-state{display:inline;margin:0;color:var(--pressure);font-size:8px}
+#reactor-stack #overdrive-status{border-color:color-mix(in srgb,var(--cockpit-cool),#9a78d6 65%);box-shadow:inset 1px 0 color-mix(in srgb,var(--cockpit-cool),transparent 40%),inset -1px 0 color-mix(in srgb,var(--cockpit-warm),transparent 40%),0 1px 0 #080a18}
+#reactor-stack #overdrive-status[data-state="active"]{border-color:#c9fffa;box-shadow:inset 1px 0 #96fff7,inset -1px 0 #ffa4ee,0 0 12px #6eebed80}
+#reactor-stack #overdrive-status[data-state="recovery"]{box-shadow:inset 1px 0 #b691df8c,inset -1px 0 #785c978c,0 1px 0 #080a18}
+#reactor-stack #overdrive-status[data-state="charge"][data-level="3"],#reactor-stack #overdrive-status[data-state="charge"][data-level="4"]{box-shadow:inset 1px 0 var(--cockpit-cool),inset -1px 0 var(--cockpit-warm),0 0 8px #be83dd70}
+#reactor-stack[data-compact="true"] #reactor-meter{padding:2px 4px 3px}
+#reactor-stack[data-compact="true"] #reactor-meter .bar{height:11px}
+#reactor-stack[data-compact="true"] #reactor-meter #pct{font-size:17px;line-height:17px}
+#reactor-stack[data-compact="true"] #pressure-label{font-size:8px;letter-spacing:.035em}
+#reactor-stack[data-compact="true"] .pressure-footer{letter-spacing:.02em}
+@media(min-width:600px) and (max-height:500px) and (orientation:landscape){#combo{top:calc(102px + env(safe-area-inset-top))}}
 </style>
 </head>
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>4.1</span></div><div class="subtitle">Rising Heat</div></div>
+  <div class="brand">REACTOR</div>
   <div class="stats" id="score-module"><div class="score-readout"><span class="stat-label">Score</span><strong id="score">0</strong></div><div class="best-readout"><span class="stat-label">Best</span><strong id="best">0</strong></div></div>
 </header>
 <div id="combo"></div>
@@ -275,7 +307,11 @@ button{font:inherit;cursor:pointer}
   </div>
 </div>
 <div id="reactor-stack" data-overdrive="charge">
-  <div id="reactor-meter" data-danger="stable"><div class="meter-label"><span>REACTOR PRESSURE</span><span id="pressure-state">STABLE</span><strong id="pct">10%</strong></div><div class="bar"><div id="pfill" class="pressure"></div></div></div>
+  <div id="reactor-meter" data-danger="stable">
+    <div class="meter-label"><span id="pressure-label">REACTOR PRESSURE</span><strong id="pct">10%</strong></div>
+    <div class="bar"><div id="pfill" class="pressure"></div></div>
+    <div class="pressure-footer"><span id="pressure-state">STABLE</span><span>100% = MELTDOWN</span></div>
+  </div>
 <div id="overdrive-status" data-state="charge"><div class="overdrive-label"><span class="energy-label">OVERDRIVE</span><span id="epct"><span id="drive-mode">CHARGE</span><strong id="drive-value">0%</strong></span></div><div class="bar energy-reservoir" aria-hidden="true"><div id="efill" class="energy"></div></div></div>
 </div>
 <div id="bottom">
@@ -285,7 +321,7 @@ button{font:inherit;cursor:pointer}
   </div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 4.1 · MIAMI 1986</div><h1>RISING <span>HEAT</span></h1>
+  <div class="eyebrow">REACTOR · MIAMI 1986</div><h1>REACTOR <span>COCKPIT</span></h1>
   <p>Tap a group of two or more gems. Bigger groups cool the reactor. Chain clears to charge OVERDRIVE.</p>
   <button id="start">PLAY</button>
 </div></div>
@@ -1090,6 +1126,8 @@ class Game extends Phaser.Scene{
     this.bg=this.add.graphics().setDepth(-10);
     this.skies=makeCitySkies(this);
     this.halos=makeNeonHalos(this);
+    this.cockpit=$('reactor-stack');
+    this.cockpitColors=[null,null];
     this.beams=[this.add.image(0,0,'neon-halo').setDepth(-7.55),this.add.image(0,0,'neon-halo').setDepth(-7.55)];
     this.sun=this.add.graphics().setDepth(-9);
     this.coasts=CITY_PHASES.map((_,i)=>this.add.graphics().setDepth(-8.95+i*.02));
@@ -1628,6 +1666,11 @@ class Game extends Phaser.Scene{
     this.edgeDanger.setAlpha(danger*.79);
     for(let i=0;i<2;i++){
       const tint=phaseGlow(i);
+      if(tint!==this.cockpitColors[i]){
+        this.cockpitColors[i]=tint;
+        const color='#'+tint.toString(16).padStart(6,'0');
+        this.cockpit.style.setProperty(i===0?'--cockpit-warm':'--cockpit-cool',color);
+      }
       this.halos[i].setTint(tint).setAlpha(halo+.10+impact*.18+(active?.13:0));
       this.halos[i+2].setTint(tint).setAlpha((halo+.08+impact*.21)*reflection+(active?.15:0));
       const sweep=(time*.014+i*this.w*.57)%(this.w+120);
