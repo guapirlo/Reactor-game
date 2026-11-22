@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="4.2">
-<title>REACTOR 4.2 · REACTOR COCKPIT</title>
+<meta name="reactor-version" content="4.3">
+<title>REACTOR 4.3 · THE ARCADE HUB</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -292,13 +292,69 @@ button{font:inherit;cursor:pointer}
 #reactor-stack[data-compact="true"] #pressure-label{font-size:8px;letter-spacing:.035em}
 #reactor-stack[data-compact="true"] .pressure-footer{letter-spacing:.02em}
 @media(min-width:600px) and (max-height:500px) and (orientation:landscape){#combo{top:calc(102px + env(safe-area-inset-top))}}
+[hidden]{display:none!important}
+:root{--hub-accent:#83fff1;--hub-hot:#f282dd;--hub-font:system-ui,Arial,sans-serif}
+#pause-game{pointer-events:auto;min-width:44px;min-height:44px;margin:-5px 0;border:1px solid #a08bb581;border-radius:9px;background:#171b32;color:#e7fcff;font:900 18px var(--hub-font)}
+#hud{grid-template-columns:1fr auto auto;gap:7px}
+body[data-mode="menu"] :is(#hud,#combo,#reactor-stack,#bottom){visibility:hidden}
+#arcade-menu{position:fixed;inset:0;z-index:9;display:grid;place-items:center;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;padding:max(12px,env(safe-area-inset-top)) max(13px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(13px,env(safe-area-inset-left));background:linear-gradient(180deg,#130d2855 0%,#15112b15 29%,#100b29a0 100%);font-family:var(--hub-font)}
+body[data-mode="paused"] #arcade-menu{background:#0d0b24a0}
+body:is([data-mode="playing"],[data-mode="ended"]) #arcade-menu{display:none}
+.hub-page{width:min(100%,390px);min-width:0;margin:auto}
+#main-menu{display:grid;gap:clamp(13px,5vh,43px);text-align:center}
+.menu-brand{align-self:end;padding:8px 0}
+.menu-city{margin:0 0 6px;font-size:11px;font-weight:900;letter-spacing:.22em;color:#fff2d6;text-shadow:0 1px 3px #1b0e2b,0 0 13px #f5b183}
+.menu-city span{margin-left:5px;padding:2px 4px;border:1px solid #ffc9e47e;border-radius:4px;color:#eaffff;letter-spacing:.08em;background:#1c1944a0}
+.menu-brand h1{margin:0;line-height:.96;letter-spacing:-.09em;font-weight:1000;font-size:clamp(45px,15vw,86px);font-style:italic;color:#e5ffff;background:linear-gradient(180deg,#fff5f4 12%,#abedfd 30%,#6d75b1 47%,#fff2f7 49%,#eea7eb 64%,#9156c6 86%);background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:1px #dbf4ff;filter:drop-shadow(-2px 0 2px #55edffae) drop-shadow(3px 3px 3px #e858e5a6)}
+.hub-actions{display:grid;gap:6px}
+#main-menu .hub-actions{width:min(100%,300px);margin:auto;padding:8px;border:1px solid #cba6ec61;border-radius:15px;background:linear-gradient(145deg,#271d46df,#10142de8);box-shadow:inset 0 1px #e0e6ff3d,0 8px 24px #150e2aa0}
+#arcade-menu button,#overlay .back{font-family:inherit;text-transform:uppercase;font-size:11px;font-weight:900;letter-spacing:.10em;min-height:44px;padding:7px 10px;border:1px solid #a5b1e169;border-radius:7px;background:#1d2141;color:#f4f5ff;touch-action:manipulation}
+#arcade-menu button.primary{background:linear-gradient(105deg,var(--hub-accent),#b2c8ff,var(--hub-hot));color:#160f2c}
+#arcade-menu button:focus-visible,#pause-game:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#arcade-menu button:disabled{opacity:.68;cursor:default}
+.hub-card{background:linear-gradient(135deg,#30234ef8,#10172ff8);border:1px solid #a2a4e49e;border-radius:14px;padding:14px;box-shadow:0 8px 25px #0b092a9c;max-height:100%;overflow:auto;touch-action:pan-y}
+.hub-card h2{margin:0 0 8px;color:var(--hub-accent);font-size:clamp(21px,6vw,30px);text-transform:uppercase;letter-spacing:.04em}
+.hub-card p{margin:5px 0;color:#e4d8eb}
+.hub-card .back{display:block;margin-top:12px;width:100%}
+.hub-score{display:block;color:#fff4b1;font-size:35px;margin-bottom:8px}
+.setting{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;touch-action:manipulation}
+.setting input[type=checkbox]{width:22px;height:22px;accent-color:var(--hub-accent)}
+.setting.volume{display:grid;grid-template-columns:1fr auto;gap:3px}
+.setting input[type=range]{grid-column:1/-1;width:100%;min-height:25px;accent-color:var(--hub-accent)}
+.setting output{color:var(--hub-accent);font-variant-numeric:tabular-nums}
+#skin-list{display:grid;gap:8px}
+.skin-tile{display:grid;text-align:left;align-content:center;gap:5px}
+.skin-tile strong{font-size:14px}
+.skin-tile span{font-size:9px;color:#cfe6ec}
+.skin-tile[aria-pressed=true]{box-shadow:inset 2px 0 var(--hub-accent)}
+.filters{display:flex;gap:5px;margin:7px 0}
+.filters button[aria-pressed=true]{color:#181229!important;background:var(--hub-accent)!important}
+#achievement-list{list-style:none;margin:0;padding:0}
+#achievement-list li{padding:8px 0;border-bottom:1px solid #bba5dc51}
+#achievement-list small{display:block;color:#d7c9e3;margin-top:4px}
+#achievement-list li[data-unlocked=true] strong{color:#9dfff0}
+#achievement-notice{position:fixed;top:calc(65px + env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));max-width:min(75vw,280px);z-index:5;border:1px solid #abffec;padding:6px 9px;border-radius:8px;background:#141b32;color:#afffeb;font-size:10px;font-weight:850;pointer-events:none}
+body:not([data-mode="playing"]) #achievement-notice{display:none}
+@media(min-width:600px) and (max-height:500px) and (orientation:landscape){
+  #hud{grid-template-columns:1fr auto}
+  #score-module{grid-row:2;grid-column:1/-1}
+  #pause-game{grid-column:2;grid-row:1;min-height:44px;min-width:44px}
+  #main-menu{width:min(100%,620px);grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:22px}
+  .menu-brand{align-self:center}
+  .menu-brand h1{font-size:clamp(43px,8.4vw,66px)}
+}
+@media(max-height:440px){.hub-card{padding:9px}.hub-card h2{font-size:20px}.setting{min-height:36px}}
+html[data-reduce-motion="true"] :is(#arcade-fx,#reactor-stack,#overlay,#arcade-menu),html[data-reduce-motion="true"] :is(#arcade-fx,#reactor-stack,#overlay,#arcade-menu) *{animation:none!important;transition:none!important}
+html[data-reduce-motion="true"] #arcade-fx .fx-arc,html[data-reduce-motion="true"] #overlay::before,html[data-reduce-motion="true"] #arcade-fx .fx-seal::after{display:none!important}
+html:has(body:is([data-mode="menu"],[data-mode="paused"])),body:is([data-mode="menu"],[data-mode="paused"]){touch-action:pan-y}
 </style>
 </head>
-<body>
+<body data-mode="menu">
 <div id="game"></div>
 <header id="hud">
   <div class="brand">REACTOR</div>
   <div class="stats" id="score-module"><div class="score-readout"><span class="stat-label">Score</span><strong id="score">0</strong></div><div class="best-readout"><span class="stat-label">Best</span><strong id="best">0</strong></div></div>
+  <button id="pause-game" type="button" aria-label="Pause game">Ⅱ</button>
 </header>
 <div id="combo"></div>
 <div id="arcade-fx" aria-hidden="true">
@@ -320,14 +376,51 @@ button{font:inherit;cursor:pointer}
     <button id="effects-toggle" aria-label="Sound effects" aria-pressed="true">SFX</button>
   </div>
 </div>
-<div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR · MIAMI 1986</div><h1>REACTOR <span>COCKPIT</span></h1>
-  <p>Tap a group of two or more gems. Bigger groups cool the reactor. Chain clears to charge OVERDRIVE.</p>
-  <button id="start">PLAY</button>
-</div></div>
+<div id="arcade-menu" aria-label="Reactor arcade hub">
+  <section id="main-menu" class="hub-page">
+    <div class="menu-brand"><p class="menu-city">MIAMI 1986 <span>SKIN 01</span></p><h1>REACTOR</h1></div>
+    <nav class="hub-actions" aria-label="Main menu">
+      <button id="start" class="primary" disabled>New game</button>
+      <button data-screen="skins">Skins</button>
+      <button data-screen="achievements">Achievements</button>
+      <button data-screen="scores">High scores</button>
+      <button data-screen="options">Options</button>
+    </nav>
+  </section>
+  <section id="skins-menu" class="hub-page hub-card" hidden>
+    <h2>Skins</h2><div id="skin-list"></div><button class="back" data-back>Back</button>
+  </section>
+  <section id="achievements-menu" class="hub-page hub-card" hidden>
+    <h2>Achievements</h2><p id="achievement-count"></p>
+    <div class="filters" aria-label="Achievement categories">
+      <button data-filter="all" aria-pressed="true">All</button><button data-filter="core" aria-pressed="false">Core</button><button data-filter="skin" aria-pressed="false">Miami 1986</button>
+    </div>
+    <ul id="achievement-list"></ul><button class="back" data-back>Back</button>
+  </section>
+  <section id="scores-menu" class="hub-page hub-card" hidden>
+    <h2>High scores</h2><p>Personal best</p><strong id="saved-best" class="hub-score">0</strong><button class="back" data-back>Back</button>
+  </section>
+  <section id="options-menu" class="hub-page hub-card" hidden>
+    <h2>Options</h2>
+    <label class="setting"><span>Music</span><input id="option-music" type="checkbox"></label>
+    <label class="setting volume"><span>Music volume</span><output id="music-volume-value" for="music-volume"></output><input id="music-volume" type="range" min="0" max="100"></label>
+    <label class="setting"><span>Sound effects</span><input id="option-effects" type="checkbox"></label>
+    <label class="setting volume"><span>Effects volume</span><output id="effects-volume-value" for="effects-volume"></output><input id="effects-volume" type="range" min="0" max="100"></label>
+    <label class="setting"><span>Reduce motion</span><input id="option-motion" type="checkbox"></label>
+    <button class="back" data-back>Back</button>
+  </section>
+  <section id="pause-menu" class="hub-page hub-card" hidden>
+    <h2>Paused</h2><div class="hub-actions">
+      <button id="resume-game" class="primary">Resume</button><button id="restart-game">Restart</button>
+      <button data-screen="options">Options</button><button data-main>Main menu</button>
+    </div>
+  </section>
+</div>
+<div id="achievement-notice" role="status" hidden></div>
+<div id="overlay" hidden><div id="panel"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script><script>
 (()=>{'use strict';
-const N=7,C=[0x39f6e0,0xff65ad,0xffd369,0xa68bff];
+const N=7;
 const $=id=>document.getElementById(id),rand=()=>Math.floor(Math.random()*C.length);
 const OVERDRIVE_MS=9000, RECOVERY_MS=12000, COMBO_MS=2100;
 const DISTURBANCE_MS=45000, CHAIN_MIN=4, MAX_CHAIN_WAVES=2;
@@ -365,7 +458,134 @@ let cityMix=[1,0,0,0,0],cityFrom=cityMix.slice();
 let qualityMoves=0,comboTier=0,critical=false;
 let elapsed=0,nextDisturbance=DISTURBANCE_MS,overUntil=0,recoverUntil=0,settleEvent=null;
 let playing=false,busy=false,musicEnabled=true,effectsEnabled=true,scene=null,audio=null,best=0;
-const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+const SETTINGS_KEY='reactor.v43.settings', ACHIEVEMENTS_KEY='reactor.v43.achievements';
+const systemMotion=matchMedia('(prefers-reduced-motion: reduce)');
+const reducedMotion={get matches(){return settings.reduceMotion||systemMotion.matches}};
+function readStore(key){
+  try{return JSON.parse(localStorage.getItem(key))||{}}catch{return {}}
+}
+function writeStore(key,value){
+  try{localStorage.setItem(key,JSON.stringify(value))}catch{}
+}
+function volumeSetting(input,fallback){
+  return typeof input==='number'&&Number.isFinite(input)?Math.max(0,Math.min(100,input)):fallback;
+}
+const savedSettings=readStore(SETTINGS_KEY);
+const settings={
+  music:savedSettings.music!==false,effects:savedSettings.effects!==false,
+  musicVolume:volumeSetting(savedSettings.musicVolume,24),
+  effectsVolume:volumeSetting(savedSettings.effectsVolume,88),
+  reduceMotion:savedSettings.reduceMotion===true,
+  skin:typeof savedSettings.skin==='string'?savedSettings.skin:'miami'
+};
+musicEnabled=settings.music;
+effectsEnabled=settings.effects;
+let runMode='menu',screen='main',optionsBack='main',achievementFilter='all';
+const CORE_ACHIEVEMENTS=[
+  ['first-spark','FIRST SPARK','Complete your first valid clear.','manualClears',1],
+  ['getting-started','GETTING STARTED','Reach 1,000 points.','score',1000],
+  ['five-figures','FIVE FIGURES','Reach 10,000 points.','score',10000],
+  ['high-voltage','HIGH VOLTAGE','Reach 50,000 points.','score',50000],
+  ['six-figures','SIX FIGURES','Reach 100,000 points.','score',100000],
+  ['elite-operator','ELITE OPERATOR','Reach 200,000 points.','score',200000],
+  ['power-surge','POWER SURGE','Activate Overdrive.','overdrive',1],
+  ['chain-reaction','CHAIN REACTION','Trigger a genuine cascade.','cascade',1],
+  ['cool-under-pressure','COOL UNDER PRESSURE','Cool from at least 80% to below 60% in one run.','cooled',1],
+  ['survivor','SURVIVOR','Survive 10 minutes in one game.','runSeconds',600]
+];
+const SKINS={
+  miami:{
+    id:'miami',name:'Miami 1986',category:'Coastal city',available:true,
+    environment:{
+      create:game=>game.createMiamiEnvironment(),paint:game=>game.paintCity(),
+      animate:(game,time)=>game.animateCity(time),reset:resetMiamiCycle,
+      update:()=>{updateCityPhase();trackMiamiProgress()}
+    },
+    gems:{colors:[0x39f6e0,0xff65ad,0xffd369,0xa68bff],create:game=>makeCrystalTextures(game)},
+    palette:{accent:'#83fff1',hot:'#f282dd'},
+    typography:'system-ui, Arial, sans-serif',animationStyle:'neon',
+    music:'./audio/miami-reactor.mp3',sound:kind=>miamiCue(kind),
+    menu:{line:'MIAMI 1986',badge:'SKIN 01'},
+    achievements:[
+      ['welcome','WELCOME TO MIAMI','Start a Miami 1986 game.','started',1],
+      ['golden-hour','GOLDEN HOUR','Score 2,500 points in Miami.','score',2500],
+      ['violet-skies','VIOLET SKIES','Experience Violet Hour.','violet',1],
+      ['neon-nights','NEON NIGHTS','Experience Neon Nights.','neon',1],
+      ['after-dark','AFTER DARK','Experience Miami After Dark.','dark',1],
+      ['sunrise-drive','SUNRISE DRIVE','Witness the next sunrise.','sunrise',1],
+      ['ocean-drive','OCEAN DRIVE','Complete a full repeating day–night cycle.','cycles',1],
+      ['miami-heat','MIAMI HEAT','Reach 50,000 points in Miami.','score',50000],
+      ['vice-legend','VICE LEGEND','Reach 200,000 points in Miami.','score',200000],
+      ['miami-master','MIAMI MASTER','Reach 300,000 points in Miami.','score',300000]
+    ]
+  },
+  classic:{id:'classic',name:'Classic',category:'Arcade',available:false,menu:{line:'CLASSIC',badge:'CONCEPT'},achievements:[]}
+};
+let activeSkin=SKINS[settings.skin]?.available?SKINS[settings.skin]:SKINS.miami;
+let C=activeSkin.gems.colors;
+const savedAchievements=readStore(ACHIEVEMENTS_KEY);
+const unlocks=Object.assign(Object.create(null),savedAchievements.unlocks);
+const achievementProgress=Object.assign(Object.create(null),savedAchievements.progress);
+let coolingArmed=false,noticeUntil=0,nextAchievementSound=0,lastRunSecond=0;
+function saveAchievements(){writeStore(ACHIEVEMENTS_KEY,{unlocks,progress:achievementProgress})}
+function achievementDefinitions(category){
+  const pack=(list,scope)=>list.map(([id,title,description,stat,goal])=>({id:scope+':'+id,scope,title,description,stat,goal}));
+  return [
+    ...(category!=='skin'?pack(CORE_ACHIEVEMENTS,'core'):[]),
+    ...(category!=='core'?pack(activeSkin.achievements,activeSkin.id):[])
+  ];
+}
+function trackAchievement(stat,value,scope='core'){
+  const key=scope+':'+stat;
+  if(value<=(achievementProgress[key]||0))return;
+  achievementProgress[key]=value;
+  const definitions=scope==='core'?CORE_ACHIEVEMENTS:activeSkin.achievements;
+  const unlocked=[];
+  for(const [id,title,,metric,goal] of definitions){
+    if(metric!==stat||value<goal||unlocks[scope+':'+id])continue;
+    unlocks[scope+':'+id]=true;
+    unlocked.push(title);
+  }
+  if(!unlocked.length)return;
+  saveAchievements();
+  const notice=$('achievement-notice');
+  notice.textContent='Achievement unlocked · '+unlocked.join(' / ');
+  notice.hidden=false;
+  noticeUntil=elapsed+2400;
+  if(elapsed>=nextAchievementSound){
+    cue('achievement');
+    nextAchievementSound=elapsed+800;
+  }
+}
+function trackMiamiProgress(){
+  if(activeSkin.id!=='miami')return;
+  if(cityMix[1]>=.99)trackAchievement('violet',1,'miami');
+  if(cityMix[2]>=.99)trackAchievement('neon',1,'miami');
+  if(cityMix[3]>=.99)trackAchievement('dark',1,'miami');
+  if(cityMix[4]>=.99)trackAchievement('sunrise',1,'miami');
+  if(cityCycleStart!==null)trackAchievement('cycles',Math.floor((elapsed-cityCycleStart)/CITY_CYCLE_MS),'miami');
+}
+function setMode(mode){
+  runMode=mode;
+  if(document.body){
+    document.body.dataset.mode=mode;
+    $('arcade-menu').inert=mode==='playing'||mode==='ended';
+    for(const id of ['hud','bottom'])$(id).inert=mode!=='playing';
+    $('overlay').inert=mode!=='ended';
+  }
+}
+function applySkin(){
+  C=activeSkin.gems.colors;
+  const style=document.documentElement?.style;
+  if(!style)return;
+  style.setProperty('--hub-accent',activeSkin.palette.accent);
+  style.setProperty('--hub-hot',activeSkin.palette.hot);
+  style.setProperty('--hub-font',activeSkin.typography);
+  document.body.dataset.skin=activeSkin.id;
+  document.body.dataset.animation=activeSkin.animationStyle;
+  document.querySelector('.menu-city').firstChild.textContent=activeSkin.menu.line+' ';
+  document.querySelector('.menu-city span').textContent=activeSkin.menu.badge;
+}
 const ANNOUNCEMENTS={
   combo:[1,410],clear:[2,520],chain:[3,570],super:[4,570],
   critical:[6,680],mega:[7,680],end:[8,580],overdrive:[9,820],notice:[2,550]
@@ -375,9 +595,8 @@ const SCORE_COUNT_MS=300, SCORE_SURGE_MIN=900;
 let scoreShown=0, scoreFrom=0, scoreTarget=0, scoreCountAt=0, scoreSurgeUntil=0;
 let surgeDisplayed=false;
 try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
-const MUSIC_PATH='./audio/miami-reactor.mp3';
-const MUSIC_VOLUME=.33;
-const EFFECTS_VOLUME=.98;
+const effectsVolume=()=>settings.effectsVolume/100*1.25;
+const musicVolume=()=>settings.musicVolume/100;
 let musicTrack=null, effectsBus=null, musicNeedsGesture=false, musicFailed=false;
 let musicFade=0, musicDuckUntil=0, tensionBus=null, tensionLevel=0, nextTensionAt=0;
 
@@ -399,19 +618,19 @@ function getMusicTrack(){
   const track=new Audio();
   track.preload='none';
   track.loop=true;
-  track.volume=MUSIC_VOLUME;
+  track.volume=musicVolume();
   track.addEventListener('error',reportMusicError);
   track.addEventListener('playing',()=>{
     musicNeedsGesture=false;
     musicFailed=false;
     setMusicStatus('Miami Reactor soundtrack');
   });
-  track.src=MUSIC_PATH;
+  track.src=activeSkin.music;
   musicTrack=track;
   return track;
 }
 function syncMusic(fromGesture=false){
-  if(!playing||!musicEnabled||document.hidden){
+  if(!playing||runMode==='paused'||!musicEnabled||document.hidden){
     musicTrack?.pause();
     return;
   }
@@ -436,7 +655,7 @@ function resetMusicFade(){
   musicFade=0;
   musicDuckUntil=0;
   if(!musicTrack)return;
-  musicTrack.volume=MUSIC_VOLUME;
+  musicTrack.volume=musicVolume();
 }
 function stopMusic(){
   if(!musicTrack)return;
@@ -470,7 +689,7 @@ function unlockEffects(){
     limiter.connect(audio.destination);
   }
   const now=audio.currentTime;
-  effectsBus.gain.setTargetAtTime(EFFECTS_VOLUME,now,.026);
+  effectsBus.gain.setTargetAtTime(effectsVolume(),now,.026);
   if(audio.state!=='running')audio.resume().catch(()=>{});
 }
 function sound(frequency,duration=.14,type='triangle',volume=.035,offset=0,endFrequency=0,bus=effectsBus){
@@ -616,12 +835,13 @@ function resetAnnouncements(){
 }
 function updateMusicMix(delta){
   if(!musicTrack||musicTrack.paused)return;
-  const target=effectsEnabled&&elapsed<musicDuckUntil?MUSIC_VOLUME*.74:MUSIC_VOLUME;
+  const target=effectsEnabled&&elapsed<musicDuckUntil?musicVolume()*.74:musicVolume();
   const next=musicTrack.volume+(target-musicTrack.volume)*(1-Math.exp(-delta/65));
   if(Math.abs(next-musicTrack.volume)>.0004)musicTrack.volume=next;
 }
-function cue(kind){
-  if(effectsEnabled&&audio?.state==='running'&&(kind==='super'||kind==='mega'||kind==='overdrive')){
+function cue(kind){activeSkin.sound(kind)}
+function miamiCue(kind){
+  if(effectsEnabled&&audio?.state==='running'&&(kind==='super'||kind==='mega'||kind==='overdrive'||kind==='achievement')){
     musicDuckUntil=Math.max(musicDuckUntil,elapsed+(kind==='overdrive'?510:300));
   }
   const tier=Math.min(5,Math.max(0,combo-2));
@@ -631,6 +851,8 @@ function cue(kind){
       sound(67,.27,'sine',.105,.26,39);
       sound(478,.19,'triangle',.040,.30,258);
       break;
+    case 'achievement':
+      sound(528,.19,'sine',.034);sound(792,.24,'triangle',.039,.065);break;
     case 'critical':
       sound(175,.18,'triangle',.055);
       sound(147,.19,'triangle',.045,.22);
@@ -679,6 +901,14 @@ function chargeOverdrive(amount){
   flash('OVERDRIVE!','overdrive');
   cityImpact=1;
   cue('overdrive');
+  trackAchievement('overdrive',1);
+}
+function resetMiamiCycle(){
+  cityPhase=0;
+  phaseStarted=0;
+  cityMix=[1,0,0,0,0];
+  cityFrom=cityMix.slice();
+  cityCycleStart=null;
 }
 function updateCityPhase(){
   if(cityCycleStart!==null){
@@ -872,6 +1102,10 @@ function clearEffects(){
   scene.cameras.main.resetFX();
 }
 function start(){
+  setMode('playing');
+  coolingArmed=false;
+  noticeUntil=nextAchievementSound=lastRunSecond=0;
+  $('achievement-notice').hidden=true;
   resetMusicFade();
   if(musicTrack)musicTrack.currentTime=0;
   nextTensionAt=0;
@@ -879,11 +1113,7 @@ function start(){
   $('overlay').dataset.shutdown='false';
   board=Array.from({length:N},()=>Array.from({length:N},rand));
   score=0;
-  cityPhase=0;
-  phaseStarted=0;
-  cityMix=[1,0,0,0,0];
-  cityFrom=cityMix.slice();
-  cityCycleStart=null;
+  activeSkin.environment.reset();
   cityImpact=0;
   lastReactorTick=0;
   resetAnnouncements();
@@ -903,12 +1133,19 @@ function start(){
   playing=true;
   busy=false;
   updateHud();
-  paintBoard();
+  if(scene?.sys){
+    scene.boardFrame.setVisible(true);
+    scene.glass.setVisible(true);
+    scene.layout();
+  }else paintBoard();
   unlockEffects();
   syncMusic(true);
+  trackAchievement('started',1,activeSkin.id);
 }
 function award(points){
   score+=points*(elapsed<overUntil?3:1);
+  trackAchievement('score',score);
+  trackAchievement('score',score,activeSkin.id);
   if(score<=best)return;
   best=score;
   try{localStorage.setItem('reactor_miami_best',String(best))}catch(e){}
@@ -916,6 +1153,8 @@ function award(points){
 function finish(){
   playing=false;
   busy=false;
+  setMode('ended');
+  saveAchievements();
   stopMusic();
   setTension(0);
   resetAnnouncements();
@@ -928,13 +1167,15 @@ function finish(){
   if(settleEvent)settleEvent.remove();
   settleEvent=null;
   updateHud();
-  $('panel').innerHTML='<div class="eyebrow">GAME OVER</div><h1>REACTOR <span>MELTDOWN</span></h1><div class="results"><div><span class="stat-label">Score</span><strong>'+score.toLocaleString('en-US')+'</strong></div><div><span class="stat-label">Best</span><strong>'+best.toLocaleString('en-US')+'</strong></div></div><button id="again">PLAY AGAIN</button>';
+  $('panel').innerHTML='<div class="eyebrow">GAME OVER</div><h1>REACTOR <span>MELTDOWN</span></h1><div class="results"><div><span class="stat-label">Score</span><strong>'+score.toLocaleString('en-US')+'</strong></div><div><span class="stat-label">Best</span><strong>'+best.toLocaleString('en-US')+'</strong></div></div><button id="again">PLAY AGAIN</button><button id="loss-menu" class="back">MAIN MENU</button>';
   $('overlay').dataset.shutdown='true';
   $('overlay').hidden=false;
   $('again').onclick=()=>{$('overlay').hidden=true;start()};
+  $('loss-menu').onclick=returnToMenu;
 }
 function changePressure(amount){
   pressure=Math.max(0,Math.min(100,pressure+amount));
+  if(pressure>=80)coolingArmed=true;
   if(pressure===100){
     finish();
     return;
@@ -1021,6 +1262,7 @@ function resolveChain(fall,wave){
     const points=groups.reduce((total,group)=>total+group.length*group.length*5*wave,0);
     const gained=points*(elapsed<overUntil?3:1);
     award(points);
+    trackAchievement('cascade',1);
     flash('CHAIN ×'+wave+' · +'+gained,'chain');
     cityImpact=Math.max(cityImpact,.52);
     cue('chain');
@@ -1085,7 +1327,7 @@ function energyForGroup(size,reward){
   return Math.min(22,2+(size-2)*2+Math.max(0,size-4)*2)+(reward===3?10:0);
 }
 function tap(x,y){
-  if(!playing||busy)return;
+  if(!playing||runMode==='paused'||busy)return;
   const group=findGroup(x,y,new Set());
   const size=group.length;
   if(size<2){
@@ -1093,10 +1335,16 @@ function tap(x,y){
     return;
   }
   busy=true;
+  trackAchievement('manualClears',1);
   const reward=updateCombo(size);
   const previousScore=score;
   award(comboPoints(size));
+  const priorPressure=pressure;
   changePressure(pressureForGroup(size));
+  if(coolingArmed&&pressure<60&&pressure<priorPressure){
+    trackAchievement('cooled',1);
+    coolingArmed=false;
+  }
   if(!playing)return;
   if(reward===3){
     flash('MEGA!'+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'mega');
@@ -1120,8 +1368,7 @@ function tap(x,y){
 }
 class Game extends Phaser.Scene{
   constructor(){super('Game')}
-  create(){
-    scene=this;
+  createMiamiEnvironment(){
     this.signs=[];
     this.bg=this.add.graphics().setDepth(-10);
     this.skies=makeCitySkies(this);
@@ -1144,38 +1391,57 @@ class Game extends Phaser.Scene{
     this.sideCity=this.add.graphics().setDepth(-6);
     this.sideLights=this.add.graphics().setDepth(-5.5);
     this.streetGlow=this.add.graphics().setDepth(-4);
+  }
+  create(){
+    scene=this;
+    activeSkin.environment.create(this);
     this.glass=this.add.graphics().setDepth(.5);
     this.edgeElectric=this.add.graphics().setDepth(3);
     this.edgeDanger=this.add.graphics().setDepth(3);
     this.neonSpill=this.add.graphics().setDepth(-3);
     this.warmSpill=this.add.graphics().setDepth(-3);
     this.lightSweep=this.add.graphics().setDepth(-3);
-    makeCrystalTextures(this);
+    activeSkin.gems.create(this);
     this.boardFrame=this.add.graphics().setDepth(0);
     this.gems=Array.from({length:N*N},()=>this.add.image(0,0,'crystal-0').setDepth(1).setVisible(false));
     this.particles=Array.from({length:MAX_PARTICLES},()=>this.add.circle(0,0,2.5,0xffffff).setDepth(2).setVisible(false));
-    this.scale.on('resize',()=>this.layout());
+    const resize=()=>this.layout();
+    this.scale.on('resize',resize);
+    this.events.once('shutdown',()=>this.scale.off('resize',resize));
     this.layout();
+    this.boardFrame.setVisible(false);
+    this.glass.setVisible(false);
+    $('start').disabled=false;
     this.input.on('pointerdown',p=>{
       const x=Math.floor((p.x-this.left)/this.cell),y=Math.floor((p.y-this.top)/this.cell);
       if(x>=0&&x<N&&y>=0&&y<N)tap(x,y);
     });
   }
   update(time,delta){
+    if(runMode==='paused')return;
     if(!playing){
-      this.animateCity(time);
+      activeSkin.environment.animate(this,time);
       return;
     }
     elapsed+=delta;
-    updateCityPhase();
+    activeSkin.environment.update();
+    if(noticeUntil&&elapsed>=noticeUntil){
+      $('achievement-notice').hidden=true;
+      noticeUntil=0;
+    }
     updateAnnouncements();
     cityImpact=Math.max(0,cityImpact-delta/570);
     updateScoreDisplay();
     updateDashboardLight();
-    this.animateCity(time);
+    activeSkin.environment.animate(this,time);
     const previousPressure=Math.floor(pressure);
     changePressure(passivePressureBetween(elapsed-delta,elapsed)+latePressureFor(delta));
     if(!playing)return;
+    const second=Math.floor(elapsed/1000);
+    if(second>lastRunSecond){
+      lastRunSecond=second;
+      trackAchievement('runSeconds',second);
+    }
     updateTension();
     updateMusicMix(delta);
     const comboExpired=combo>0&&elapsed-lastMove>=COMBO_MS;
@@ -1237,8 +1503,8 @@ class Game extends Phaser.Scene{
     stack.style.setProperty('--stack-y',(landscape?hudBottom+12:this.top-stackHeight-9)+'px');
     this.positionArcadeFX();
     this.paintReactorFX();
-    this.paintCity();
-    paintBoard();
+    activeSkin.environment.paint(this);
+    if(runMode!=='menu')paintBoard();
   }
   positionArcadeFX(){
     // Convert the grid's Phaser-space bounds through the actual canvas CSS box.
@@ -1258,8 +1524,10 @@ class Game extends Phaser.Scene{
     for(const sign of this.signs)sign.destroy();
     this.signs.length=0;
     const {w,h,bg,sun,city}=this;
-    const horizon=this.horizon=Math.max(h*.13,Math.min(h*.36,this.top-58));
-    const r=this.sunRadius=Math.min(w*.23,h*.14,118);
+    const menu=runMode==='menu';
+    const horizon=this.horizon=menu?h*.46:Math.max(h*.13,Math.min(h*.36,this.top-58));
+    this.foregroundFoot=menu?h*.59:this.top+this.cell*N;
+    const r=this.sunRadius=menu?Math.min(w*.37,h*.26,170):Math.min(w*.23,h*.14,118);
     const skyHeight=horizon+45;
     for(const sky of this.skies)sky.setDisplaySize(w,skyHeight);
     bg.clear();
@@ -1294,7 +1562,7 @@ class Game extends Phaser.Scene{
     this.cityShade.clear();
     this.cityWindows.clear();
     const hotelWidth=Math.max(48,Math.min(w*.26,132));
-    const span=this.cell*N, boardBottom=this.top+span;
+    const span=this.cell*N, boardBottom=this.foregroundFoot;
     const haloSize=Math.min(w*.57,255);
     for(let i=0;i<2;i++){
       const side=i===0?-1:1;
@@ -1330,7 +1598,12 @@ class Game extends Phaser.Scene{
       car.fillRect(-18,-4,3,2);
       car.setScale(i===0?1:-.83,i===0?1:.83);
     });
-    this.paintSideCity();
+    this.sideCity.setVisible(!menu);
+    this.sideLights.setVisible(!menu);
+    if(menu){
+      this.sideCity.clear();
+      this.sideLights.clear();
+    }else this.paintSideCity();
     for(const sign of this.signs)sign.homeX=sign.x;
     this.paintStreetGlow();
     this.palms.forEach((p,i)=>this.drawPalm(p,i,horizon));
@@ -1339,7 +1612,7 @@ class Game extends Phaser.Scene{
   paintCoast(){
     const {w,h,coasts,surf,promenade}=this;
     const horizon=this.horizon;
-    const boardFoot=this.top+this.cell*N;
+    const boardFoot=this.foregroundFoot;
     for(let i=0;i<CITY_PHASES.length;i++){
       const layer=coasts[i], phase=CITY_PHASES[i];
       layer.clear();
@@ -1664,6 +1937,7 @@ class Game extends Phaser.Scene{
     const danger=playing?Math.max(0,(pressure-60)/40):0;
     const sway=subdued?0:Math.sin(time/3400);
     this.edgeDanger.setAlpha(danger*.79);
+    this.edgeElectric.setVisible(runMode!=='menu');
     for(let i=0;i<2;i++){
       const tint=phaseGlow(i);
       if(tint!==this.cockpitColors[i]){
@@ -1726,26 +2000,195 @@ function resizeGame(){
 }
 window.addEventListener('resize',resizeGame);
 window.visualViewport?.addEventListener('resize',resizeGame);
-$('start').onclick=()=>{$('overlay').hidden=true;start()};
-$('music-toggle').onclick=()=>{
-  musicEnabled=!musicEnabled;
-  $('music-toggle').setAttribute('aria-pressed',String(musicEnabled));
+function showScreen(next){
+  screen=next;
+  for(const name of ['main','skins','achievements','scores','options','pause'])$(name+'-menu').hidden=name!==next;
+  if(next==='options')refreshOptions();
+  if(next==='scores')$('saved-best').textContent=best.toLocaleString('en-US');
+  if(next==='skins')renderSkins();
+  if(next==='achievements')renderAchievements();
+  const panel=$(next+'-menu');
+  panel.scrollTop=0;
+  const heading=panel.querySelector('h2');
+  if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
+}
+function renderSkins(){
+  const list=$('skin-list');
+  list.replaceChildren();
+  for(const skin of Object.values(SKINS)){
+    const tile=document.createElement('button');
+    tile.className='skin-tile';
+    tile.type='button';
+    tile.disabled=!skin.available;
+    tile.setAttribute('aria-pressed',String(skin===activeSkin));
+    const name=document.createElement('strong'), detail=document.createElement('span');
+    name.textContent=skin.name;
+    detail.textContent=skin.category+' · '+(skin.available?(skin===activeSkin?'Selected':'Available'):'Coming soon');
+    tile.append(name,detail);
+    if(skin.available)tile.onclick=()=>{
+      const changed=skin!==activeSkin;
+      if(changed&&musicTrack){
+        musicTrack.pause();
+        musicTrack=null;
+        musicFailed=musicNeedsGesture=false;
+      }
+      activeSkin=skin;
+      settings.skin=skin.id;
+      writeStore(SETTINGS_KEY,settings);
+      applySkin();
+      if(changed&&scene){
+        $('start').disabled=true;
+        scene.scene.restart();
+      }
+      renderSkins();
+    };
+    list.append(tile);
+  }
+}
+function renderAchievements(){
+  const definitions=achievementDefinitions(achievementFilter);
+  const complete=definitions.filter(item=>unlocks[item.id]).length;
+  $('achievement-count').textContent=complete+' / '+definitions.length+' unlocked';
+  for(const button of document.querySelectorAll('[data-filter]')){
+    button.setAttribute('aria-pressed',String(button.dataset.filter===achievementFilter));
+    if(button.dataset.filter==='skin')button.textContent=activeSkin.name;
+  }
+  const list=$('achievement-list');
+  list.replaceChildren();
+  for(const item of definitions){
+    const row=document.createElement('li'), title=document.createElement('strong'), detail=document.createElement('small');
+    const unlocked=!!unlocks[item.id];
+    row.dataset.unlocked=String(unlocked);
+    title.textContent=item.title;
+    detail.textContent=item.description+' · '+(unlocked?'Unlocked':'Locked')+
+      (item.goal>1?' · '+Math.min(item.goal,achievementProgress[item.scope+':'+item.stat]||0).toLocaleString('en-US')+' / '+item.goal.toLocaleString('en-US'):'');
+    row.append(title,detail);
+    list.append(row);
+  }
+}
+function refreshOptions(){
+  $('option-music').checked=musicEnabled;
+  $('option-effects').checked=effectsEnabled;
+  $('option-motion').checked=settings.reduceMotion;
+  $('music-volume').value=settings.musicVolume;
+  $('effects-volume').value=settings.effectsVolume;
+  $('music-volume-value').textContent=settings.musicVolume+'%';
+  $('effects-volume-value').textContent=settings.effectsVolume+'%';
+}
+function persistOptions(){
+  writeStore(SETTINGS_KEY,settings);
+  if(document.documentElement)document.documentElement.dataset.reduceMotion=String(settings.reduceMotion);
+  $('music-toggle').setAttribute?.('aria-pressed',String(musicEnabled));
+  $('effects-toggle').setAttribute?.('aria-pressed',String(effectsEnabled));
+}
+function setMusicEnabled(enabled){
+  settings.music=musicEnabled=enabled;
+  persistOptions();
   syncMusic(true);
-};
-$('effects-toggle').onclick=()=>{
-  effectsEnabled=!effectsEnabled;
-  $('effects-toggle').setAttribute('aria-pressed',String(effectsEnabled));
-  if(effectsEnabled)unlockEffects();
+}
+function setEffectsEnabled(enabled){
+  settings.effects=effectsEnabled=enabled;
+  persistOptions();
+  if(playing&&runMode!=='paused'&&effectsEnabled)unlockEffects();
   else if(effectsBus)effectsBus.gain.setTargetAtTime(0,audio.currentTime,.026);
+}
+function pauseRun(){
+  if(!playing||runMode!=='playing')return;
+  setMode('paused');
+  scene.scene.pause();
+  syncMusic();
+  setTension(0);
+  if(effectsBus)effectsBus.gain.setTargetAtTime(0,audio.currentTime,.026);
+  showScreen('pause');
+  $('resume-game').focus();
+}
+function resumeRun(){
+  if(!playing||runMode!=='paused')return;
+  setMode('playing');
+  scene.scene.resume();
+  unlockEffects();
+  syncMusic(true);
+  $('pause-game').focus();
+}
+function discardRun(){
+  playing=false;
+  busy=false;
+  if(settleEvent)settleEvent.remove();
+  settleEvent=null;
+  clearEffects();
+  resetAnnouncements();
+  $('achievement-notice').hidden=true;
+  saveAchievements();
+  setTension(0);
+  resetMusicFade();
+  if(musicTrack){
+    musicTrack.pause();
+    musicTrack.currentTime=0;
+  }
+}
+function returnToMenu(){
+  const wasPaused=runMode==='paused';
+  discardRun();
+  setMode('menu');
+  $('overlay').hidden=true;
+  board=[];
+  activeSkin.environment.reset();
+  cityImpact=0;
+  scene.boardFrame.setVisible(false);
+  scene.glass.setVisible(false);
+  for(const gem of scene.gems)gem.setVisible(false);
+  if(wasPaused)scene.scene.resume();
+  scene.layout();
+  showScreen('main');
+  $('start').focus();
+}
+function restartRun(){
+  discardRun();
+  scene.scene.resume();
+  start();
+}
+$('start').onclick=()=>{if(scene){$('overlay').hidden=true;start()}};
+$('pause-game').onclick=pauseRun;
+$('resume-game').onclick=resumeRun;
+$('restart-game').onclick=restartRun;
+$('music-toggle').onclick=()=>setMusicEnabled(!musicEnabled);
+$('effects-toggle').onclick=()=>setEffectsEnabled(!effectsEnabled);
+$('option-music').onchange=event=>setMusicEnabled(event.target.checked);
+$('option-effects').onchange=event=>setEffectsEnabled(event.target.checked);
+$('option-motion').onchange=event=>{settings.reduceMotion=event.target.checked;persistOptions()};
+$('music-volume').oninput=event=>{
+  settings.musicVolume=Number(event.target.value);
+  if(musicTrack)musicTrack.volume=musicVolume();
+  refreshOptions();persistOptions();
 };
+$('effects-volume').oninput=event=>{
+  settings.effectsVolume=Number(event.target.value);
+  if(effectsBus&&effectsEnabled&&runMode==='playing')effectsBus.gain.setTargetAtTime(effectsVolume(),audio.currentTime,.026);
+  refreshOptions();persistOptions();
+};
+if(document.body){
+  applySkin();
+  persistOptions();
+  setMode('menu');
+  for(const button of document.querySelectorAll('[data-screen]'))button.onclick=()=>{
+    if(button.dataset.screen==='options')optionsBack=screen;
+    showScreen(button.dataset.screen);
+  };
+  for(const button of document.querySelectorAll('[data-back]'))button.onclick=()=>showScreen(screen==='options'?optionsBack:'main');
+  for(const button of document.querySelectorAll('[data-main]'))button.onclick=returnToMenu;
+  for(const button of document.querySelectorAll('[data-filter]'))button.onclick=()=>{
+    achievementFilter=button.dataset.filter;
+    renderAchievements();
+  };
+}
 window.addEventListener('visibilitychange',()=>{
   syncMusic();
   if(document.hidden)setTension(0);
 });
-window.addEventListener('pagehide',()=>musicTrack?.pause());
+window.addEventListener('pagehide',()=>{musicTrack?.pause();saveAchievements()});
 window.addEventListener('pageshow',()=>syncMusic());
 window.addEventListener('pointerdown',event=>{
-  if(!playing||event.target.closest?.('button'))return;
+  if(runMode!=='playing'||!playing||event.target.closest?.('button'))return;
   if(effectsEnabled&&audio?.state!=='running')unlockEffects();
   if(musicTrack?.paused&&musicEnabled&&!musicFailed)syncMusic(true);
 },true);
