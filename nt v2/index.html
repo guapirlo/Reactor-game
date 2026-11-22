@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 3.7 · MIAMI SOUNDTRACK</title>
+<title>REACTOR 3.8 · MIAMI ALIVE</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -197,12 +197,17 @@ button{font:inherit;cursor:pointer}
 #arcade-fx.show:is([data-effect="mega"],[data-effect="overdrive"]) .fx-seal::after{content:"";position:absolute;z-index:-1;pointer-events:none;inset:-12% -10%;border:1px solid var(--fx);border-radius:50%;box-shadow:0 0 11px var(--hit),inset 0 0 6px var(--fx);animation:overload-wave var(--fx-time) ease-out both}
 @keyframes overload-wave{0%,9%{opacity:0;transform:scale(.48,.65)}24%{opacity:.74}65%,100%{opacity:0;transform:scale(1.37,1.45)}}
 @media(prefers-reduced-motion:reduce){#arcade-fx.show .fx-seal::after{display:none}#overdrive-status,#overdrive-status .energy::after{animation:none!important}}
+#overlay[data-shutdown="true"]{background:#180c1c83}
+#overlay[data-shutdown="true"]::before{content:"";position:absolute;pointer-events:none;left:var(--shutdown-x);top:var(--shutdown-y);width:var(--shutdown-size);height:var(--shutdown-size);border-radius:14px;box-shadow:inset 0 0 46px 10px #ff433f9e,0 0 19px #fa554f80;background:linear-gradient(0deg,#4d152842,transparent 55%,#b3293b44);animation:shutdown .65s ease-out both}
+#overlay[data-shutdown="true"] #panel{position:relative;border-color:#ff9caa;box-shadow:0 12px 36px #0a0719b5,0 0 25px #ff626646}
+@keyframes shutdown{from{opacity:1}to{opacity:0}}
+@media(prefers-reduced-motion:reduce){#overlay[data-shutdown="true"]::before{display:none}}
 </style>
 </head>
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>3.7</span></div><div class="subtitle">Neon Overload</div></div>
+  <div><div class="brand">REACTOR <span>3.8</span></div><div class="subtitle">Miami Alive</div></div>
   <div class="stats" id="score-module"><div class="score-readout"><span class="stat-label">Score</span><strong id="score">0</strong></div><div class="best-readout"><span class="stat-label">Best</span><strong id="best">0</strong></div></div>
 </header>
 <div id="combo"></div>
@@ -220,7 +225,7 @@ button{font:inherit;cursor:pointer}
   </div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 3.7 · MIAMI 1986</div><h1>NEON <span>OVERLOAD</span></h1>
+  <div class="eyebrow">REACTOR 3.8 · MIAMI 1986</div><h1>MIAMI <span>ALIVE</span></h1>
   <p>Touche un groupe de deux cristaux ou plus. Les grands groupes réduisent la pression. Enchaîne les coups pour charger OVERDRIVE.</p>
   <button id="start">JOUER</button>
 </div></div>
@@ -243,10 +248,10 @@ const PRESSURE={
 };
 const CITY_TRANSITION_MS=6000;
 const CITY_PHASES=[
-  {score:0,sky:['#77427a','#f77da1','#ffce86'],sun:1,lights:.72,night:0,reflection:.65,depth:.65,glow:[0xffa46e,0xffc16e],halo:.31},
-  {score:5000,sky:['#3a3590','#a054ca','#fb92c0'],sun:.58,lights:.82,night:.19,reflection:.78,depth:.86,glow:[0xff78d3,0x9fa5ff],halo:.34},
-  {score:15000,sky:['#1d3783','#5839a9','#b25dc7'],sun:.15,lights:.98,night:.38,reflection:.93,depth:1.08,glow:[0xff49c5,0x5dfcff],halo:.39},
-  {score:35000,sky:['#17295c','#46358b','#943d9e'],sun:.025,lights:1,night:.52,reflection:1,depth:1.32,glow:[0xc578ff,0x47e5f8],halo:.45}
+  {score:0,sky:['#77427a','#f77da1','#ffce86'],sun:1,lights:.72,night:0,reflection:.65,depth:.65,glow:[0xffa46e,0xffc16e],halo:.31,sea:[0x39d9cd,0x137a9d],sand:0xf6bd83,sunDrop:0},
+  {score:5000,sky:['#3a3590','#a054ca','#fb92c0'],sun:.58,lights:.82,night:.19,reflection:.78,depth:.86,glow:[0xff78d3,0x9fa5ff],halo:.34,sea:[0x609dc6,0x383c89],sand:0xd18db6,sunDrop:.57},
+  {score:15000,sky:['#1d3783','#5839a9','#b25dc7'],sun:0,lights:.98,night:.38,reflection:.93,depth:1.08,glow:[0xff49c5,0x5dfcff],halo:.39,sea:[0x23578f,0x171a5b],sand:0x6662a2,sunDrop:1.17},
+  {score:35000,sky:['#17295c','#46358b','#943d9e'],sun:0,lights:1,night:.52,reflection:1,depth:1.32,glow:[0xc578ff,0x47e5f8],halo:.45,sea:[0x1b5185,0x14153c],sand:0x52458d,sunDrop:1.46}
 ];
 const MAX_PARTICLES=80, FALL_MS=115;
 let board=[],score=0,pressure=PRESSURE.initial,energy=0,combo=0,lastMove=-Infinity;
@@ -268,6 +273,7 @@ try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
 const MUSIC_PATH='./audio/miami-reactor.mp3';
 const MUSIC_VOLUME=.42;
 let musicTrack=null, effectsBus=null, musicNeedsGesture=false, musicFailed=false;
+let musicFade=0, tensionBus=null, tensionLevel=0, nextTensionAt=0;
 
 function setMusicStatus(message){
   const button=$('music-toggle');
@@ -319,10 +325,27 @@ function syncMusic(fromGesture=false){
     }else reportMusicError();
   });
 }
+function resetMusicFade(){
+  if(musicFade)cancelAnimationFrame(musicFade);
+  musicFade=0;
+  if(!musicTrack)return;
+  musicTrack.volume=MUSIC_VOLUME;
+}
 function stopMusic(){
   if(!musicTrack)return;
-  musicTrack.pause();
-  musicTrack.currentTime=0;
+  resetMusicFade();
+  if(musicTrack.paused)return;
+  const start=performance.now();
+  const fade=now=>{
+    const remaining=Math.max(0,1-(now-start)/540);
+    musicTrack.volume=MUSIC_VOLUME*remaining**2;
+    if(remaining>0)musicFade=requestAnimationFrame(fade);
+    else{
+      musicFade=0;
+      musicTrack.pause();
+    }
+  };
+  musicFade=requestAnimationFrame(fade);
 }
 function unlockEffects(){
   if(!effectsEnabled)return;
@@ -331,6 +354,9 @@ function unlockEffects(){
   if(!audio){
     audio=new Context();
     effectsBus=audio.createGain();
+    tensionBus=audio.createGain();
+    tensionBus.gain.value=0;
+    tensionBus.connect(effectsBus);
     const limiter=audio.createDynamicsCompressor();
     limiter.threshold.value=-12;
     limiter.ratio.value=5;
@@ -341,19 +367,34 @@ function unlockEffects(){
   effectsBus.gain.setTargetAtTime(.85,now,.026);
   if(audio.state!=='running')audio.resume().catch(()=>{});
 }
-function sound(frequency,duration=.14,type='triangle',volume=.035,offset=0){
+function sound(frequency,duration=.14,type='triangle',volume=.035,offset=0,endFrequency=0,bus=effectsBus){
   if(!audio||!effectsEnabled||audio.state!=='running')return;
   const when=audio.currentTime+.004+offset;
   const oscillator=audio.createOscillator();
   const gain=audio.createGain();
   oscillator.type=type;
   oscillator.frequency.setValueAtTime(frequency,when);
+  if(endFrequency)oscillator.frequency.exponentialRampToValueAtTime(endFrequency,when+duration*.9);
   gain.gain.setValueAtTime(.0001,when);
   gain.gain.exponentialRampToValueAtTime(volume,when+Math.min(.021,duration*.4));
   gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
-  oscillator.connect(gain).connect(effectsBus);
+  oscillator.connect(gain).connect(bus);
   oscillator.start(when);
   oscillator.stop(when+duration+.01);
+}
+function setTension(level){
+  if(!tensionBus||level===tensionLevel)return;
+  tensionLevel=level;
+  tensionBus.gain.setTargetAtTime(level*.70,audio.currentTime,.23);
+}
+function updateTension(){
+  if(!tensionBus||audio.state!=='running')return;
+  const target=effectsEnabled&&playing&&!document.hidden?Math.max(0,Math.min(1,(pressure-52)/44)):0;
+  if(target===0||Math.abs(target-tensionLevel)>.035)setTension(target);
+  if(target<=0||elapsed<nextTensionAt)return;
+  nextTensionAt=elapsed+1100-target*555;
+  sound(76,.18,'sine',.079,0,45,tensionBus);
+  if(target>.60)sound(132,.079,'triangle',.032,.115,88,tensionBus);
 }
 function pressureState(value){
   if(value>=100)return ['failed','ARRÊT'];
@@ -463,23 +504,35 @@ function resetAnnouncements(){
   $('announcement-points').textContent='';
 }
 function cue(kind){
-  const cues={
-    clear:[198,.075,'triangle',.039], large:[122,.21,'triangle',.071],
-    combo:[659,.13,'sine',.048], super:[784,.21,'triangle',.06],
-    mega:[1047,.34,'sawtooth',.048], chain:[880,.16,'triangle',.048],
-    overdrive:[659,.4,'sawtooth',.05], critical:[185,.26,'square',.029],
-    defeat:[98,.55,'sawtooth',.045]
-  };
-  sound(...cues[kind]);
-  if(kind==='large'||kind==='mega')sound(79,.22,'sine',.065,.018);
-  if(kind==="super"||kind==="mega"){
-    sound(988,.22,"triangle",.035,.065);
-    if(kind==="mega")sound(1319,.32,"sine",.036,.13);
-  }
-  if(kind==="defeat"){
-    sound(196,.38,"triangle",.055,.04);
-    sound(146.83,.52,"sine",.052,.13);
-    sound(98,.65,"sine",.052,.24);
+  switch(kind){
+    case 'overdrive':
+      sound(133,.34,'triangle',.070,0,446);
+      sound(63,.27,'sine',.106,.29,39);
+      sound(442,.17,'triangle',.042,.33,289);
+      break;
+    case 'critical':
+      sound(175,.18,'triangle',.055);
+      sound(147,.19,'triangle',.045,.22);
+      break;
+    case 'defeat':
+      sound(55,.55,'sine',.13,0,32);
+      sound(245,.42,'triangle',.075,.06,90);
+      sound(139,.56,'sine',.058,.19,48);
+      break;
+    case 'mega':
+      sound(104,.23,'sine',.104,0,63);
+      sound(524,.23,'triangle',.058,.034);
+      sound(785,.26,'sine',.039,.12);
+      break;
+    case 'super':
+      sound(131,.16,'sine',.080,0,76);
+      sound(392,.18,'triangle',.050,.025);
+      sound(587,.20,'sine',.036,.105);
+      break;
+    case 'chain': sound(370,.13,'triangle',.045,0,510); break;
+    case 'combo': sound(330,.105,'triangle',.046,0,424); break;
+    case 'large': sound(146,.19,'triangle',.073,0,74); break;
+    case 'clear': sound(196,.075,'triangle',.039); break;
   }
 }
 function chargeOverdrive(amount){
@@ -649,6 +702,11 @@ function clearEffects(){
   scene.cameras.main.resetFX();
 }
 function start(){
+  resetMusicFade();
+  if(musicTrack)musicTrack.currentTime=0;
+  nextTensionAt=0;
+  setTension(0);
+  $('overlay').dataset.shutdown='false';
   board=Array.from({length:N},()=>Array.from({length:N},rand));
   score=0;
   cityPhase=0;
@@ -687,6 +745,7 @@ function finish(){
   playing=false;
   busy=false;
   stopMusic();
+  setTension(0);
   resetAnnouncements();
   cityImpact=0;
   updateDashboardLight();
@@ -698,6 +757,7 @@ function finish(){
   settleEvent=null;
   updateHud();
   $('panel').innerHTML='<div class="eyebrow">ARCADE MAYHEM</div><h1>RÉACTEUR <span>CRITIQUE</span></h1><div class="results"><div><span class="stat-label">Score</span><strong>'+score.toLocaleString('fr-FR')+'</strong></div><div><span class="stat-label">Record</span><strong>'+best.toLocaleString('fr-FR')+'</strong></div></div><button id="again">REJOUER</button>';
+  $('overlay').dataset.shutdown='true';
   $('overlay').hidden=false;
   $('again').onclick=()=>{$('overlay').hidden=true;start()};
 }
@@ -881,6 +941,9 @@ class Game extends Phaser.Scene{
     this.halos=makeNeonHalos(this);
     this.beams=[this.add.image(0,0,'neon-halo').setDepth(-7.55),this.add.image(0,0,'neon-halo').setDepth(-7.55)];
     this.sun=this.add.graphics().setDepth(-9);
+    this.coasts=CITY_PHASES.map((_,i)=>this.add.graphics().setDepth(-8.95+i*.02));
+    this.surf=this.add.graphics().setDepth(-8.84);
+    this.promenade=this.add.graphics().setDepth(-8.1);
     this.stars=this.add.graphics().setDepth(-9.2);
     this.cityShade=this.add.graphics().setDepth(-7.8);
     this.cityWindows=this.add.graphics().setDepth(-7.7);
@@ -922,6 +985,7 @@ class Game extends Phaser.Scene{
     const previousPressure=Math.floor(pressure);
     changePressure(passivePressureBetween(elapsed-delta,elapsed));
     if(!playing)return;
+    updateTension();
     const comboExpired=combo>0&&elapsed-lastMove>=COMBO_MS;
     if(comboExpired)combo=0;
     const reactorTick=elapsed<recoverUntil?Math.floor((elapsed<overUntil?overUntil-elapsed:recoverUntil-elapsed)/100):0;
@@ -988,6 +1052,10 @@ class Game extends Phaser.Scene{
         drive.style.setProperty('--drive-width',this.cell*N+'px');
       }
     }
+    if(!landscape&&h>=700){
+      const room=controlsTop-this.top-this.cell*N-43;
+      this.top+=Math.max(0,Math.min(24,Math.floor(room)));
+    }
     drive.style.setProperty('--drive-x',(landscape?hud.left:this.left)+'px');
     drive.style.setProperty('--drive-y',(landscape?hudBottom+12:this.top-height-9)+'px');
     this.meterLift=landscape?0:Math.max(0,Math.floor(controlsTop-this.top-this.cell*N-43));
@@ -1006,13 +1074,17 @@ class Game extends Phaser.Scene{
     overlay.setProperty('--board-center-x',canvas.left+(this.left+span/2)*sx+'px');
     overlay.setProperty('--board-center-y',canvas.top+(this.top+span/2)*sy+'px');
     overlay.setProperty('--board-fx-span',span*sx+'px');
+    const shutdown=$('overlay').style;
+    shutdown.setProperty('--shutdown-x',canvas.left+this.left*sx+'px');
+    shutdown.setProperty('--shutdown-y',canvas.top+this.top*sy+'px');
+    shutdown.setProperty('--shutdown-size',span*sx+'px');
   }
   paintCity(){
     for(const sign of this.signs)sign.destroy();
     this.signs.length=0;
     const {w,h,bg,sun,city}=this;
     const horizon=this.horizon=Math.max(h*.13,Math.min(h*.36,this.top-58));
-    const r=Math.min(w*.2,h*.13,105);
+    const r=this.sunRadius=Math.min(w*.23,h*.14,118);
     const skyHeight=horizon+45;
     for(const sky of this.skies)sky.setDisplaySize(w,skyHeight);
     bg.clear();
@@ -1022,34 +1094,23 @@ class Game extends Phaser.Scene{
     bg.fillRect(0,skyHeight,w,Math.max(0,h*.5-skyHeight));
     bg.fillGradientStyle(0x281734,0x261737,0x080f24,0x1b132e);
     bg.fillRect(0,h*.5,w,h*.5);
-    // Low-contrast reflections keep the foreground distinct from the playable grid.
-    const promenade=this.top+this.cell*N+9;
-    const vanishingX=w*.53, vanishingY=horizon+38;
-    bg.fillStyle(0x191327,.62);
-    bg.fillTriangle(vanishingX,vanishingY,w*.06,h,w*.94,h);
-    bg.lineStyle(1,0x9b537d,.24);
-    for(const lane of [.08,.26,.46,.66,.88])bg.lineBetween(vanishingX,vanishingY,w*lane,h);
-    for(let i=0;i<20;i++){
-      const x=(i*97+23)%Math.max(1,w), y=promenade+10+i*7;
-      bg.fillStyle(i%3===0?0x6df3ef:0xf976c0,.12*(1-i/22));
-      bg.fillEllipse(x,y,18+(i*17)%76,2);
-    }
+    this.paintCoast();
     this.stars.clear();
     this.stars.fillStyle(0xffdaee,.7);
     for(let i=0;i<31;i++)this.stars.fillCircle((i*83+19)%Math.max(1,w),(i*29+13)%Math.max(1,horizon-r*.7),i%7===0?1.3:.65);
     sun.clear();
     sun.fillStyle(0xfc9a87,.1);
-    sun.fillCircle(w*.56,horizon-r*.4,r*1.23);
+    sun.fillCircle(w*.53,horizon-r*.51,r*1.24);
     sun.fillStyle(0xffb57d,1);
-    sun.fillCircle(w*.56,horizon-r*.4,r);
+    sun.fillCircle(w*.53,horizon-r*.51,r);
     sun.lineStyle(3,0xcc5483,.72);
     for(let i=0;i<6;i++){
       const y=r*(.12+i*.14),half=Math.sqrt(r*r-y*y);
-      sun.lineBetween(w*.56-half,horizon-r*.4+y,w*.56+half,horizon-r*.4+y);
+      sun.lineBetween(w*.53-half,horizon-r*.51+y,w*.53+half,horizon-r*.51+y);
     }
     city.clear();
-    for(let i=0;i<19;i++){
-      const x=i*w/18, bh=16+(i*37)%67;
+    for(let i=0;i<12;i++){
+      const x=(i<6?i*.038:.76+(i-6)*.045)*w, bh=14+(i*29)%51;
       city.fillStyle(0x42244f,1);
       city.fillRect(x,horizon+21-bh,w/17,bh);
       city.fillStyle(0xe094b8,.38);
@@ -1069,11 +1130,11 @@ class Game extends Phaser.Scene{
     this.hotel(w*.05,horizon+32,hotelWidth,hotelWidth*.83,0xeab2ba,0xffa46d,'PALOMA');
     this.hotel(w-hotelWidth-w*.045,horizon+39,hotelWidth,hotelWidth*.97,0xb8bedb,0x86f8e8,'MARÉE');
     city.fillStyle(0x201632,1);
-    city.fillRect(0,horizon+39,w,23);
+    city.fillRect(w*.68,horizon+39,w*.32,16);
     city.lineStyle(1,0xffa1c7,.55);
-    city.lineBetween(0,horizon+40,w,horizon+40);
+    city.lineBetween(w*.68,horizon+40,w,horizon+40);
     for(let i=0;i<16;i++){
-      const x=i*w/15;
+      const x=w*(.68+.32*i/15);
       city.fillStyle(i%2?0x74f4ed:0xff84c1,.19);
       city.fillEllipse(x,horizon+57+(i*19)%74,14+(i*7)%25,3);
       city.fillStyle(0xffd6aa,.38);
@@ -1099,6 +1160,62 @@ class Game extends Phaser.Scene{
     this.paintStreetGlow();
     this.palms.forEach((p,i)=>this.drawPalm(p,i,horizon));
     this.paintGlass();
+  }
+  paintCoast(){
+    const {w,h,coasts,surf,promenade}=this;
+    const horizon=this.horizon;
+    const boardFoot=this.top+this.cell*N;
+    for(let i=0;i<CITY_PHASES.length;i++){
+      const layer=coasts[i], phase=CITY_PHASES[i];
+      layer.clear();
+      layer.fillGradientStyle(phase.sea[0],phase.sea[0],phase.sea[1],phase.sea[1]);
+      layer.fillRect(0,horizon,w,h-horizon);
+      layer.lineStyle(1,i<2?0xd4fff3:0x8faeff,i<2?.60:.36);
+      layer.lineBetween(0,horizon+1,w,horizon+1);
+      layer.fillStyle(phase.sand,1);
+      layer.fillPoints([{x:w*.82,y:horizon+15},{x:w,y:horizon+6},{x:w,y:h},
+        {x:w*.19,y:h},{x:w*.57,y:boardFoot+55}],true);
+      // Long, broken highlights form a reflection path without animating the whole ocean.
+      for(let n=0;n<41;n++){
+        const row=n/40, y=horizon+8+(h-horizon-12)*row**1.45;
+        const center=w*(.48-.18*row);
+        const x=center+(((n*53)%89)/89-.5)*w*(.12+row*.43);
+        const tint=i<2?(n%3===0?phase.glow[0]:0xffeaaa):phase.glow[n%2];
+        layer.fillStyle(tint,(i<2?.26:.36)*(1-row*.59));
+        layer.fillEllipse(x,y,9+(n*19)%39+row*23,1+row*1.5);
+      }
+      layer.lineStyle(2,i<2?0xffffcf:phase.glow[1],.53);
+      layer.strokePoints([{x:w*.82,y:horizon+15},{x:w*.57,y:boardFoot+55},{x:w*.19,y:h}],false);
+    }
+    surf.clear();
+    for(let i=0;i<14;i++){
+      const y=boardFoot+17+i*12;
+      if(y>h-6)break;
+      const x=w*(.05+((i*29)%37)*.01);
+      surf.lineStyle(i%4===0?1.4:.7, i%3===0?0xfde3c7:0xbbffff,.31);
+      surf.lineBetween(x,y,x+9+i*2,y-2);
+      surf.lineBetween(x+13+i*2,y-2,x+22+i*3,y-4);
+    }
+    promenade.clear();
+    const foot=Math.max(horizon+25,boardFoot+10);
+    promenade.fillStyle(0x201936,.88);
+    promenade.fillPoints([{x:w*.95,y:horizon+18},{x:w,y:horizon+20},{x:w,y:h},
+      {x:w*.43,y:h},{x:w*.73,y:foot}],true);
+    promenade.lineStyle(2,0xeaaeb4,.65);
+    promenade.strokePoints([{x:w*.95,y:horizon+18},{x:w*.73,y:foot},{x:w*.43,y:h}],false);
+    for(let i=0;i<9;i++){
+      const t=i/9,y=foot+(h-foot)*t;
+      const x=w*(.73-.30*t);
+      promenade.lineStyle(1,0xbb90b0,.32);
+      promenade.lineBetween(x+6,y+2,Math.min(w,x+w*(.12+t*.29)),y+12);
+      if(i%2===0){
+        const height=6+t*12;
+        promenade.lineStyle(1.5,0x2b203b,1);
+        promenade.lineBetween(x,y,x,y-height);
+        promenade.fillStyle(0xffc38e,.8);
+        promenade.fillCircle(x,y-height,1+t*1.3);
+      }
+    }
   }
   paintSideCity(){
     const {w,h,left,top,cell,sideCity:g,sideLights:lights}=this;
@@ -1315,11 +1432,14 @@ class Game extends Phaser.Scene{
     l.fillEllipse(-15,this.h*.36+7,112,3);
   }
   animateCity(time){
-    let coverage=0,sun=0,lights=0,night=0,reflection=0,depth=0,halo=0;
+    let coverage=0,sun=0,lights=0,night=0,reflection=0,depth=0,halo=0,sunDrop=0;
     for(let i=0;i<CITY_PHASES.length;i++){
       const weight=cityMix[i], phase=CITY_PHASES[i];
       coverage+=weight;
-      this.skies[i].setVisible(weight>.001).setAlpha(coverage?weight/coverage:0);
+      const opacity=coverage?weight/coverage:0;
+      this.skies[i].setVisible(weight>.001).setAlpha(opacity);
+      this.coasts[i].setVisible(weight>.001).setAlpha(opacity);
+      sunDrop+=weight*phase.sunDrop;
       sun+=weight*phase.sun;
       lights+=weight*phase.lights;
       night+=weight*phase.night;
@@ -1352,7 +1472,8 @@ class Game extends Phaser.Scene{
     this.cityWindows.setAlpha(Math.min(1,lights*(.82+(subdued?0:.16*Math.sin(time/1260)))+impact*.35+(active?.16:0)));
     this.sideLights.setAlpha(Math.min(1,lights*(.82+(subdued?0:.18*Math.sin(time/1020)))+impact*.29+(active?.19:0)));
     this.streetGlow.setAlpha(Math.min(1,reflection*(.82+(subdued?0:.17*Math.sin(time/1420)))+impact*.34+(active?.17:0)));
-    this.sun.setX(depth*2.6*sway);
+    this.sun.setPosition(depth*2.6*sway,this.sunRadius*sunDrop);
+    this.surf.setX(subdued?0:Math.sin(time/2600)*3).setAlpha(.65+night*.32);
     this.city.setX(depth*1.2*sway);
     this.cityShade.setX(this.city.x);
     this.cityWindows.setX(this.city.x);
@@ -1360,7 +1481,8 @@ class Game extends Phaser.Scene{
     this.palms.forEach((p,i)=>p.setRotation((subdued?0:Math.sin(time/1900+i))*.025*depth));
     this.traffic.forEach((car,i)=>{
       const travel=(time*(i===0?.043:.036)+i*this.w*.47)%(this.w+115);
-      car.setPosition(i===0?travel-55:this.w+55-travel,this.horizon+46+i*8);
+      car.setPosition(i===0?travel-55:this.w+55-travel,this.horizon+46+i*8)
+        .setVisible((i===0?travel-55:this.w+55-travel)>this.w*.69);
     });
     this.signs.forEach((sign,i)=>sign.setAlpha(Math.min(1,lights*(.93+(subdued?0:.07*Math.sin(time/960+i)))+impact*.4+(active?.15:0))).setX(sign.homeX+1.5*sway));
   }
@@ -1388,7 +1510,10 @@ $('effects-toggle').onclick=()=>{
   if(effectsEnabled)unlockEffects();
   else if(effectsBus)effectsBus.gain.setTargetAtTime(0,audio.currentTime,.026);
 };
-window.addEventListener('visibilitychange',()=>syncMusic());
+window.addEventListener('visibilitychange',()=>{
+  syncMusic();
+  if(document.hidden)setTension(0);
+});
 window.addEventListener('pagehide',()=>musicTrack?.pause());
 window.addEventListener('pageshow',()=>syncMusic());
 window.addEventListener('pointerdown',event=>{
