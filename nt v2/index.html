@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="4.4.6">
-<title>REACTOR 4.4.6 · MIAMI BOOMBOX</title>
+<meta name="reactor-version" content="4.4.7">
+<title>REACTOR 4.4.7 · FIRST CONTACT</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -441,6 +441,43 @@ body[data-mode="menu"] #arcade-menu{background:linear-gradient(180deg,#130d284f 
 }
 html[data-reduce-motion="true"] #menu-boombox[data-state="playing"] :is(.speaker,.boombox-leds i){animation:none}
 html[data-reduce-motion="true"] #menu-boombox[data-state="playing"] .boombox-leds i{transform:scaleY(.75)}
+#training{width:min(calc(100% - 26px),460px);max-height:calc(100% - 24px);padding:0;border:1px solid #83fff1;border-radius:14px;background:#14142b;color:#effaff;box-shadow:0 0 22px #35fafa48,inset 0 0 34px #c6448a22;overscroll-behavior:contain;touch-action:pan-y}
+#training::backdrop{background:#11091dd9}
+.training-content{display:grid;gap:9px;padding:clamp(12px,4vw,20px);border-top:3px solid #ff80d1}
+#training h2,#training p{margin:0}
+#training h2{color:#a4fff5;font-size:clamp(22px,5vw,32px);text-transform:uppercase;line-height:1.06}
+#training-copy{font-size:14px;line-height:1.4;color:#f3def5}
+#training-note{font-size:12px;line-height:1.35;color:#fff0bb}
+#training-board{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;justify-self:center;width:min(100%,206px);padding:6px;background:#0d1022;border:1px solid #625594;border-radius:8px;overflow:hidden}
+#training-board button{min-width:0;min-height:44px;padding:0;border:1px solid #7b759c;border-radius:5px;background:#24213c;display:grid;place-items:center}
+#training-board button:disabled{opacity:.68}
+#training-board button[data-target]{border-color:#fff0b8;box-shadow:inset 0 0 9px #ffe58699}
+.training-gem{width:66%;aspect-ratio:1;clip-path:polygon(28% 0,73% 0,100% 34%,79% 83%,50% 100%,16% 81%,0 38%);background:conic-gradient(from 25deg,#fff9,var(--gem) 24%,#282047 42%,var(--gem) 62%,#fff9 80%,var(--gem));animation:practice-fall .45s ease-out both}
+.training-actions{display:flex;justify-content:space-between;gap:8px}
+.training-actions button{min-height:44px;min-width:74px;padding:7px 13px;border:1px solid #bb87cf;border-radius:6px;background:#272340;color:#fdf3ff;font-weight:850;text-transform:uppercase}
+#training-next{margin-left:auto;border-color:#a5fff5;background:#a5fff5;color:#1d1733}
+#training button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#training-meter>div:first-child{display:flex;justify-content:space-between;gap:5px;font:800 11px/1.2 ui-monospace,monospace}
+.training-track{margin-top:5px;height:12px;border:1px solid #da8aab;border-radius:3px;background:#2e2441;overflow:hidden}
+#training-fill{display:block;height:100%;background:linear-gradient(90deg,#c4518b,#ffaa75);transition:width .45s ease}
+#training-meter[data-energy] #training-fill{background:linear-gradient(90deg,#ae78fd,#55ffed)}
+#training-meter[data-active] #training-fill{box-shadow:inset 0 0 5px 2px #fff;background:linear-gradient(90deg,#74fff0,#ff8dde);animation:practice-surge .5s ease-out both}
+@keyframes practice-surge{from{filter:brightness(1.55)}to{filter:none}}
+#training [hidden],.clear-impact[hidden]{display:none}
+@keyframes practice-fall{from{transform:translateY(calc(var(--travel) * -130%));opacity:.5}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.training-gem,#training-meter #training-fill{animation:none!important;transition:none}}
+html[data-reduce-motion="true"] :is(.training-gem,#training-meter #training-fill){animation:none!important;transition:none}
+@media(max-height:500px) and (orientation:landscape){
+  #training:has(#training-board:not([hidden])){width:min(calc(100% - 26px),650px)}
+  .training-content:has(#training-board:not([hidden])){grid-template-columns:minmax(0,1fr) 192px}
+  #training-board{grid-column:2;grid-row:1 / span 5;align-self:center}
+}
+#reactor-stack .bar{position:relative}
+.clear-impact{position:absolute;z-index:1;inset:0;display:grid;place-items:center;font:900 8px/1 ui-monospace,monospace;color:#fff9df;text-shadow:0 1px 2px #131023;pointer-events:none}
+#pressure-impact[data-cool="true"],#energy-impact{color:#cafffb}
+@media(max-height:500px) and (orientation:landscape){
+  #main-menu .hub-actions{gap:4px}
+}
 </style>
 </head>
 <body data-mode="menu">
@@ -459,10 +496,10 @@ html[data-reduce-motion="true"] #menu-boombox[data-state="playing"] .boombox-led
 <div id="reactor-stack" data-overdrive="charge">
   <div id="reactor-meter" data-danger="stable">
     <div class="meter-label"><span id="pressure-label">REACTOR PRESSURE</span><strong id="pct">10%</strong></div>
-    <div class="bar"><div id="pfill" class="pressure"></div></div>
-    <div class="pressure-footer"><span id="pressure-state">STABLE</span><span>100% = MELTDOWN</span></div>
+    <div class="bar"><div id="pfill" class="pressure"></div><span id="pressure-impact" class="clear-impact" hidden></span></div>
+    <div class="pressure-footer"><span id="pressure-state">STABLE</span><span>100% = GAME OVER</span></div>
   </div>
-<div id="overdrive-status" data-state="charge"><div class="overdrive-label"><span class="energy-label">OVERDRIVE</span><span id="epct"><span id="drive-mode">CHARGE</span><strong id="drive-value">0%</strong></span></div><div class="bar energy-reservoir" aria-hidden="true"><div id="efill" class="energy"></div></div></div>
+<div id="overdrive-status" data-state="charge"><div class="overdrive-label"><span class="energy-label">OVERDRIVE ENERGY</span><span id="epct"><span id="drive-mode">CHARGE</span><strong id="drive-value">0%</strong></span></div><div class="bar energy-reservoir" aria-hidden="true"><div id="efill" class="energy"></div><span id="energy-impact" class="clear-impact" hidden></span></div></div>
 </div>
 <div id="bottom">
   <div class="audio-toggles">
@@ -506,6 +543,7 @@ html[data-reduce-motion="true"] #menu-boombox[data-state="playing"] .boombox-led
       <button data-screen="achievements">Achievements</button>
       <button data-screen="scores">High scores</button>
       <button data-screen="options">Options</button>
+      <button id="how-to-play">How to play</button>
     </nav>
     <button id="menu-boombox" type="button" aria-label="Menu music" aria-pressed="false" aria-describedby="boombox-hint" data-state="off">
       <span class="speaker" aria-hidden="true"></span>
@@ -551,6 +589,20 @@ html[data-reduce-motion="true"] #menu-boombox[data-state="playing"] .boombox-led
     </div>
   </section>
 </div>
+<dialog id="training" aria-labelledby="training-title" aria-describedby="training-copy">
+  <div class="training-content">
+    <p id="training-step" class="eyebrow"></p>
+    <h2 id="training-title" tabindex="-1">How to play</h2>
+    <p id="training-copy"></p>
+    <div id="training-board" role="group" aria-label="Practice gem grid" hidden></div>
+    <div id="training-meter" hidden>
+      <div><strong id="training-meter-label"></strong><span id="training-value"></span></div>
+      <div class="training-track" aria-hidden="true"><i id="training-fill"></i></div>
+    </div>
+    <p id="training-note" aria-live="polite" hidden></p>
+    <div class="training-actions"><button id="training-skip" type="button">Skip</button><button id="training-next" type="button"></button></div>
+  </div>
+</dialog>
 <div id="achievement-notice" role="status" hidden></div>
 <div id="overlay" hidden><div id="panel"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script><script>
@@ -587,7 +639,7 @@ const CITY_PHASES=[
 ];
 const MAX_PARTICLES=80, FALL_MS=115;
 let board=[],score=0,pressure=PRESSURE.initial,energy=0,combo=0,lastMove=-Infinity;
-let latePressureBonus=0;
+let latePressureBonus=0,clearImpactUntil=0;
 let cityPhase=0,phaseStarted=0,cityCycleStart=null;
 let cityMix=[1,0,0,0,0],cityFrom=cityMix.slice();
 let qualityMoves=0,comboTier=0,critical=false;
@@ -762,6 +814,7 @@ function trackMiamiProgress(){
 }
 function setMode(mode){
   runMode=mode;
+  if(mode!=='paused')clearClearImpact();
   syncMiamiHotspots();
   if(document.body){
     document.body.dataset.mode=mode;
@@ -1136,7 +1189,7 @@ function updateHud(){
   $('overdrive-status').dataset.state=driveState;
   $('overdrive-status').dataset.level=String(energy>=95?4:Math.min(3,Math.floor(energy/25)));
   $('reactor-stack').dataset.overdrive=driveState;
-  $('drive-mode').textContent=active?'ACTIVE ×3':remaining?'COOLDOWN':'CHARGE';
+  $('drive-mode').textContent=active?'ACTIVE ×3':remaining?'COOLDOWN':'AUTO AT 100%';
   $('drive-value').textContent=active?overdriveSeconds(overUntil)+' s':remaining?remaining+' s':energy+'%';
   $('efill').style.width=(active?100*(overUntil-elapsed)/OVERDRIVE_MS:remaining?100*(1-(recoverUntil-elapsed)/RECOVERY_MS):energy)+'%';
   $('combo').textContent=combo>1?'COMBO ×'+combo:'';
@@ -1258,9 +1311,12 @@ function miamiCue(kind){
       break;
   }
 }
+function cappedCharge(current,amount){
+  return Math.min(100,current+amount);
+}
 function chargeOverdrive(amount){
   if(elapsed<recoverUntil)return;
-  energy=Math.min(100,energy+amount);
+  energy=cappedCharge(energy,amount);
   if(energy<100)return;
   energy=0;
   overUntil=elapsed+OVERDRIVE_MS;
@@ -1577,11 +1633,12 @@ function changePressure(amount){
   }
   if(pressure<74)critical=false;
 }
-function findGroup(x,y,seen){
-  const color=board[y][x], stack=[[x,y]], group=[];
+function findGroup(x,y,seen,grid=board){
+  const width=grid[0].length, height=grid.length;
+  const color=grid[y][x], stack=[[x,y]], group=[];
   while(stack.length){
-    const [a,b]=stack.pop(), key=b*N+a;
-    if(a<0||a>=N||b<0||b>=N||seen.has(key)||board[b][a]!==color)continue;
+    const [a,b]=stack.pop(), key=b*width+a;
+    if(a<0||a>=width||b<0||b>=height||seen.has(key)||grid[b][a]!==color)continue;
     seen.add(key);
     group.push([a,b]);
     stack.push([a+1,b],[a-1,b],[a,b+1],[a,b-1]);
@@ -1602,7 +1659,7 @@ function labelComponents(){
 }
 function collapse(groups,intensity=1){
   const labels=labelComponents();
-  const columns=new Set(), moved=[];
+  const columns=new Set();
   for(const group of groups){
     const [x,y]=group[0];
     burst(group,C[board[y][x]],intensity);
@@ -1611,23 +1668,28 @@ function collapse(groups,intensity=1){
       columns.add(a);
     }
   }
+  const moved=settleColumns(board,labels,columns,rand);
+  paintBoard(moved);
+  return {labels,moved};
+}
+function settleColumns(grid,labels,columns,nextGem){
+  const moved=[];
   for(const x of columns){
-    let destination=N-1;
-    for(let y=N-1;y>=0;y--){
-      if(board[y][x]<0)continue;
-      board[destination][x]=board[y][x];
+    let destination=grid.length-1;
+    for(let y=grid.length-1;y>=0;y--){
+      if(grid[y][x]<0)continue;
+      grid[destination][x]=grid[y][x];
       labels[destination][x]=labels[y][x];
       if(destination!==y)moved.push([x,destination,y]);
       destination--;
     }
     for(let y=destination;y>=0;y--){
-      board[y][x]=rand();
+      grid[y][x]=nextGem();
       labels[y][x]=0;
       moved.push([x,y,y-destination-1]);
     }
   }
-  paintBoard(moved);
-  return {labels,moved};
+  return moved;
 }
 function chainGroups({labels,moved}){
   const seen=new Set(), groups=[];
@@ -1736,6 +1798,7 @@ function tap(x,y){
     coolingArmed=false;
   }
   if(!playing)return;
+  const pressureDelta=pressure-priorPressure;
   if(reward===3){
     flash('MEGA!'+(size>=5?' · +'+(score-previousScore).toLocaleString('en-US'):''),'mega');
     cue('mega');
@@ -1751,7 +1814,10 @@ function tap(x,y){
   }
   if(size>=5||reward>0)cityImpact=Math.max(cityImpact,reward>=2?.87:size>=5?.63:.36);
   if(navigator.vibrate&&(size>=5||reward>=2))navigator.vibrate(reward===3?35:12);
-  chargeOverdrive(energyForGroup(size,reward));
+  const gain=energyForGroup(size,reward);
+  const energyDelta=elapsed<recoverUntil?0:cappedCharge(energy,gain)-energy;
+  chargeOverdrive(gain);
+  showClearImpact(pressureDelta,energyDelta);
   updateHud();
   if(!reducedMotion.matches&&(reward>=2||size>=7))scene.cameras.main.shake(85,reward===3?.0026:.0014);
   resolveChain(collapse([group],reward>=2?3:size>=5?2:1),1);
@@ -1840,6 +1906,7 @@ class Game extends Phaser.Scene{
       noticeUntil=0;
     }
     updateAnnouncements();
+    if(clearImpactUntil&&elapsed>=clearImpactUntil)clearClearImpact();
     cityImpact=Math.max(0,cityImpact-delta/570);
     updateScoreDisplay();
     updateDashboardLight();
@@ -3378,10 +3445,153 @@ $('effects-volume').oninput=event=>{
   if(effectsBus&&effectsEnabled&&runMode==='playing')effectsBus.gain.setTargetAtTime(effectsVolume(),audio.currentTime,.026);
   refreshOptions();persistOptions();
 };
+const TRAINING_KEY='reactor.v447.tutorial';
+const TRAINING_GEMS=['Turquoise','Pink','Gold','Violet'];
+const TRAINING_BOARD=[
+  [1,2,3,0],
+  [2,3,1,2],
+  [0,1,2,3],
+  [1,0,0,1]
+];
+let lesson,practiceBoard,practiceMoves,practicePressure,pressureStage,driveStage;
+function clearClearImpact(){
+  clearImpactUntil=0;
+  if(!document.body)return;
+  $('pressure-impact').hidden=$('energy-impact').hidden=true;
+}
+function showClearImpact(pressureDelta,energyDelta){
+  if(!document.body)return;
+  const heat=$('pressure-impact'), charge=$('energy-impact');
+  const amount=Number(Math.abs(pressureDelta).toFixed(1));
+  heat.hidden=!amount;
+  heat.dataset.cool=String(pressureDelta<0);
+  heat.textContent=pressureDelta<0?'COOLING −'+amount:'PRESSURE +'+amount;
+  charge.hidden=!energyDelta;
+  charge.textContent='ENERGY +'+energyDelta;
+  clearImpactUntil=elapsed+950;
+}
+function openTraining(invitation=false){
+  if(runMode!=='menu')return;
+  lesson=invitation?0:1;
+  practiceBoard=TRAINING_BOARD.map(row=>row.slice());
+  practiceMoves=[];
+  practicePressure=70;
+  pressureStage=driveStage=0;
+  renderTraining();
+  $('training').showModal();
+  $('training-title').focus();
+}
+function closeTraining(status){
+  if(status==='completed'||!readStore(TRAINING_KEY).status)writeStore(TRAINING_KEY,{status});
+  $('training').close();
+  $('how-to-play').focus();
+}
+function nextLesson(){
+  if(lesson===0||lesson===2)lesson++;
+  else if(lesson===3&&pressureStage<3){
+    const size=[0,2,6][pressureStage++];
+    practicePressure+=size?pressureForGroup(size):passivePressureBetween(0,10000);
+  }else if(lesson===3)lesson++;
+  else if(lesson===4&&driveStage<2)driveStage++;
+  else if(lesson===4)lesson++;
+  else if(lesson===5){
+    closeTraining('completed');
+    return;
+  }
+  renderTraining();
+  $('training-title').focus({preventScroll:true});
+}
+function clearPracticeGem(x,y){
+  if(lesson!==1)return;
+  const group=findGroup(x,y,new Set(),practiceBoard);
+  if(group.length<2)return;
+  const columns=new Set();
+  for(const [column,row] of group){
+    practiceBoard[row][column]=-1;
+    columns.add(column);
+  }
+  const labels=practiceBoard.map(row=>row.map(()=>0));
+  const refill=[3,1];
+  practiceMoves=settleColumns(practiceBoard,labels,columns,()=>refill.shift());
+  lesson=2;
+  renderTraining();
+  $('training-title').focus({preventScroll:true});
+}
+function renderTrainingBoard(){
+  const container=$('training-board');
+  container.hidden=lesson!==1&&lesson!==2;
+  if(container.hidden)return;
+  container.replaceChildren();
+  const targets=new Set(findGroup(1,3,new Set(),TRAINING_BOARD).map(([x,y])=>y*4+x));
+  const travel=new Map(practiceMoves.map(([x,y,from])=>[y*4+x,y-from]));
+  for(const [y,row] of practiceBoard.entries())for(const [x,color] of row.entries()){
+    const cell=document.createElement('button'), gem=document.createElement('span');
+    cell.type='button';
+    const target=lesson===1&&targets.has(y*4+x);
+    cell.disabled=!target;
+    if(target)cell.dataset.target='';
+    cell.setAttribute('aria-label',TRAINING_GEMS[color]+' gem, row '+(y+1)+', column '+(x+1));
+    cell.onclick=()=>clearPracticeGem(x,y);
+    gem.className='training-gem';
+    gem.style.setProperty('--gem','#'+C[color].toString(16).padStart(6,'0'));
+    gem.style.setProperty('--travel',travel.get(y*4+x)||0);
+    cell.append(gem);
+    container.append(cell);
+  }
+}
+function renderTraining(){
+  const flow=[
+    ['First contact','Learn the controls in a short practice session. Your score and achievements stay intact.','Play'],
+    ['Tap to clear','Tap 2 or more gems of the same color that touch horizontally or vertically. Try the highlighted turquoise gems.',''],
+    ['Watch the gravity','Gems above fall down. New gems enter from the top.','Next'],
+    ['Control the reactor','Pressure rises over time. Small clears add heat. Bigger groups cool the reactor. At 100% pressure, it’s game over.',['Advance time','Clear 2 gems','Clear 6 gems','Next'][pressureStage]],
+    ['Charge Overdrive','Build energy by clearing gems. At 100%, Overdrive activates automatically.','Charge'],
+    ['Ready for Miami','Tap matching groups. Pick bigger clears to cool the reactor and charge Overdrive faster.','Done']
+  ];
+  const [title,copy,action]=flow[lesson];
+  $('training-step').textContent=lesson>0&&lesson<5?'Step '+lesson+' of 4':'Reactor training';
+  $('training-title').textContent=title;
+  $('training-copy').textContent=copy;
+  const next=$('training-next');
+  next.hidden=!action;
+  next.textContent=lesson===4?['Clear 6 gems','Preview recovery','Next'][driveStage]:action;
+  $('training-skip').hidden=lesson===5;
+  renderTrainingBoard();
+  const meter=$('training-meter'), note=$('training-note');
+  meter.hidden=lesson!==3&&lesson!==4;
+  meter.toggleAttribute('data-energy',lesson===4);
+  meter.toggleAttribute('data-active',lesson===4&&driveStage===1);
+  let message='';
+  if(lesson===2)message='The cleared spaces filled from above.';
+  if(lesson===3){
+    $('training-meter-label').textContent='REACTOR PRESSURE';
+    $('training-value').textContent=Number(practicePressure.toFixed(1))+'%';
+    $('training-fill').style.width=practicePressure+'%';
+    message=['Start this example at 70% pressure.','10 seconds passed. Pressure rose by '+passivePressureBetween(0,10000).toFixed(1)+'.',
+      'A two-gem clear adds '+pressureForGroup(2)+' pressure.','A six-gem clear removes '+Math.abs(pressureForGroup(6))+' pressure.'][pressureStage];
+  }
+  if(lesson===4){
+    const gain=energyForGroup(6,0), initial=100-gain;
+    const charged=cappedCharge(initial,gain);
+    $('training-meter-label').textContent='OVERDRIVE ENERGY';
+    $('training-value').textContent=[initial+'%',charged+'% → ACTIVE ×3','RECOVERY · 0%'][driveStage];
+    $('training-fill').style.width=[initial,charged,0][driveStage]+'%';
+    message=['This six-gem clear adds '+gain+' energy.',
+      'Overdrive gives ×3 points for '+(OVERDRIVE_MS/1000)+' seconds. The practice preview advances without waiting.',
+      'After Overdrive ends, recharge is locked for '+(RECOVERY_MS/1000)+' seconds.'][driveStage];
+  }
+  note.hidden=!message;
+  note.textContent=message;
+}
 if(document.body){
+  $('how-to-play').onclick=()=>openTraining();
+  $('training-next').onclick=nextLesson;
+  $('training-skip').onclick=()=>closeTraining('skipped');
+  $('training').addEventListener('cancel',event=>{event.preventDefault();closeTraining('skipped')});
   applySkin();
   persistOptions();
   setMode('menu');
+  if(!readStore(TRAINING_KEY).status&&!best&&!Object.values(unlocks).some(Boolean))openTraining(true);
   $('arcade-menu').addEventListener('click',menuClick,true);
   renderBoombox();
   $('menu-boombox').onclick=()=>{
