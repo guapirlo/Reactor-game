@@ -9,7 +9,13 @@ const html = readFileSync(join(__dirname, 'index.html'), 'utf8');
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const hook = `
   globalThis.sim = {
-    start, tap, findGroup, pressureForGroup, passivePressureBetween, changePressure,
+    start, tap, finish, restartRun, findGroup,
+    mission(level){pendingMission=level;start()},
+    missionState(){return {run:adventureRun,profile:playerProfile.state}},
+    setEnergy(value){energy=value},
+    award, chargeOverdrive, collapse, chainGroups, settleColumns,
+    hidden(value){document.hidden=value},
+ pressureForGroup, passivePressureBetween, changePressure,
     tick(delta){scene.update(0,delta)},
     mount(host){
       scene = Object.assign(new Game(),host);
@@ -57,6 +63,9 @@ function createSimulation(seed = 20261122) {
     innerWidth: 412,
     innerHeight: 915,
   });
+  for (const file of ['adventure.js', 'profile.js', 'locale.js']) {
+    new Script(readFileSync(join(__dirname, 'js', file), 'utf8'), { filename: file }).runInContext(context);
+  }
   instrumented.runInContext(context);
   const game = context.sim;
 
@@ -251,7 +260,7 @@ test('restart resets pressure and ramp, preserves the record and cancels pending
   sim.changePressure(100);
   const record = sim.state().best;
   assert.ok(record > 0);
-  sim.elements.get('again').onclick();
+  sim.start();
   assert.deepEqual(
     (({ elapsed, pressure, playing, busy, best }) => ({ elapsed, pressure, playing, busy, best }))(sim.state()),
     { elapsed: 0, pressure: 10, playing: true, busy: false, best: record },
@@ -261,3 +270,5 @@ test('restart resets pressure and ramp, preserves the record and cancels pending
   assert.equal(sim.state().score, 0);
   assert.equal(Number(sim.records.get('reactor_miami_best')), record);
 });
+
+module.exports={createSimulation};
