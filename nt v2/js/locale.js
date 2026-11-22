@@ -1,6 +1,11 @@
 (function(root){
 'use strict';
 const words={
+  starDetails:['Star details','Détails des étoiles','Detalles de estrellas'],
+  skipReveal:['Show results','Afficher le résultat','Ver resultados'],
+  missionRecord:['New mission record','Nouveau record de mission','Nuevo récord de misión'],
+  equipMedal:['Equip King of Miami medal','Équiper la médaille King of Miami','Equipar medalla King of Miami'],
+  equippedMedal:['Medal equipped','Médaille équipée','Medalla equipada'],
   continue:['Continue','Continuer','Continuar'],
   chapterFilm:['Chapter film','Cinématique du chapitre','Cinemática del capítulo'],
   replayFilm:['Watch again','Revoir','Volver a ver'],
