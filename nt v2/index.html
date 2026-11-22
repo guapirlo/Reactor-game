@@ -511,6 +511,11 @@ body[data-skin="classic"] #arcade-fx[data-effect="mega"] #announcement{
 .world-card h3{margin:0;font-size:15px;letter-spacing:.07em;text-transform:uppercase;color:#d6f8ff}
 #world-menu .world-card p{margin:2px 0;color:#b8c8e5;font-size:11px;text-transform:uppercase}
 #world-menu .world-status{font:800 9px ui-monospace,monospace;color:#8cefe6;text-transform:uppercase}
+@media(max-width:360px){
+  #world-menu .world-card{padding:8px}
+  #world-menu .world-card h3{font-size:13px}
+  #arcade-menu .world-card button{padding-inline:7px;font-size:9px}
+}
 @media(max-height:510px) and (orientation:landscape){
   #world-menu{width:min(100%,700px)}
   .world-body{display:grid;grid-template-columns:minmax(200px,1fr) minmax(220px,1fr);gap:14px;align-items:center}
