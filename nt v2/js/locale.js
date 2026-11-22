@@ -1,6 +1,11 @@
 (function(root){
 'use strict';
 const words={
+  continue:['Continue','Continuer','Continuar'],
+  chapterFilm:['Chapter film','Cinématique du chapitre','Cinemática del capítulo'],
+  replayFilm:['Watch again','Revoir','Volver a ver'],
+  comicMute:['Mute music','Couper la musique','Silenciar música'],
+  comicUnmute:['Enable music','Activer la musique','Activar música'],
   audioUnavailable:['Soundtrack unavailable.','Bande-son indisponible.','Banda sonora no disponible.'],
   audioResume:['Tap the game to resume music.','Touchez le jeu pour reprendre la musique.','Toca el juego para reanudar la música.'],
   oceanDrive:['Back to Ocean Drive','Retour sur Ocean Drive','Vuelta a Ocean Drive'],

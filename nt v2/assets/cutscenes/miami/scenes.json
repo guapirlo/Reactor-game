@@ -1,0 +1,103 @@
+{
+  "version": "1.0",
+  "format": "motion-comic-stills",
+  "note": "Illustrations fixes; animation, audio, subtitles and skip button to be implemented in Phaser. Do not burn subtitles into images.",
+  "scenes": [
+    {
+      "id": "miami_ch1",
+      "triggerLevel": 5,
+      "title": "THE NEW KID",
+      "image": "chapter1_ocean_drive.webp",
+      "durationMs": 14500,
+      "dialogue": {
+        "fr": [
+          "Alors, c'est toi le nouveau ?",
+          "Tu crois que Miami va t'ouvrir ses portes comme ça ?",
+          "Bonne chance, campeón."
+        ],
+        "en": [
+          "So you're the new kid?",
+          "You think Miami will just open its doors for you?",
+          "Good luck, campeón."
+        ],
+        "es": [
+          "¿Así que tú eres el nuevo?",
+          "¿Crees que Miami te abrirá sus puertas así de fácil?",
+          "Buena suerte, campeón."
+        ]
+      }
+    },
+    {
+      "id": "miami_ch2",
+      "triggerLevel": 10,
+      "title": "NO RESPECT",
+      "image": "chapter2_marina.webp",
+      "durationMs": 16500,
+      "dialogue": {
+        "fr": [
+          "T'as fait du chemin, je te l'accorde.",
+          "Mais cette ville, c'est pas un jeu, chico.",
+          "On verra jusqu'où tu vas."
+        ],
+        "en": [
+          "You've come a long way, I'll give you that.",
+          "But this city isn't a game, chico.",
+          "Let's see how far you get."
+        ],
+        "es": [
+          "Has llegado lejos, te lo reconozco.",
+          "Pero esta ciudad no es un juego, chico.",
+          "A ver hasta dónde llegas."
+        ]
+      }
+    },
+    {
+      "id": "miami_ch3",
+      "triggerLevel": 15,
+      "title": "BAD BUSINESS",
+      "image": "chapter3_club.webp",
+      "durationMs": 17000,
+      "dialogue": {
+        "fr": [
+          "Bon... là, tu commences à m'agacer.",
+          "Tu veux ma place ?",
+          "Viens donc la chercher."
+        ],
+        "en": [
+          "Okay... now you're starting to annoy me.",
+          "You want my spot?",
+          "Come and take it."
+        ],
+        "es": [
+          "Bueno... ya empiezas a molestarme.",
+          "¿Quieres mi lugar?",
+          "Ven a buscarlo."
+        ]
+      }
+    },
+    {
+      "id": "miami_ch4",
+      "triggerLevel": 20,
+      "title": "KING OF MIAMI",
+      "image": "chapter4_finale.webp",
+      "durationMs": 23000,
+      "dialogue": {
+        "fr": [
+          "No me jodas... Tu l'as vraiment fait.",
+          "La ville connaît ton nom, maintenant.",
+          "King of Miami."
+        ],
+        "en": [
+          "No me jodas... You actually did it.",
+          "The city knows your name now.",
+          "King of Miami."
+        ],
+        "es": [
+          "No me jodas... De verdad lo lograste.",
+          "Ahora toda la ciudad conoce tu nombre.",
+          "King of Miami."
+        ]
+      }
+    }
+  ]
+}
