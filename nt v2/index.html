@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="4.4.2">
-<title>REACTOR 4.4.2 · MIAMI ALIVE</title>
+<meta name="reactor-version" content="4.4.3">
+<title>REACTOR 4.4.3 · MIAMI FINAL TOUCH</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -738,7 +738,7 @@ try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
 const effectsVolume=()=>settings.effectsVolume/100*1.25;
 const musicVolume=()=>settings.musicVolume/100;
 let musicTrack=null, effectsBus=null, musicNeedsGesture=false, musicFailed=false;
-let musicFade=0, musicDuckUntil=0, tensionBus=null, tensionLevel=0, nextTensionAt=0;
+let musicFade=0, musicDuckUntil=0, musicIntroSilenceUntil=0, menuWaitingForGameplay=false, tensionBus=null, tensionLevel=0, nextTensionAt=0;
 
 function setMusicStatus(message){
   const button=$('music-toggle');
@@ -758,7 +758,7 @@ function getMusicTrack(){
   const track=new Audio();
   track.preload='none';
   track.loop=true;
-  track.volume=musicVolume();
+  track.volume=elapsed<musicIntroSilenceUntil?0:musicVolume();
   track.addEventListener('error',reportMusicError);
   track.addEventListener('playing',()=>{
     musicNeedsGesture=false;
@@ -797,17 +797,23 @@ function resetMusicFade(){
   if(!musicTrack)return;
   musicTrack.volume=musicVolume();
 }
-function stopMusic(){
-  if(!musicTrack)return;
-  if(musicTrack.paused)return;
-  const start=performance.now(), volume=musicTrack.volume;
+function stopMusic(duration=540,onStopped){
+  const track=musicTrack;
+  if(musicFade)cancelAnimationFrame(musicFade);
+  musicFade=0;
+  if(!track||track.paused){
+    onStopped?.();
+    return;
+  }
+  const start=performance.now(), volume=track.volume;
   const fade=now=>{
-    const remaining=Math.max(0,1-(now-start)/540);
-    musicTrack.volume=volume*remaining**2;
+    const remaining=Math.max(0,1-(now-start)/duration);
+    track.volume=volume*remaining**2;
     if(remaining>0)musicFade=requestAnimationFrame(fade);
     else{
       musicFade=0;
-      musicTrack.pause();
+      track.pause();
+      onStopped?.();
     }
   };
   musicFade=requestAnimationFrame(fade);
@@ -926,6 +932,7 @@ function tryMenuTrack(fromGesture){
   return true;
 }
 function syncMenuAmbience(fromGesture=false){
+  if(menuWaitingForGameplay)return;
   if(runMode!=='menu'||!musicEnabled||document.hidden||musicVolume()===0){
     stopMenuAmbience();
     return;
@@ -1079,7 +1086,8 @@ function resetAnnouncements(){
 }
 function updateMusicMix(delta){
   if(!musicTrack||musicTrack.paused)return;
-  const target=effectsEnabled&&elapsed<musicDuckUntil?musicVolume()*.74:musicVolume();
+  const target=elapsed<musicIntroSilenceUntil?0:
+    effectsEnabled&&elapsed<musicDuckUntil?musicVolume()*.74:musicVolume();
   const next=musicTrack.volume+(target-musicTrack.volume)*(1-Math.exp(-delta/65));
   if(Math.abs(next-musicTrack.volume)>.0004)musicTrack.volume=next;
 }
@@ -1351,13 +1359,20 @@ function clearEffects(){
   scene.cameras.main.resetFX();
 }
 function start(){
+  const menuReleasing=menuClock!==0;
+  if(menuWaitingForGameplay)musicTrack?.pause();
+  menuWaitingForGameplay=false;
   stopMenuAmbience();
+  musicIntroSilenceUntil=menuReleasing?180:0;
   setMode('playing');
   coolingArmed=false;
   noticeUntil=nextAchievementSound=lastRunSecond=0;
   $('achievement-notice').hidden=true;
   resetMusicFade();
-  if(musicTrack)musicTrack.currentTime=0;
+  if(musicTrack){
+    musicTrack.currentTime=0;
+    if(musicIntroSilenceUntil)musicTrack.volume=0;
+  }
   nextTensionAt=0;
   setTension(0);
   $('overlay').dataset.shutdown='false';
@@ -1940,6 +1955,15 @@ class Game extends Phaser.Scene{
       g.fillEllipse(x+1,top+14+i*.8,11+i,2);
     }
     fill(0x43355c,[[0,y+9],[1,y+15],[1,y+22],[0,y+14]]);
+    for(let i=1;i<14;i++){
+      const x=w*i/14, deck=y+9+6*i/14;
+      g.lineStyle(1,0xffd6c4,.68);
+      g.lineBetween(x,deck-4,x,deck+1);
+      g.lineStyle(.75,0x609aa3,.42);
+      g.lineBetween(x+1,deck+14,x+7,deck+16);
+    }
+    g.lineStyle(1,0xffe2cf,.47);
+    g.lineBetween(0,y+6,w,y+12);
     g.lineStyle(1.2,0xffb8c5,.85);
     g.lineBetween(0,y+9,w,y+15);
     g.lineStyle(.8,0x75fff0,.7);
@@ -2020,6 +2044,19 @@ class Game extends Phaser.Scene{
           lights.fillRect(px-2,py,4*unit,3*unit);
         }
       }
+      for(const side of [x+3,x+hotelWidth-4]){
+        lights.lineStyle(3,neon,.24);
+        lights.lineBetween(side,roof+20,side,base-9);
+        lights.lineStyle(.75,neon,.85);
+        lights.lineBetween(side,roof+20,side,base-9);
+      }
+      const shopX=x+hotelWidth*.36, shopY=base-13;
+      g.fillStyle(0x2a2041,.96);
+      g.fillRoundedRect(shopX,shopY,hotelWidth*.28,7*unit,1);
+      lights.fillStyle(neon,.86);
+      for(let pixel=0;pixel<5;pixel++){
+        lights.fillRect(shopX+3+pixel*hotelWidth*.042,shopY+2,2*unit,(pixel%2?2:3)*unit);
+      }
       lights.lineStyle(3,neon,.22);
       lights.lineBetween(x+3,base-9,x+hotelWidth-4,base-9);
       lights.lineStyle(1,neon,.91);
@@ -2048,7 +2085,11 @@ class Game extends Phaser.Scene{
     g.fillStyle(0x98ffdc,.85);g.fillCircle(sx,sy-9*unit,1.25*unit);
     lights.fillStyle(0x9dfff8,.20);lights.fillEllipse(sx,sy+5*unit,28*unit,4*unit);
     // A clear strip of sand lies between the foam and the turnout.
-    const parasols=[[.77,.86,0x7dfff0,.73],[.67,.925,0xffc56b,.91],[.52,.91,0xff6fbd,1.04]];
+    const parasols=[
+      [.65,.806,0xffd176,.61],[.81,.887,0xfb8fc6,.75],
+      [.77,.86,0x7dfff0,.73],[.67,.925,0xffc56b,.91],[.52,.91,0xff6fbd,1.04],
+      [.57,.972,0x67edeb,1.14]
+    ];
     for(const [nx,ny,color,depth] of parasols){
       const x=w*nx,py=h*ny,size=11*unit*depth;
       g.fillStyle(0x57364f,.29);g.fillEllipse(x+size*.31,py+size*.7,size*2,4*unit);
@@ -2059,6 +2100,7 @@ class Game extends Phaser.Scene{
       g.fillStyle(0xfcd39f,1);g.fillRect(x+size*.42,py+size*.39,3*unit,3*unit);
       g.fillStyle(color,.82);g.fillRect(x-size*.82,py+size*.53,size*.46,3*unit);
     }
+    this.paintBeachForeground(g,unit);
     this.umbrellaPoint=[w*.52,h*.91];
     this.placeSecret('umbrella',...this.umbrellaPoint);
     const vx=w*.69,vy=h*.96;
@@ -2076,6 +2118,11 @@ class Game extends Phaser.Scene{
     g.fillStyle(0xe47c9b,1);g.fillRect(tx-4*unit,ty-4*unit,15*unit,8*unit);
     g.fillStyle(0xffd5a1,1);g.fillRect(tx-6*unit,ty-6*unit,19*unit,2*unit);
     // Foam follows the same shoreline points as the underlying terrain.
+    for(let i=0;i<9;i++){
+      const depth=i/8,x=w*(.03+(i*31%47)*.004),py=h*(.74+depth*.22);
+      foam.lineStyle(.8,i%3?0x9ffff2:0xffd2d3,.35);
+      foam.lineBetween(x,py,x+7+depth*12,py-1);
+    }
     for(const [fx,fy] of [[.135,.648],[.343,.714],[.557,.766],[.573,.819],[.47,.877],[.417,.937]]){
       foam.lineStyle(1.2,0xd7fff2,.69);
       foam.lineBetween(w*fx-10*unit,h*fy,w*fx+5*unit,h*fy-2*unit);
@@ -2099,6 +2146,57 @@ class Game extends Phaser.Scene{
       const x=i*13*unit,by=(i%2)*5*unit;
       this.menuBirds.lineStyle(1.15,0x3f3050,1);
       this.menuBirds.strokePoints([{x:x-4*unit,y:by-2*unit},{x,y:by},{x:x+4*unit,y:by-2*unit}],false);
+    }
+  }
+  paintBeachForeground(g,unit){
+    const {w,h}=this;
+    const pixel=(x,y,color,width=2,height=2,alpha=1)=>{
+      g.fillStyle(color,alpha);
+      g.fillRect(Math.round(x),Math.round(y),Math.max(1,width*unit),Math.max(1,height*unit));
+    };
+    // Beach kiosk and surfboard rack sit inland from the foam, clear of the turnout.
+    const kx=w*.85,ky=h*.952;
+    g.fillStyle(0x492f50,.30);g.fillEllipse(kx+3,ky+4,34*unit,9*unit);
+    pixel(kx-13*unit,ky-13*unit,0x643955,26,17);
+    pixel(kx-12*unit,ky-12*unit,0xefd5b5,24,15);
+    pixel(kx-9*unit,ky-10*unit,0x423755,18,7);
+    pixel(kx-15*unit,ky-16*unit,0xea77a9,30,5);
+    for(let i=0;i<5;i++)pixel(kx-13*unit+i*6*unit,ky-16*unit,0xffdec2,3,5);
+    pixel(kx-8*unit,ky-4*unit,0x69fff0,16,2);
+    for(let i=0;i<3;i++){
+      const sx=kx-26*unit+i*4*unit,sy=ky-2*unit+i*unit;
+      g.fillStyle([0xff83c5,0x63e2e7,0xffce76][i],.96);
+      g.fillRoundedRect(sx,sy-10*unit,3.4*unit,13*unit,2*unit);
+      pixel(sx+unit,sy-7*unit,0xfff0c9,1,5);
+    }
+    // Two towel groups, coolers and seated figures along the dry strip.
+    const groups=[[.57,.86,.68],[.73,.903,.89],[.47,.972,1]];
+    for(let i=0;i<groups.length;i++){
+      const [nx,ny,depth]=groups[i],x=w*nx,y=h*ny;
+      const towel=[0x79fcef,0xe996cf,0xffd083][i];
+      pixel(x,y,0x7a4a61,13*depth,5*depth,.25);
+      pixel(x,y-2*unit,towel,11*depth,5*depth);
+      pixel(x+2*unit,y-2*unit,0xffefd0,1.5,5*depth,.85);
+      pixel(x+13*unit*depth,y+unit,0x677bae,5*depth,4*depth);
+      pixel(x+13*unit*depth,y,0xd9fff7,5*depth,1.2);
+      pixel(x+5*unit,y-4*unit,0xd08077,2.4*depth,2.4*depth);
+      pixel(x+6*unit,y-2*unit,0x444569,3.6*depth,2.5*depth);
+      pixel(x-5*unit,y+4*unit,0xe0a07a,2.5*depth,2.5*depth);
+      pixel(x-5*unit,y+6*unit,0xb34a91,4.4*depth,2.7*depth);
+    }
+    // Footprints track the shoreline. Dunes stay on the landward edge.
+    for(let i=0;i<17;i++){
+      const t=i/16,y=h*(.805+t*.185),x=w*(.65-t*.20)+Math.sin(i*.75)*3*unit;
+      pixel(x+(i%2?2.5:-1)*unit,y,0x725370,1.5,2,.34);
+    }
+    for(const [nx,ny,depth] of [[.9,.72,.6],[.95,.78,.75],[.94,.9,1],[.68,.99,1.05]]){
+      const x=w*nx,y=h*ny;
+      g.fillStyle(0x1d655f,.84);
+      for(let i=0;i<4;i++){
+        const bend=(i-1.5)*3.6*unit*depth;
+        g.fillTriangle(x-2*unit,y,x+bend,y-(5+i%2*3)*unit*depth,x+2*unit,y);
+      }
+      pixel(x-2*unit,y,0x48a58a,4*depth,1,.8);
     }
   }
   playMenuDetail(kind){
@@ -2832,7 +2930,7 @@ function resumeRun(){
   syncMusic(true);
   $('pause-game').focus();
 }
-function discardRun(){
+function discardRun(keepMusic=false){
   playing=false;
   busy=false;
   if(settleEvent)settleEvent.remove();
@@ -2842,15 +2940,20 @@ function discardRun(){
   $('achievement-notice').hidden=true;
   saveAchievements();
   setTension(0);
-  resetMusicFade();
-  if(musicTrack){
-    musicTrack.pause();
-    musicTrack.currentTime=0;
+  if(!keepMusic){
+    resetMusicFade();
+    if(musicTrack){
+      musicTrack.pause();
+      musicTrack.currentTime=0;
+    }
   }
 }
 function returnToMenu(){
   const wasPaused=runMode==='paused';
-  discardRun();
+  const outgoing=musicTrack;
+  const shouldFade=!!outgoing&&!outgoing.paused;
+  discardRun(shouldFade);
+  menuWaitingForGameplay=shouldFade;
   setMode('menu');
   $('overlay').hidden=true;
   board=[];
@@ -2862,7 +2965,14 @@ function returnToMenu(){
   if(wasPaused)scene.scene.resume();
   scene.layout();
   showScreen('main');
-  syncMenuAmbience(true);
+  if(shouldFade){
+    if(musicEnabled&&ensureAudio())menuAudioUnlocked=true;
+    stopMusic(260,()=>{
+      menuWaitingForGameplay=false;
+      outgoing.currentTime=0;
+      syncMenuAmbience();
+    });
+  }else syncMenuAmbience(true);
   $('start').focus();
 }
 function restartRun(){
