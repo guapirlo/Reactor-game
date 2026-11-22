@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="4.3">
-<title>REACTOR 4.3 · THE ARCADE HUB</title>
+<meta name="reactor-version" content="4.4">
+<title>REACTOR 4.4 · MIAMI SIGNATURE</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -347,6 +347,30 @@ body:not([data-mode="playing"]) #achievement-notice{display:none}
 html[data-reduce-motion="true"] :is(#arcade-fx,#reactor-stack,#overlay,#arcade-menu),html[data-reduce-motion="true"] :is(#arcade-fx,#reactor-stack,#overlay,#arcade-menu) *{animation:none!important;transition:none!important}
 html[data-reduce-motion="true"] #arcade-fx .fx-arc,html[data-reduce-motion="true"] #overlay::before,html[data-reduce-motion="true"] #arcade-fx .fx-seal::after{display:none!important}
 html:has(body:is([data-mode="menu"],[data-mode="paused"])),body:is([data-mode="menu"],[data-mode="paused"]){touch-action:pan-y}
+#main-menu{width:min(100%,560px);gap:clamp(12px,3.5vh,34px)}
+.menu-brand{padding:0}
+.menu-brand h1{background:none;filter:none;-webkit-text-stroke:0;line-height:0}
+.signature-logo{width:100%;height:auto;overflow:visible;filter:drop-shadow(0 0 4px #64fff4b7) drop-shadow(1px 5px 6px #681c5eae)}
+body[data-mode="menu"] #main-menu:not([hidden]) .signature-logo{animation:signature-reveal .75s cubic-bezier(.2,.85,.29,1) both}
+@keyframes signature-reveal{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+.menu-city{font-family:ui-monospace,monospace;margin:1px 0 0;font-size:11px;letter-spacing:.25em}
+#main-menu .hub-actions{width:min(92%,330px);padding:0;gap:7px;border:0;background:none;box-shadow:none}
+#main-menu .hub-actions button{position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(104deg,#12182cd9,#351d51aa 65%,#221430cb);border-color:#8bf4f4b3;box-shadow:inset -1px 0 #f890d9c0,inset 1px 0 #91fcf9a0,0 2px 5px #0b0c2494;color:#f6fcff;font:850 12px/1.1 ui-monospace,monospace;letter-spacing:.19em;text-shadow:0 1px 3px #070a1a;transition:background .16s ease,box-shadow .16s ease,transform .16s ease}
+#main-menu .hub-actions button::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(111deg,transparent 25%,#dda7ff35 54%,transparent 74%);opacity:.55}
+#main-menu .hub-actions button.primary{border-color:#affff6;background:linear-gradient(100deg,#153d4cd9,#2b2e62bc 53%,#632e61d6);color:#eafffe;box-shadow:inset 1px 0 #cefffa,inset -1px 0 #ffd2f1,0 0 10px #80fff849}
+#main-menu .hub-actions button:is(:active,:focus-visible){transform:translateY(1px);box-shadow:inset 0 0 15px #7cdfff52,0 0 10px #faa3e987}
+#world-list{display:grid;gap:10px}
+.world-group{display:grid;gap:6px}
+.world-group h3{margin:4px 0 0;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#ccdaf5}
+.world-tile{min-height:44px;padding:8px;border:1px solid #a6add365;border-radius:8px;background:#191e37c9;text-align:left}
+.world-tile small{display:block;margin-top:3px;color:#c8bedd}
+#arcade-menu button.world-tile{text-align:left;letter-spacing:.09em}
+@media(min-width:600px) and (max-height:500px) and (orientation:landscape){
+  #main-menu{width:min(100%,720px);gap:16px;grid-template-columns:1.23fr 1fr}
+  #main-menu .hub-actions{width:min(100%,285px)}
+}
+@media(prefers-reduced-motion:reduce){body[data-mode="menu"] #main-menu .signature-logo{animation:none}#main-menu .hub-actions button{transition:none}}
+html[data-reduce-motion="true"] #main-menu .signature-logo{animation:none!important}
 </style>
 </head>
 <body data-mode="menu">
@@ -378,7 +402,26 @@ html:has(body:is([data-mode="menu"],[data-mode="paused"])),body:is([data-mode="m
 </div>
 <div id="arcade-menu" aria-label="Reactor arcade hub">
   <section id="main-menu" class="hub-page">
-    <div class="menu-brand"><p class="menu-city">MIAMI 1986 <span>SKIN 01</span></p><h1>REACTOR</h1></div>
+    <div class="menu-brand">
+      <h1 aria-label="REACTOR">
+        <svg class="signature-logo" viewBox="0 0 700 158" aria-hidden="true" focusable="false">
+          <defs>
+            <path id="signature-letters" d="M22 19H82L95 32V64L81 77H72L99 108H76L48 77H41V108H22ZM41 36V60H75V36ZM115 19H183V36H133V55H174V72H133V91H183V108H115ZM197 108L231 19H251L285 108H265L258 89H224L217 108ZM230 72H252L241 42ZM359 19L371 31V45H352V36H318V91H352V82H371V96L359 108H312L299 95V32L312 19ZM384 19H459V37H431V108H412V37H384ZM486 19H533L546 32V95L533 108H486L473 95V32ZM492 36V91H527V36ZM567 19H627L640 32V64L626 77H617L644 108H621L593 77H586V108H567ZM586 36V60H620V36Z"/>
+            <linearGradient id="signature-metal" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+              <stop offset="0" stop-color="#f3fffd"/><stop offset=".25" stop-color="#b3fbff"/>
+              <stop offset=".48" stop-color="#5276ad"/><stop offset=".5" stop-color="#19183a"/>
+              <stop offset=".54" stop-color="#f9d4f0"/><stop offset=".78" stop-color="#f18ab9"/><stop offset="1" stop-color="#ab4fd8"/>
+            </linearGradient>
+          </defs>
+          <g transform="translate(20 5) skewX(-8) translate(19 0)">
+            <use href="#signature-letters" transform="translate(4 7)" fill="#28162e" stroke="#ff58bf" stroke-width="5" stroke-linejoin="round" fill-rule="evenodd"/>
+            <use href="#signature-letters" fill="url(#signature-metal)" stroke="#91fff9" stroke-width="2.7" stroke-linejoin="round" fill-rule="evenodd"/>
+          </g>
+          <path d="M45 132H274L291 139H409L426 132H655M171 141H262L279 148H421L438 141H529" fill="none" stroke="#ffd8e8" stroke-width="2" opacity=".8"/>
+        </svg>
+      </h1>
+      <p class="menu-city">MIAMI 1986 <span>SKIN 01</span></p>
+    </div>
     <nav class="hub-actions" aria-label="Main menu">
       <button id="start" class="primary" disabled>New game</button>
       <button data-screen="skins">Skins</button>
@@ -388,7 +431,11 @@ html:has(body:is([data-mode="menu"],[data-mode="paused"])),body:is([data-mode="m
     </nav>
   </section>
   <section id="skins-menu" class="hub-page hub-card" hidden>
-    <h2>Skins</h2><div id="skin-list"></div><button class="back" data-back>Back</button>
+    <h2>Skins</h2><div id="skin-list"></div><button class="back" data-screen="world">World Map</button><button class="back" data-back>Back</button>
+  </section>
+  <section id="world-menu" class="hub-page hub-card" hidden>
+    <h2>World Map</h2>
+    <div id="world-list"></div><button class="back" data-back-to="skins" data-back>Back</button>
   </section>
   <section id="achievements-menu" class="hub-page hub-card" hidden>
     <h2>Achievements</h2><p id="achievement-count"></p>
@@ -495,7 +542,7 @@ const CORE_ACHIEVEMENTS=[
 ];
 const SKINS={
   miami:{
-    id:'miami',name:'Miami 1986',category:'Coastal city',available:true,
+    id:'miami',name:'Miami 1986',category:'Coastal city',worldCategory:'geographic',available:true,
     environment:{
       create:game=>game.createMiamiEnvironment(),paint:game=>game.paintCity(),
       animate:(game,time)=>game.animateCity(time),reset:resetMiamiCycle,
@@ -519,10 +566,14 @@ const SKINS={
       ['miami-master','MIAMI MASTER','Reach 300,000 points in Miami.','score',300000]
     ]
   },
-  classic:{id:'classic',name:'Classic',category:'Arcade',available:false,menu:{line:'CLASSIC',badge:'CONCEPT'},achievements:[]}
+  classic:{id:'classic',name:'Classic Arcade',category:'Arcade',worldCategory:'universes',available:false,menu:{line:'CLASSIC',badge:'CONCEPT'},achievements:[]}
 };
 let activeSkin=SKINS[settings.skin]?.available?SKINS[settings.skin]:SKINS.miami;
 let C=activeSkin.gems.colors;
+const WORLD_CATEGORIES=[
+  {id:'geographic',title:'Geographic destinations',unknown:'Uncharted coast'},
+  {id:'universes',title:'Other universes',unknown:'Unknown universe'}
+];
 const savedAchievements=readStore(ACHIEVEMENTS_KEY);
 const unlocks=Object.assign(Object.create(null),savedAchievements.unlocks);
 const achievementProgress=Object.assign(Object.create(null),savedAchievements.progress);
@@ -672,10 +723,15 @@ function stopMusic(){
   };
   musicFade=requestAnimationFrame(fade);
 }
-function unlockEffects(){
-  if(!effectsEnabled)return;
+let menuBus=null, menuClock=0, menuNoteAt=0, menuPhrase=0, menuAudioUnlocked=false;
+const MENU_BEAT=60/82, menuVoices=new Set();
+const MENU_CHORDS=[
+  [130.81,261.63,329.63,392,493.88],[110,220,261.63,329.63,392],
+  [87.31,174.61,220,261.63,329.63],[98,196,246.94,293.66,440]
+];
+function ensureAudio(){
   const Context=window.AudioContext||window.webkitAudioContext;
-  if(!Context)return;
+  if(!Context)return false;
   if(!audio){
     audio=new Context();
     effectsBus=audio.createGain();
@@ -686,26 +742,95 @@ function unlockEffects(){
     limiter.threshold.value=-12;
     limiter.ratio.value=5;
     effectsBus.connect(limiter);
+    menuBus=audio.createGain();
+    menuBus.gain.value=0;
+    menuBus.connect(limiter);
     limiter.connect(audio.destination);
   }
-  const now=audio.currentTime;
-  effectsBus.gain.setTargetAtTime(effectsVolume(),now,.026);
   if(audio.state!=='running')audio.resume().catch(()=>{});
+  return true;
+}
+function unlockEffects(){
+  if(!effectsEnabled||!ensureAudio())return;
+  effectsBus.gain.setTargetAtTime(effectsVolume(),audio.currentTime,.026);
 }
 function sound(frequency,duration=.14,type='triangle',volume=.035,offset=0,endFrequency=0,bus=effectsBus){
   if(!audio||!effectsEnabled||audio.state!=='running')return;
-  const when=audio.currentTime+.004+offset;
+  voice(frequency,duration,type,volume,audio.currentTime+.004+offset,bus,endFrequency);
+}
+function voice(frequency,duration,type,volume,when,bus,endFrequency=0,attack=.021){
   const oscillator=audio.createOscillator();
   const gain=audio.createGain();
   oscillator.type=type;
   oscillator.frequency.setValueAtTime(frequency,when);
   if(endFrequency)oscillator.frequency.exponentialRampToValueAtTime(endFrequency,when+duration*.9);
   gain.gain.setValueAtTime(.0001,when);
-  gain.gain.exponentialRampToValueAtTime(volume,when+Math.min(.021,duration*.4));
+  gain.gain.exponentialRampToValueAtTime(volume,when+Math.min(attack,duration*.4));
   gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
   oscillator.connect(gain).connect(bus);
   oscillator.start(when);
   oscillator.stop(when+duration+.01);
+  return oscillator;
+}
+function menuVoice(frequency,duration,type,volume,when,attack){
+  const oscillator=voice(frequency,duration,type,volume,when,menuBus,0,attack);
+  menuVoices.add(oscillator);
+  oscillator.onended=()=>menuVoices.delete(oscillator);
+}
+function scheduleMenuAmbience(){
+  if(!audio||audio.state!=='running'||runMode!=='menu'||document.hidden||!musicEnabled)return;
+  const now=audio.currentTime;
+  if(menuNoteAt<now)menuNoteAt=now+.025;
+  if(menuNoteAt>now+.12)return;
+  const at=menuNoteAt, phrase=menuPhrase++;
+  const [root,...chord]=MENU_CHORDS[phrase%MENU_CHORDS.length];
+  menuVoice(root,2.3,'sine',.036,at,.30);
+  for(const note of chord)menuVoice(note,2.55,'sine',.018,at+.08,.36);
+  const motif=phrase%4===3?[chord[3],chord[1]]:[chord[2],chord[3]];
+  motif.forEach((note,i)=>{
+    const when=at+MENU_BEAT*(1.35+i*.93);
+    menuVoice(note*2,.36,'triangle',.019,when,.035);
+    menuVoice(note,.65,'sine',.010,when+.21,.04);
+  });
+  menuNoteAt+=MENU_BEAT*4;
+}
+function stopMenuAmbience(){
+  if(menuClock){
+    clearInterval(menuClock);
+    menuClock=0;
+    menuNoteAt=0;
+  }
+  if(menuBus){
+    const now=audio.currentTime;
+    menuBus.gain.setTargetAtTime(0,now,.045);
+    for(const oscillator of menuVoices)oscillator.stop(now+.17);
+    menuVoices.clear();
+  }
+}
+function syncMenuAmbience(fromGesture=false){
+  if(runMode!=='menu'||!musicEnabled||document.hidden||musicVolume()===0){
+    stopMenuAmbience();
+    return;
+  }
+  if(!menuClock){
+    if(fromGesture){
+      if(!ensureAudio())return;
+      menuAudioUnlocked=true;
+    }else if(!menuAudioUnlocked||audio?.state!=='running')return;
+    menuClock=setInterval(scheduleMenuAmbience,75);
+    scheduleMenuAmbience();
+  }
+  if(fromGesture&&audio.state!=='running')audio.resume().catch(()=>{});
+  menuBus.gain.setTargetAtTime(musicVolume()*.85,audio.currentTime,.17);
+}
+function menuClick(event){
+  if(runMode!=='menu'&&runMode!=='paused')return;
+  const button=event.target.closest('button');
+  if(button?.id==='start')return;
+  if(runMode==='menu')syncMenuAmbience(true);
+  if(!button||button.disabled||!effectsEnabled)return;
+  unlockEffects();
+  sound(button.classList.contains('world-tile')||button.classList.contains('skin-tile')?587:392,.095,'sine',.045);
 }
 function setTension(level){
   if(!tensionBus||level===tensionLevel)return;
@@ -1102,6 +1227,7 @@ function clearEffects(){
   scene.cameras.main.resetFX();
 }
 function start(){
+  stopMenuAmbience();
   setMode('playing');
   coolingArmed=false;
   noticeUntil=nextAchievementSound=lastRunSecond=0;
@@ -1391,6 +1517,7 @@ class Game extends Phaser.Scene{
     this.sideCity=this.add.graphics().setDepth(-6);
     this.sideLights=this.add.graphics().setDepth(-5.5);
     this.streetGlow=this.add.graphics().setDepth(-4);
+    this.menuLights=this.add.graphics().setDepth(-4.5);
   }
   create(){
     scene=this;
@@ -1606,8 +1733,28 @@ class Game extends Phaser.Scene{
     }else this.paintSideCity();
     for(const sign of this.signs)sign.homeX=sign.x;
     this.paintStreetGlow();
+    this.menuLights.setVisible(menu);
+    if(menu)this.paintSignatureBackdrop();
     this.palms.forEach((p,i)=>this.drawPalm(p,i,horizon));
     this.paintGlass();
+  }
+  paintSignatureBackdrop(){
+    const {w,h,horizon,menuLights:g}=this;
+    g.clear();
+    for(const [x,color] of [[w*.15,0xff65c9],[w*.83,0x56fafa]]){
+      g.lineStyle(5,color,.18);
+      g.lineBetween(x-w*.085,horizon+22,x+w*.085,horizon+22);
+      g.lineStyle(1.5,color,.88);
+      g.lineBetween(x-w*.085,horizon+22,x+w*.085,horizon+22);
+      for(let i=0;i<12;i++){
+        const y=horizon+31+i*(h-horizon)/19;
+        const length=(.025+i*.004)*w;
+        g.fillStyle(color,.24*(1-i/13));
+        g.fillEllipse(x+Math.sin(i*1.7)*w*.028,y,length,1.5+i*.12);
+      }
+    }
+    g.lineStyle(1,0xffdcba,.35);
+    g.lineBetween(w*.03,horizon+3,w*.97,horizon+3);
   }
   paintCoast(){
     const {w,h,coasts,surf,promenade}=this;
@@ -1938,6 +2085,7 @@ class Game extends Phaser.Scene{
     const sway=subdued?0:Math.sin(time/3400);
     this.edgeDanger.setAlpha(danger*.79);
     this.edgeElectric.setVisible(runMode!=='menu');
+    if(runMode==='menu')this.menuLights.setAlpha(subdued?.86:.82+.12*Math.sin(time/2100));
     for(let i=0;i<2;i++){
       const tint=phaseGlow(i);
       if(tint!==this.cockpitColors[i]){
@@ -2002,15 +2150,59 @@ window.addEventListener('resize',resizeGame);
 window.visualViewport?.addEventListener('resize',resizeGame);
 function showScreen(next){
   screen=next;
-  for(const name of ['main','skins','achievements','scores','options','pause'])$(name+'-menu').hidden=name!==next;
+  for(const name of ['main','skins','world','achievements','scores','options','pause'])$(name+'-menu').hidden=name!==next;
   if(next==='options')refreshOptions();
   if(next==='scores')$('saved-best').textContent=best.toLocaleString('en-US');
   if(next==='skins')renderSkins();
+  if(next==='world')renderWorldMap();
   if(next==='achievements')renderAchievements();
   const panel=$(next+'-menu');
   panel.scrollTop=0;
   const heading=panel.querySelector('h2');
   if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
+}
+function renderWorldMap(){
+  const list=$('world-list');
+  list.replaceChildren();
+  for(const category of WORLD_CATEGORIES){
+    const group=document.createElement('section'), title=document.createElement('h3');
+    group.className='world-group';
+    title.textContent=category.title;
+    group.append(title);
+    for(const skin of Object.values(SKINS).filter(skin=>skin.worldCategory===category.id)){
+      const tile=document.createElement(skin.available?'button':'div');
+      tile.className='world-tile';
+      const name=document.createElement('strong'), status=document.createElement('small');
+      name.textContent=skin.name;
+      status.textContent=skin.available?(skin===activeSkin?'Playable · Selected':'Playable'):'Planned · Unavailable';
+      tile.append(name,status);
+      if(skin.available)tile.onclick=()=>selectSkin(skin);
+      group.append(tile);
+    }
+    const unknown=document.createElement('div');
+    unknown.className='world-tile';
+    unknown.textContent=category.unknown+' · Unknown';
+    group.append(unknown);
+    list.append(group);
+  }
+}
+function selectSkin(skin){
+  if(!skin.available)return;
+  const changed=skin!==activeSkin;
+  if(changed&&musicTrack){
+    musicTrack.pause();
+    musicTrack=null;
+    musicFailed=musicNeedsGesture=false;
+  }
+  activeSkin=skin;
+  settings.skin=skin.id;
+  writeStore(SETTINGS_KEY,settings);
+  applySkin();
+  if(changed&&scene){
+    $('start').disabled=true;
+    scene.scene.restart();
+  }
+  showScreen('skins');
 }
 function renderSkins(){
   const list=$('skin-list');
@@ -2025,23 +2217,7 @@ function renderSkins(){
     name.textContent=skin.name;
     detail.textContent=skin.category+' · '+(skin.available?(skin===activeSkin?'Selected':'Available'):'Coming soon');
     tile.append(name,detail);
-    if(skin.available)tile.onclick=()=>{
-      const changed=skin!==activeSkin;
-      if(changed&&musicTrack){
-        musicTrack.pause();
-        musicTrack=null;
-        musicFailed=musicNeedsGesture=false;
-      }
-      activeSkin=skin;
-      settings.skin=skin.id;
-      writeStore(SETTINGS_KEY,settings);
-      applySkin();
-      if(changed&&scene){
-        $('start').disabled=true;
-        scene.scene.restart();
-      }
-      renderSkins();
-    };
+    if(skin.available)tile.onclick=()=>selectSkin(skin);
     list.append(tile);
   }
 }
@@ -2085,6 +2261,7 @@ function setMusicEnabled(enabled){
   settings.music=musicEnabled=enabled;
   persistOptions();
   syncMusic(true);
+  syncMenuAmbience(true);
 }
 function setEffectsEnabled(enabled){
   settings.effects=effectsEnabled=enabled;
@@ -2140,6 +2317,7 @@ function returnToMenu(){
   if(wasPaused)scene.scene.resume();
   scene.layout();
   showScreen('main');
+  syncMenuAmbience(true);
   $('start').focus();
 }
 function restartRun(){
@@ -2159,6 +2337,7 @@ $('option-motion').onchange=event=>{settings.reduceMotion=event.target.checked;p
 $('music-volume').oninput=event=>{
   settings.musicVolume=Number(event.target.value);
   if(musicTrack)musicTrack.volume=musicVolume();
+  syncMenuAmbience(true);
   refreshOptions();persistOptions();
 };
 $('effects-volume').oninput=event=>{
@@ -2170,11 +2349,12 @@ if(document.body){
   applySkin();
   persistOptions();
   setMode('menu');
+  $('arcade-menu').addEventListener('click',menuClick,true);
   for(const button of document.querySelectorAll('[data-screen]'))button.onclick=()=>{
     if(button.dataset.screen==='options')optionsBack=screen;
     showScreen(button.dataset.screen);
   };
-  for(const button of document.querySelectorAll('[data-back]'))button.onclick=()=>showScreen(screen==='options'?optionsBack:'main');
+  for(const button of document.querySelectorAll('[data-back]'))button.onclick=()=>showScreen(button.dataset.backTo||(screen==='options'?optionsBack:'main'));
   for(const button of document.querySelectorAll('[data-main]'))button.onclick=returnToMenu;
   for(const button of document.querySelectorAll('[data-filter]'))button.onclick=()=>{
     achievementFilter=button.dataset.filter;
@@ -2183,10 +2363,13 @@ if(document.body){
 }
 window.addEventListener('visibilitychange',()=>{
   syncMusic();
-  if(document.hidden)setTension(0);
+  if(document.hidden){
+    setTension(0);
+    stopMenuAmbience();
+  }else syncMenuAmbience();
 });
-window.addEventListener('pagehide',()=>{musicTrack?.pause();saveAchievements()});
-window.addEventListener('pageshow',()=>syncMusic());
+window.addEventListener('pagehide',()=>{musicTrack?.pause();stopMenuAmbience();saveAchievements()});
+window.addEventListener('pageshow',()=>{syncMusic();syncMenuAmbience()});
 window.addEventListener('pointerdown',event=>{
   if(runMode!=='playing'||!playing||event.target.closest?.('button'))return;
   if(effectsEnabled&&audio?.state!=='running')unlockEffects();
