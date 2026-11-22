@@ -660,6 +660,59 @@ html[data-reduce-motion=true] :is(.map-car,.map-boat,.map-storefront,.map-palm,.
 #campaign-menu>h2{font-family:"Brush Script MT","Segoe Script",cursive;font-style:italic;letter-spacing:.015em;color:#ffe2ed;text-shadow:0 0 12px #ff72c6}
 #campaign-menu .archive-films{position:static}#chapter-films[hidden]{display:none}
 .campaign-chapter[data-offscreen=true] :is(.map-car,.map-boat,.map-storefront,.map-palm,.map-water,.level-node){animation-play-state:paused!important}
+#campaign-map{display:grid;gap:3px}
+#campaign-menu .campaign-chapter{margin:0}
+#campaign-menu .campaign-chapter:has([data-current=true]){border-color:#ffce96}
+#mission-menu{padding:0;overflow:auto;background:#1a142d}
+.mission-banner{position:relative;min-height:164px;display:flex;align-items:flex-end;padding:13px;border-bottom:2px solid #f592db;background:linear-gradient(0deg,#19162d 2%,#18132c1a 90%),var(--mission-art) center 42%/cover}
+.mission-banner>*{position:relative}
+.mission-banner .mission-index{position:absolute;top:9px;right:12px;color:#feebff;font:1000 italic clamp(48px,13vw,84px)/.92 system-ui;text-shadow:3px 4px #892565,0 0 12px #09081d}
+#mission-title{margin:0;font-size:clamp(28px,8vw,48px);max-width:96%;text-wrap:balance}
+#mission-family{margin:0 0 6px;color:#b7fdf6;font-weight:850;text-shadow:0 1px 4px #080817}
+.mission-body{padding:12px}
+#mission-menu h3{margin:8px 0}
+#mission-goals{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+#mission-goals li{font-size:clamp(15px,4vw,19px);font-weight:850;padding:7px 8px;border-left:3px solid #82fff0;background:#27213e;color:#fceaff}
+#mission-limits{display:flex;flex-wrap:wrap;gap:4px}
+#mission-limits span{padding:4px 7px;border-radius:5px;border:1px solid #ea9cce55;background:#342443;font-weight:750}
+#mission-stars{color:#ffd687}.star-details{margin:6px 0;font-size:12px;color:#eacaf4}.star-details summary{min-height:36px;cursor:pointer;padding:8px 0}
+#mission-menu #mission-play{min-height:52px;font-size:16px}
+.comic-picture{position:relative}
+.comic-art{position:absolute;inset:0;overflow:hidden}
+.comic-picture .comic-dialogue{position:absolute;z-index:2;inset:auto 0 0;margin:0;padding:15px max(9px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom));min-height:0;text-align:center;background:linear-gradient(transparent,#050412d9 61%);color:#fff;font:800 clamp(14px,3.8vw,24px)/1.18 system-ui;text-shadow:1px 2px 1px #000,0 0 5px #000;paint-order:stroke fill;-webkit-text-stroke:1.5px #080615;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;box-sizing:content-box}
+.comic-controls{margin-top:8px}
+#panel:has(.victory-board){width:min(96vw,560px);background:radial-gradient(ellipse at 50% 4%,#682457,#1d1534 60%);border:2px solid #fc93d9;box-shadow:0 0 28px #ee77e783}
+.victory-board{display:grid;gap:8px;justify-items:center}
+.victory-board h1{margin:0!important}
+.victory-score{font:1000 italic clamp(28px,9vw,58px)/1 system-ui;font-variant-numeric:tabular-nums;color:#a5fff6;text-shadow:0 0 13px #48deb8;margin:0}
+.victory-board .victory-stars{display:flex;gap:8px;justify-content:center;animation:none!important}
+.victory-stars .star-stamp{display:inline-block;color:#9882a5}
+.victory-stars .star-stamp[data-earned=true]{color:#ffe293;text-shadow:0 0 18px #ff8d83}
+.victory-stars .star-stamp.impact{animation:star-impact .33s cubic-bezier(.19,.83,.34,1) both}
+.victory-stars .star-stamp.impact:nth-child(2){filter:drop-shadow(0 0 9px #ff87de)}
+.victory-stars .star-stamp.impact:nth-child(3){filter:drop-shadow(0 0 15px #75fff7)}
+@keyframes star-impact{0%{transform:translateY(-16px) scale(.3);opacity:.25}58%{transform:scale(1.24);filter:brightness(1.55)}100%{transform:none;opacity:1}}
+.victory-actions{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+#panel .victory-actions button{flex:1 1 90px;min-height:44px;margin:0}
+.victory-record{color:#fff29f;font-weight:850}
+#celebration{width:min(94vw,460px);max-height:92dvh;overflow:auto;background:radial-gradient(ellipse at 50% 40%,#6e2c68,#191733 69%);border:2px solid #ffd38c}
+#celebration .king-medal{width:clamp(113px,36vw,185px);height:auto;display:block;border:0;background:none;box-shadow:none;filter:drop-shadow(0 0 19px #ffaf74);animation:medal-rise .68s ease-out both}
+#celebration-name{font:1000 italic clamp(22px,8vw,43px) system-ui;color:#a3fff5;margin:0;overflow-wrap:anywhere}
+#celebration .legend-skyline{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:.23;z-index:-1;pointer-events:none}
+#celebration::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 12% 22%,#ff9ddb 0 2px,transparent 3px),radial-gradient(circle at 87% 18%,#a3fff5 0 2px,transparent 3px),radial-gradient(circle at 24% 65%,#ffe49b 0 2px,transparent 3px),radial-gradient(circle at 83% 58%,#ffabce 0 2px,transparent 3px);animation:medal-spark 1.5s ease-in-out infinite alternate;pointer-events:none}
+@keyframes medal-rise{from{transform:translateY(17px) scale(.83);opacity:.25}to{transform:none;opacity:1}}
+@keyframes medal-spark{to{opacity:.25;transform:translateY(-8px)}}
+.king-controls{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.profile-medal{width:58px;display:block;margin:5px 0;filter:drop-shadow(0 0 6px #ffc77d)}
+@media(max-height:500px) and (orientation:landscape){.mission-banner{min-height:120px}#celebration .king-medal{width:96px}}
+@media(prefers-reduced-motion:reduce){.impact,#celebration .king-medal,#celebration::after{animation:none!important}}
+html[data-reduce-motion=true] :is(.impact,#celebration .king-medal,#celebration::after){animation:none!important}
+
+.victory-actions[hidden],#profile-medal[hidden]{display:none}
+.victory-board h1{animation:victory-title .33s ease-out both}
+@keyframes victory-title{from{opacity:.25;transform:translateY(10px) skewX(-7deg)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.victory-board h1{animation:none}}
+html[data-reduce-motion=true] .victory-board h1{animation:none}
 </style>
 </head>
 <body data-mode="menu">
@@ -761,15 +814,22 @@ html[data-reduce-motion=true] :is(.map-car,.map-boat,.map-storefront,.map-palm,.
     <button class="back" data-back-to="adventure" data-back data-i18n="back">Back</button>
   </section>
   <section id="mission-menu" class="hub-page hub-card" hidden>
-    <p id="mission-family"></p><h2 id="mission-title" class="miami-letter"></h2><p id="mission-stars"></p>
-    <h3 data-i18n="requirements">Objectives</h3><ul id="mission-goals"></ul>
-    <p id="mission-limits"></p><p id="mission-obstacles"></p><p data-i18n="starHelp"></p>
-    <p id="mission-locked" role="status"></p>
-    <button id="mission-play" class="primary back" data-i18n="play">Play</button>
-    <button class="back" data-back-to="campaign" data-back data-i18n="back">Back</button>
+    <header class="mission-banner">
+      <span class="mission-index" id="mission-index" aria-hidden="true"></span>
+      <div><p id="mission-family"></p><h2 id="mission-title" class="miami-letter"></h2></div>
+    </header>
+    <div class="mission-body">
+      <p id="mission-stars"></p>
+      <h3 data-i18n="requirements">Objectives</h3><ul id="mission-goals"></ul>
+      <p id="mission-limits"></p><p id="mission-obstacles"></p>
+      <details class="star-details"><summary data-i18n="starDetails">Star details</summary><p data-i18n="starHelp"></p></details>
+      <p id="mission-locked" role="status"></p>
+      <button id="mission-play" class="primary back" data-i18n="play">Play</button>
+      <button class="back" data-back-to="campaign" data-back data-i18n="back">Back</button>
+    </div>
   </section>
   <section id="profile-menu" class="hub-page hub-card" hidden>
-    <h2 data-i18n="profile">Player Profile</h2><p id="profile-name"></p><p id="profile-title" hidden></p>
+    <h2 data-i18n="profile">Player Profile</h2><p id="profile-name"></p><img id="profile-medal" class="profile-medal" src="./assets/cutscenes/miami/king-medal.svg" alt="King of Miami" hidden><button id="profile-equip-king" type="button" hidden></button><p id="profile-title" hidden></p>
     <form id="nickname-form">
       <label for="nickname" data-i18n="nickname">Nickname</label>
       <div><input id="nickname" name="nickname" autocomplete="off" maxlength="20" required><button type="submit" data-i18n="save">Save</button></div>
@@ -863,8 +923,7 @@ html[data-reduce-motion=true] :is(.map-car,.map-boat,.map-storefront,.map-palm,.
 </dialog>
 <dialog id="comic" aria-labelledby="comic-title">
   <h2 id="comic-title" class="miami-letter"></h2>
-  <div class="comic-picture"></div>
-  <p class="comic-dialogue" aria-live="polite"></p>
+  <div class="comic-picture"><div class="comic-art"></div><p class="comic-dialogue" aria-live="polite"></p></div>
   <div class="comic-controls">
     <button type="button" data-comic-skip></button><button type="button" data-comic-next></button>
     <button type="button" data-comic-replay></button><button type="button" data-comic-mute></button>
@@ -872,10 +931,14 @@ html[data-reduce-motion=true] :is(.map-car,.map-boat,.map-storefront,.map-palm,.
 </dialog>
 <dialog id="celebration" aria-labelledby="celebration-title">
   <div class="legend-skyline" aria-hidden="true"></div>
-  <div class="king-medal" aria-hidden="true">★</div>
+  <img class="king-medal" src="./assets/cutscenes/miami/king-medal.svg" alt="">
   <h2 id="celebration-title" class="miami-letter">KING OF MIAMI</h2><p id="celebration-name"></p><p id="celebration-stars"></p>
   <p data-i18n="legendEarned">Miami campaign completed</p>
-  <form method="dialog"><button data-i18n="back">Back</button></form>
+  <div class="king-controls">
+    <button id="equip-king" type="button"></button>
+    <button id="repeat-king" type="button" data-i18n="celebrate">Replay celebration</button>
+    <button id="king-map" type="button" data-i18n="campaign">Campaign map</button>
+  </div>
 </dialog>
 <div id="achievement-notice" role="status" hidden></div>
 <div id="overlay" hidden><div id="panel"></div></div>
@@ -2115,6 +2178,7 @@ function award(points){
 function finish(result='reactor'){
   if(!playing)return;
   const won=result==='win';
+  const previous=adventureRun&&playerProfile.state.campaign.levels[adventureRun.level.number];
   const earnedStars=won?adventure.stars(adventureRun,elapsed,pressure):0;
   if(adventureRun)adventureRun.settled=true;
   const progression=playerProfile.complete(sessionRun,{score,elapsed,level:adventureRun?.level.number??null,stars:earnedStars});
@@ -2135,16 +2199,11 @@ function finish(result='reactor'){
   if(settleEvent)settleEvent.remove();
   settleEvent=null;
   updateHud();
-  if(document.body)renderResult(result,earnedStars);
+  if(document.body)renderResult(result,earnedStars,previous);
   $('overlay').dataset.shutdown=String(result==='reactor');
   $('overlay').hidden=false;
   notifyProgress(progression);
-  if(document.body&&won&&ReactorCutscenes.finaleLevels.includes(adventureRun?.level.number)){
-    const completed=adventureRun;
-    setTimeout(()=>{
-      if(adventureRun===completed&&!completed.cinematicRequested&&runMode==='ended'&&!$('overlay').hidden)replayChapter(completed.level.number);
-    },1050);
-  }
+
 }
 function changePressure(amount){
   pressure=Math.max(0,Math.min(100,pressure+amount));
@@ -4179,6 +4238,10 @@ function renderPlayer(){
   $('nickname').value=state.player.nickname;
   $('nickname-status').textContent='';
   $('profile-name').textContent=state.player.nickname;
+  const slot=$('profile-medal');
+  slot.hidden=!(state.campaign.levels[20]&&readStore('reactor.miami.medal').equipped);
+  $('profile-equip-king').hidden=!state.campaign.levels[20];
+  $('profile-equip-king').textContent=t(slot.hidden?'equipMedal':'equippedMedal');
   const rewards=profiles.earnedRewards(state);
   $('profile-menu').dataset.reward=rewards.at(-1)||'';
   const title=$('profile-title');
@@ -4268,7 +4331,8 @@ function chapterArt(theme){
     midnight:'<path d="M0 395v-70h23v-44h21v37h17v-36h32v40h19v56h44v-42h22v-50h24v68h37v-50h27v-29h27v55h21v-31h46v96z" fill="#171c37" stroke="#766bd2"/><path class="map-storefront" d="M30 310v33m47-46v37m111-29v46m85-55v50m55-24v29" stroke="#f584ef" stroke-width="4" stroke-dasharray="3 7"/><path d="M319 267l-34 57 21-8-22 43 48-59-22 9z" fill="#d3baff" opacity=".65"/>'
   };
   g.innerHTML='<rect width="360" height="530" fill="'+sky+'"/><circle cx="309" cy="58" r="41" fill="'+trim+'" opacity=".69"/><path d="'+land+'" fill="'+sea+'"/><path d="'+shore+'" fill="#241f45" opacity=".5"/>'+areas[theme]+hotels+palms+
-    '<path d="'+route+'" stroke="#fd9adc" stroke-opacity=".42" stroke-width="30" fill="none"/><path d="'+route+'" stroke="#271d41" stroke-width="25" fill="none"/><path d="'+route+'" stroke="#ffc49c" stroke-width="1.4" stroke-dasharray="5 5" fill="none"/><g class="map-car"><rect x="316" y="181" width="23" height="8" rx="3" fill="#ff9fce"/><path d="M319 181l4-4h10l4 4" fill="#92fff5"/><path d="M340 184h7" stroke="#ffe4aa"/></g>';
+    '<path transform="translate(0 560) scale(1 -1)" d="'+route+'" stroke="#fd9adc" stroke-opacity=".42" stroke-width="30" fill="none"/><path transform="translate(0 560) scale(1 -1)" d="'+route+'" stroke="#271d41" stroke-width="25" fill="none"/><path transform="translate(0 560) scale(1 -1)" d="'+route+'" stroke="#ffc49c" stroke-width="1.4" stroke-dasharray="5 5" fill="none"/><g class="map-car"><rect x="316" y="181" width="23" height="8" rx="3" fill="#ff9fce"/><path d="M319 181l4-4h10l4 4" fill="#92fff5"/><path d="M340 184h7" stroke="#ffe4aa"/></g>';
+  if(theme==='midnight')g.insertAdjacentHTML('beforeend','<g transform="translate(77 60)"><path d="M-22 20V1h9v-7h26v7h10v19z" fill="#281d45" stroke="#ffd78f" stroke-width="2"/><path d="M-14 3h28M-13 10h26" stroke="#ff85d7"/></g>');
   return g;
 }
 function renderCampaign(){
@@ -4279,24 +4343,25 @@ function renderCampaign(){
   const map=$('campaign-map');
   map.replaceChildren();
   const landmarkSymbols=[['☂','⌁','✦'],['◈','♧'],['♫','☆','◐'],['ϟ','✧']];
-  for(const [index,chapter] of campaign.chapters.entries()){
+  for(const [index,chapter] of [...campaign.chapters.entries()].reverse()){
     const aerial=playerNode('section',undefined,'campaign-chapter');
     aerial.append(chapterArt(chapter.theme));
     aerial.dataset.chapter=chapter.theme;
     aerial.append(playerNode('h3',t('chapter',{n:index+1})+' · '+chapter.name,'miami-letter'),
       playerNode('p',t('rewards')+' · '+t(rewardKeys[chapter.reward])));
     const route=playerNode('div',undefined,'campaign-route');
-    for(const [slot,level] of campaign.levels.filter(item=>item.chapter===index).entries()){
+    for(const [slot,level] of [...campaign.levels.filter(item=>item.chapter===index).entries()].reverse()){
       const earned=playerProfile.state.campaign.levels[level.number]?.stars||0;
       const locked=level.number>unlocked;
       const button=uiButton('',()=>{selectedLevel=level.number;showScreen('mission');});
       button.className='level-node';
+      button.dataset.level=String(level.number);
       button.dataset.current=String(level.number===unlocked&&!earned);
       button.dataset.locked=String(locked);
       button.setAttribute('aria-label',t('level',{n:level.number})+' '+level.title+' · '+(locked?t('locked',{n:level.number-1}):t('stars')+' '+earned+' / 3'));
       button.setAttribute('aria-current',button.dataset.current==='true'?'step':'false');
       button.style.left=routePoints[slot][0]/360*100+'%';
-      button.style.top=routePoints[slot][1]/530*100+'%';
+      button.style.top=(560-routePoints[slot][1])/530*100+'%';
       button.append(playerNode('span',String(level.number),'level-number'));
       if(locked)button.append(playerNode('span','🔒','level-lock'));
       else button.append(playerNode('small','★'.repeat(earned)+'☆'.repeat(3-earned)));
@@ -4317,7 +4382,7 @@ function renderCampaign(){
     },{root:$('campaign-menu')});
     for(const chapter of map.children)campaignObserver.observe(chapter);
   }
-  const node=map.querySelector('[data-current="true"]')||map.querySelector('.campaign-chapter:last-child .level-node:last-child');
+  const node=map.querySelector('[data-current="true"]')||map.querySelector('.level-node');
   $('current-level').onclick=()=>node?.scrollIntoView({block:'center',behavior:reducedMotion.matches?'instant':'smooth'});
   requestAnimationFrame(()=>{if(screen==='campaign')node?.scrollIntoView({block:'center',behavior:'instant'});});
   const archive=$('chapter-films');
@@ -4332,14 +4397,19 @@ function renderCampaign(){
 function renderMission(){
   const level=campaign.levels[selectedLevel-1], unlocked=profiles.unlockedLevel(playerProfile.state);
   $('mission-title').textContent=level.title;
+  if(document.body){
+    $('mission-index').textContent=String(level.number).padStart(2,'0');
+    const art=['chapter1_ocean_drive','chapter2_marina','chapter3_club','chapter4_finale'][level.chapter];
+    document.querySelector('.mission-banner').style.setProperty('--mission-art','url("./assets/cutscenes/miami/'+art+'.webp")');
+  }
   $('mission-family').textContent=t('chapter',{n:level.chapter+1})+' · '+campaign.chapters[level.chapter].name+' / '+t('level',{n:level.number})+' · '+t('family'+level.family);
   const earned=playerProfile.state.campaign.levels[level.number]?.stars||0;
   $('mission-stars').textContent=t('stars')+' · '+'★'.repeat(earned)+'☆'.repeat(3-earned)+' · '+earned+' / 3';
   const constraints=[
-    level.moves!==null?t('moves')+' '+level.moves:'',
-    level.time!==null?t('time')+' '+level.time+' s':''
+    level.moves!==null?'↪ '+t('moves')+' '+level.moves:'',
+    level.time!==null?'◷ '+t('time')+' '+level.time+' s':''
   ].filter(Boolean);
-  $('mission-limits').textContent=constraints.join(' · ')||t('unlimited');
+  $('mission-limits').replaceChildren(...(constraints.length?constraints:[t('unlimited')]).map(text=>playerNode('span',text)));
   $('mission-goals').replaceChildren(...Object.entries(level.targets).map(([key,target])=>playerNode('li',t('goal'+objectiveKeys[key],{n:formatNumber(target)}))));
   $('mission-obstacles').textContent=[
     level.blocks.some(block=>block.hp)?t('locksHelp'):'',
@@ -4377,7 +4447,7 @@ function checkMission(){
   finish(result);
   return true;
 }
-function renderResult(result,stars){
+function renderResult(result,stars,previous){
   const panel=$('panel');
   panel.replaceChildren();
   if(!adventureRun){
@@ -4387,17 +4457,59 @@ function renderResult(result,stars){
     panel.append(scores,uiButton(t('replay'),()=>{$('overlay').hidden=true;start();}),uiButton(t('main'),()=>returnToMenu('main')));
     return;
   }
-  const won=result==='win', level=adventureRun.level;
-  panel.append(playerNode('div',t(won?'win':'loss'),'eyebrow'),playerNode('h1',level.title,'miami-letter'));
-  if(won)panel.append(playerNode('p','★'.repeat(stars)+'☆'.repeat(3-stars),'victory-stars'),playerNode('p',t('score')+' '+formatNumber(score)));
-  else panel.append(playerNode('p',t({reactor:'reactor',moves:'outMoves',time:'outTime'}[result])));
-  if(won&&level.reward)panel.append(playerNode('p',t('rewards')+' · '+t(rewardKeys[level.reward])));
-  if(won&&level.number===20)panel.append(playerNode('p',playerProfile.state.player.nickname+' · '+t('legend')));
-  panel.append(uiButton(t('replay'),()=>{selectedLevel=level.number;returnToMenu('mission');}));
-  if(won&&level.number<20)panel.append(uiButton(t('continue'),()=>{selectedLevel=level.number+1;returnToMenu('mission');}));
-  if(won&&ReactorCutscenes.finaleLevels.includes(level.number))panel.append(uiButton(t('replayFilm'),()=>replayChapter(level.number)));
-  panel.append(uiButton(t('campaign'),()=>returnToMenu('campaign')));
-  if(won&&level.number===20)panel.append(uiButton(t('celebrate'),()=>{returnToMenu('campaign');showCelebration();}));
+  const won=result==='win', completed=adventureRun, level=completed.level;
+  const stage=playerNode('div',undefined,won?'victory-board':'mission-loss');
+  stage.append(playerNode('div',t(won?'win':'loss'),'eyebrow'),playerNode('h1',level.title,'miami-letter'));
+  panel.append(stage);
+  const actions=playerNode('div',undefined,'victory-actions');
+  actions.append(uiButton(t('replay'),()=>{selectedLevel=level.number;returnToMenu('mission');}),
+    uiButton(t('campaign'),()=>returnToMenu('campaign')));
+  if(won&&level.number<20)actions.append(uiButton(t('next'),()=>{selectedLevel=level.number+1;returnToMenu('mission');}));
+  const finale=won&&ReactorCutscenes.finaleLevels.includes(level.number);
+  if(finale)actions.append(uiButton(t('replayFilm'),()=>replayChapter(level.number)));
+  if(!won){
+    stage.append(playerNode('p',t({reactor:'reactor',moves:'outMoves',time:'outTime'}[result])),actions);
+    return;
+  }
+  const tally=playerNode('p','0','victory-score');
+  tally.setAttribute('aria-label',t('score')+' '+formatNumber(score));
+  const row=playerNode('p',undefined,'victory-stars');
+  row.setAttribute('aria-label',t('stars')+' '+stars+' / 3');
+  const stamps=Array.from({length:3},()=>playerNode('span','☆','star-stamp'));
+  stamps.forEach(stamp=>stamp.setAttribute('aria-hidden','true'));
+  row.append(...stamps);
+  const skip=uiButton(t('skipReveal'),()=>reveal(true));
+  stage.append(playerNode('small',t('score')),tally,row);
+  const recordLabel=previous&&score>previous.score?t('missionRecord'):t('personalBest');
+  stage.append(playerNode('p',recordLabel+' · '+formatNumber(Math.max(previous?.score||0,score)),'victory-record'));
+  if(level.reward)stage.append(playerNode('p',t('rewards')+' · '+t(rewardKeys[level.reward])));
+  stage.append(skip,actions);
+  actions.hidden=true;
+  const resultScore=score, begin=performance.now(), still=reducedMotion.matches;
+  let raf,finished=false;
+  function reveal(immediate=false){
+    if(finished||adventureRun!==completed||runMode!=='ended')return;
+    const passed=immediate?1800:performance.now()-begin;
+    tally.textContent=formatNumber(Math.floor(resultScore*Math.min(1,passed/550)));
+    stamps.forEach((stamp,index)=>{
+      if(index>=stars||passed<550+index*240||stamp.dataset.earned)return;
+      stamp.dataset.earned='true';
+      stamp.textContent='★';
+      if(!immediate){stamp.classList.add('impact');sound(470+index*120,.13,'sine',.05);}
+    });
+    if(immediate||passed>=700+stars*240){
+      finished=true;
+      if(raf)cancelAnimationFrame(raf);
+      skip.hidden=true;
+      actions.hidden=false;
+      if(finale)setTimeout(()=>{
+        if(adventureRun===completed&&!completed.cinematicRequested&&runMode==='ended')replayChapter(level.number);
+      },still?520:330);
+    }else raf=requestAnimationFrame(()=>reveal());
+  }
+  if(still)reveal(true);
+  else raf=requestAnimationFrame(()=>reveal());
+
 }
 let comicManifest,comicPlayer,comicPending=false,campaignObserver;
 function replayChapter(level){
@@ -4438,8 +4550,14 @@ function showCelebration(){
   $('celebration-name').textContent=playerProfile.state.player.nickname;
   $('celebration-stars').textContent='★ '+profiles.totals(playerProfile.state).stars+' / 60 · '+t('stars');
   $('celebration').style.setProperty('--skyline-preview','url('+MIAMI_PREVIEW+')');
+  refreshMedal();
   $('celebration').showModal();
   cue('record');
+}
+function refreshMedal(){
+  const equipped=readStore('reactor.miami.medal').equipped===true;
+  $('equip-king').textContent=t(equipped?'equippedMedal':'equipMedal');
+  $('equip-king').setAttribute('aria-pressed',String(equipped));
 }
 function paintMissionMarks(){
   if(!scene?.missionMarks)return;
@@ -4703,6 +4821,22 @@ if(document.body){
     const valid=playerProfile.nickname($('nickname').value);
     if(valid)renderPlayer();
     $('nickname-status').textContent=t(valid?'saved':'badName');
+  };
+  const equip=()=>{
+    if(!playerProfile.state.campaign.levels[20])return;
+    writeStore('reactor.miami.medal',{equipped:!readStore('reactor.miami.medal').equipped});
+    refreshMedal();
+    if(screen==='profile')renderPlayer();
+  };
+  $('equip-king').onclick=$('profile-equip-king').onclick=equip;
+  $('repeat-king').onclick=()=>{
+    $('celebration').close();
+    requestAnimationFrame(()=>requestAnimationFrame(showCelebration));
+  };
+  $('king-map').onclick=()=>{
+    $('celebration').close();
+    if(runMode==='ended')returnToMenu('campaign');
+    else {showScreen('campaign');syncMenuAmbience(true);}
   };
   $('replay-celebration').onclick=showCelebration;
   $('celebration').addEventListener('close',()=>{if(runMode==='menu')syncMenuAmbience(true);});

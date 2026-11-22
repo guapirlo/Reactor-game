@@ -22,6 +22,7 @@ function normalize(manifest,source){
 }
 function makePlayer(dialog,{reducedMotion,language,strings,music,volume,enabled,toggle}){
   const title=dialog.querySelector('h2'),picture=dialog.querySelector('.comic-picture');
+  const art=dialog.querySelector('.comic-art');
   const text=dialog.querySelector('.comic-dialogue'),skip=dialog.querySelector('[data-comic-skip]');
   const next=dialog.querySelector('[data-comic-next]'),mute=dialog.querySelector('[data-comic-mute]'),replay=dialog.querySelector('[data-comic-replay]');
   let scene,index=0,timer=null,generation=0,done=null,deadline=0,remaining=0,track=null;
@@ -41,7 +42,7 @@ function makePlayer(dialog,{reducedMotion,language,strings,music,volume,enabled,
     track?.pause();
     track=null;
     dialog.close();
-    picture.replaceChildren();
+    art.replaceChildren();
     const callback=done;
     done=null;
     callback?.();
@@ -63,7 +64,7 @@ function makePlayer(dialog,{reducedMotion,language,strings,music,volume,enabled,
     image.decoding='async';
     image.dataset.motion=panel.motion;
     image.style.setProperty('--shot-duration',panel.duration+'ms');
-    picture.replaceChildren(image);
+    art.replaceChildren(image);
     text.textContent=panel.dialogue[language()]||panel.dialogue.en;
     image.onload=()=>{
       if(sequence!==generation||reducedMotion())return;
