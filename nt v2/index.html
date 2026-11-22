@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="4.4.5">
-<title>REACTOR 4.4.5 · OCEAN DRIVE COMPLETE</title>
+<meta name="reactor-version" content="4.4.6">
+<title>REACTOR 4.4.6 · MIAMI BOOMBOX</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -395,6 +395,52 @@ html[data-reduce-motion="true"] #main-menu .signature-logo{animation:none!import
 @media(prefers-reduced-motion:reduce){.pixel-map::after,#main-menu .hub-actions button::before{animation:none!important}}
 html[data-reduce-motion="true"] .pixel-map::after,html[data-reduce-motion="true"] #main-menu .hub-actions button::before{animation:none!important}
 body[data-mode="menu"] #arcade-menu{background:linear-gradient(180deg,#130d284f 0%,#15112b12 30%,#100b2969 100%)}
+
+#main-menu{gap:clamp(10px,2.4vh,23px)}
+#arcade-menu #menu-boombox{
+  position:relative;pointer-events:auto;justify-self:center;width:min(76%,250px);
+  min-height:68px;margin-top:6px;padding:5px 9px 4px;display:grid;
+  grid-template-columns:1fr 1.42fr 1fr;gap:6px;align-items:center;
+  border:2px solid #83fff4;border-right-color:#ff8cd9;border-bottom:4px solid #9e559d;border-radius:4px;
+  background:linear-gradient(#57506c 0 6%,#211c37 6% 84%,#3f2c50 84%);
+  box-shadow:0 6px 2px #161329a0,0 8px 14px #171228a0,inset 0 0 0 2px #121427,0 0 10px #ee65ce68;
+  font:900 10px/1.2 ui-monospace,monospace;color:#f6edff;
+}
+#menu-boombox::before{
+  content:"";position:absolute;top:-9px;left:34%;width:32%;height:8px;border:2px solid #9983ae;
+  border-bottom:0;border-radius:3px 3px 0 0;box-shadow:inset 0 1px #ffe0ee;
+}
+#menu-boombox .speaker{
+  display:block;width:100%;max-width:48px;aspect-ratio:1;justify-self:center;
+  border:2px solid #8dfafa;outline:1px solid #33284c; border-radius:35%;
+  background:radial-gradient(circle,#9b7fa2 0 15%,#272643 17% 32%,#614d78 35% 40%,#19182c 44% 57%,#51486e 60%);
+  box-shadow:inset 0 0 5px #11162e,0 0 6px #64ffea5c;
+}
+#menu-boombox .speaker:last-of-type{border-color:#ff8ddd;box-shadow:inset 0 0 5px #21112c,0 0 6px #ff71d461}
+.boombox-deck{display:grid;gap:3px}
+.boombox-cassette{display:block;height:13px;border:1px solid #a18cae;border-radius:2px;background:radial-gradient(circle at 26% 50%,#dceaff 0 2px,#4c4b6f 2.5px 4px,transparent 4.5px),radial-gradient(circle at 74% 50%,#ffd2ef 0 2px,#69517c 2.5px 4px,transparent 4.5px),linear-gradient(#282741,#14172d)}
+.boombox-leds{display:flex;justify-content:center;align-items:end;gap:3px;height:10px;background:#17182a;padding:1px}
+.boombox-leds i{width:5px;height:100%;background:repeating-linear-gradient(to top,#56f5dd 0 2px,transparent 2px 3px);opacity:.28;transform:scaleY(.35);transform-origin:bottom}
+.boombox-leds i:nth-child(even){background:repeating-linear-gradient(to top,#ff8dda 0 2px,transparent 2px 3px);animation-delay:-.23s}
+.boombox-leds i:nth-child(3n){animation-delay:-.42s}
+#boombox-state,#boombox-hint{display:block;white-space:nowrap;letter-spacing:.065em}
+#boombox-hint{font-size:8px;color:#f5d4eb}
+#menu-boombox[data-state="playing"] #boombox-state{color:#a5fff3;text-shadow:0 0 7px #36ffd8}
+#menu-boombox[data-state="playing"] .boombox-leds i{animation:boombox-level .66s steps(4,end) infinite;opacity:1}
+#menu-boombox[data-state="playing"] .speaker{animation:boombox-cone .48s ease-out infinite}
+@keyframes boombox-level{0%,100%{transform:scaleY(.35)}42%{transform:scaleY(1)}72%{transform:scaleY(.55)}}
+@keyframes boombox-cone{0%,100%{transform:none}28%{transform:scale(1.045)}}
+@media(min-width:600px) and (max-height:500px) and (orientation:landscape){
+  #main-menu{row-gap:14px}
+  #main-menu .hub-actions{grid-column:2;grid-row:1 / span 2}
+  #menu-boombox{grid-column:1;grid-row:2;align-self:start}
+}
+@media(prefers-reduced-motion:reduce){
+  #menu-boombox[data-state="playing"] :is(.speaker,.boombox-leds i){animation:none}
+  #menu-boombox[data-state="playing"] .boombox-leds i{transform:scaleY(.75)}
+}
+html[data-reduce-motion="true"] #menu-boombox[data-state="playing"] :is(.speaker,.boombox-leds i){animation:none}
+html[data-reduce-motion="true"] #menu-boombox[data-state="playing"] .boombox-leds i{transform:scaleY(.75)}
 </style>
 </head>
 <body data-mode="menu">
@@ -461,6 +507,16 @@ body[data-mode="menu"] #arcade-menu{background:linear-gradient(180deg,#130d284f 
       <button data-screen="scores">High scores</button>
       <button data-screen="options">Options</button>
     </nav>
+    <button id="menu-boombox" type="button" aria-label="Menu music" aria-pressed="false" aria-describedby="boombox-hint" data-state="off">
+      <span class="speaker" aria-hidden="true"></span>
+      <span class="boombox-deck">
+        <span class="boombox-cassette" aria-hidden="true"></span>
+        <span class="boombox-leds" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        <span id="boombox-state" aria-live="polite">MUSIC OFF</span>
+        <span id="boombox-hint">TAP FOR MUSIC</span>
+      </span>
+      <span class="speaker" aria-hidden="true"></span>
+    </button>
   </section>
   <section id="skins-menu" class="hub-page hub-card" hidden>
     <h2>Skins</h2><div id="skin-list"></div><button class="back" data-screen="world">World Map</button><button class="back" data-back>Back</button>
@@ -903,7 +959,21 @@ function stopSynthAmbience(){
     menuVoices.clear();
   }
 }
+let menuTrackPlaying=false;
+function renderBoombox(){
+  if(!document.body)return;
+  const audible=musicEnabled&&musicVolume()>0;
+  const playing=audible&&menuTrackPlaying&&runMode==='menu';
+  const loading=audible&&!playing&&optionalMenuTrack&&!optionalMenuTrack.paused&&!optionalMenuFailed;
+  const button=$('menu-boombox');
+  button.dataset.state=playing?'playing':loading?'loading':'off';
+  button.setAttribute('aria-pressed',String(playing));
+  $('boombox-state').textContent=playing?'MUSIC ON':loading?'LOADING':'MUSIC OFF';
+  $('boombox-hint').textContent=playing?'TAP TO PAUSE':loading?'TAP TO CANCEL':audible&&optionalMenuFailed?'TRACK UNAVAILABLE':musicEnabled&&!audible?'VOLUME IS ZERO':'TAP FOR MUSIC';
+}
 function stopMenuAmbience(fadeTrack=false){
+  menuTrackPlaying=false;
+  renderBoombox();
   stopSynthAmbience();
   if(optionalMenuFade)cancelAnimationFrame(optionalMenuFade);
   optionalMenuFade=0;
@@ -942,7 +1012,17 @@ function tryMenuTrack(fromGesture){
       track.pause();
       syncMenuAmbience();
     };
-    optionalMenuTrack.addEventListener('error',fallback);
+    track.addEventListener('error',fallback);
+    track.addEventListener('playing',()=>{
+      if(track!==optionalMenuTrack)return;
+      menuTrackPlaying=true;
+      renderBoombox();
+    });
+    for(const event of ['pause','waiting','ended','error'])track.addEventListener(event,()=>{
+      if(track!==optionalMenuTrack)return;
+      menuTrackPlaying=false;
+      renderBoombox();
+    });
     optionalMenuTrack.src=path;
   }
   if(optionalMenuFade)cancelAnimationFrame(optionalMenuFade);
@@ -952,12 +1032,14 @@ function tryMenuTrack(fromGesture){
   track.volume=musicVolume();
   if(track.paused)track.play().catch(error=>{
     if(track!==optionalMenuTrack||error.name==='AbortError'||runMode!=='menu'||!musicEnabled||document.hidden)return;
-    if(error.name==='NotAllowedError')return;
+    if(error.name==='NotAllowedError'){renderBoombox();return;}
     console.warn('[Reactor menu audio] Playback failed:',path,error.message);
     optionalMenuFailed=true;
     track.pause();
     syncMenuAmbience(fromGesture);
+    renderBoombox();
   });
+  renderBoombox();
   return true;
 }
 function syncMenuAmbience(fromGesture=false){
@@ -982,7 +1064,6 @@ function menuClick(event){
   if(runMode!=='menu'&&runMode!=='paused')return;
   const button=event.target.closest('button');
   if(button?.id==='start')return;
-  if(runMode==='menu')syncMenuAmbience(true);
   if(!button||button.disabled||!effectsEnabled)return;
   unlockEffects();
   sound(button.classList.contains('world-tile')||button.classList.contains('skin-tile')?587:392,.095,'sine',.045);
@@ -3302,6 +3383,16 @@ if(document.body){
   persistOptions();
   setMode('menu');
   $('arcade-menu').addEventListener('click',menuClick,true);
+  renderBoombox();
+  $('menu-boombox').onclick=()=>{
+    if(!musicEnabled)setMusicEnabled(true);
+    else if(optionalMenuFailed||(optionalMenuTrack&&!optionalMenuTrack.paused))setMusicEnabled(false);
+    else syncMenuAmbience(true);
+  };
+  window.addEventListener('click',event=>{
+    if(!event.isTrusted||runMode!=='menu'||event.target.closest?.('#start,#menu-boombox,#option-music'))return;
+    syncMenuAmbience(true);
+  },true);
   $('secret-penthouse').onclick=()=>discoverMiami('penthouse','WELCOME TO MIAMI!');
   $('secret-jet').onclick=()=>discoverMiami('jet','NICE CATCH!');
   $('secret-radio').onclick=()=>discoverMiami('radio','THE CITY IS YOURS!');
