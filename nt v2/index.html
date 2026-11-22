@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<title>REACTOR 3.3 · PRESSURE REBALANCE</title>
+<title>REACTOR 3.4 · NEON IMPACT</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -22,15 +22,8 @@ button{font:inherit;cursor:pointer}
 #score,#best{display:block;font-variant-numeric:tabular-nums;font-weight:850}
 #score{font-size:clamp(17px,4.5vw,25px);line-height:1}
 #best{font-size:12px;color:var(--gold)}
-#combo,#toast{position:fixed;left:0;right:0;text-align:center;pointer-events:none;text-shadow:0 2px 8px #100819,0 0 12px #181024;font-weight:900}
+#combo{position:fixed;left:0;right:0;text-align:center;pointer-events:none;text-shadow:0 2px 8px #100819,0 0 12px #181024;font-weight:900}
 #combo{top:calc(72px + env(safe-area-inset-top));font-size:13px;color:var(--mint);letter-spacing:.15em;line-height:20px}
-#toast{bottom:calc(96px + env(safe-area-inset-bottom));padding:0 10px;color:#fff2fa;font-size:clamp(16px,4.6vw,26px);font-style:italic;opacity:0;transition:opacity .16s;z-index:2}
-#toast.show{opacity:1}
-#toast[data-effect="chain"]{color:var(--mint)}
-#toast[data-effect="critical"]{color:#ff9bb7}
-#toast[data-effect="super"],#toast[data-effect="mega"]{color:var(--gold);text-shadow:0 0 16px #ff408c,0 2px 6px #190f32}
-#toast[data-effect="mega"].announce{animation:mega-pop .36s ease-out}
-@keyframes mega-pop{0%{transform:scale(.72)}45%{transform:scale(1.07)}100%{transform:scale(1)}}
 #bottom{bottom:calc(9px + env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 11px;align-items:center;padding:9px 11px;border:1px solid var(--edge);border-radius:15px;background:linear-gradient(120deg,#291632f7,#10172cf7)}
 .meter-label{display:flex;justify-content:space-between;gap:4px;margin-bottom:4px;letter-spacing:.08em}
 #epct,#pct{color:var(--mint);white-space:nowrap}
@@ -56,14 +49,14 @@ button{font:inherit;cursor:pointer}
 .results{display:flex;justify-content:center;gap:26px;margin:17px 0}
 .results strong{display:block;color:var(--gold);font-size:24px;font-variant-numeric:tabular-nums}
 @media(max-width:360px){.stats{gap:6px}.brand{font-size:16px}#hud{padding-inline:9px}}
-@media(max-height:480px){#panel{padding:12px 18px}#panel h1{font-size:27px}#panel p{margin:6px 0}#combo{top:calc(62px + env(safe-area-inset-top))}#toast{bottom:calc(81px + env(safe-area-inset-bottom))}}
+@media(max-height:480px){#panel{padding:12px 18px}#panel h1{font-size:27px}#panel p{margin:6px 0}#combo{top:calc(62px + env(safe-area-inset-top))}}
 @media (min-width:760px) and (max-height:500px) and (orientation:landscape){
   #hud{width:156px;right:auto;top:calc(14px + env(safe-area-inset-top));grid-template-columns:1fr;gap:8px}
   .stats{text-align:left}
   #bottom{width:156px;left:auto;bottom:calc(12px + env(safe-area-inset-bottom));grid-template-columns:1fr;padding:8px}
   .audio-toggles{grid-column:1;grid-row:3;justify-self:end}
   #combo{right:auto;width:156px;top:113px}
-  #toast{left:auto;width:172px;bottom:148px;font-size:16px}
+  
 }
 #game{--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px)}
 #reactor-meter{--pressure:#60f6dc;--pressure-tail:#3a88fe;color:var(--pressure)}
@@ -82,47 +75,91 @@ button{font:inherit;cursor:pointer}
 #overdrive-status[data-state="active"] .bar{border-color:#63f8ed;box-shadow:0 0 7px #6bfff36b}
 #overdrive-status[data-state="recovery"] .energy{background:linear-gradient(90deg,#45878d,#9d75e9)}
 #bottom{transform:translateY(calc(0px - var(--meter-lift,0px)))}
-#toast{bottom:calc(102px + env(safe-area-inset-bottom) + var(--meter-lift,0px));display:grid;place-items:center;isolation:isolate;opacity:0;transition:none;line-height:1.1;--fx:#72ffe7;font-size:clamp(17px,5.8vw,37px);font-weight:950;letter-spacing:.045em}
-#toast.show{opacity:1}
-#announcement{display:block;color:#fff8ed;-webkit-text-stroke:.65px #171129;paint-order:stroke fill;text-shadow:0 2px #150f28,0 0 13px var(--fx);text-wrap:balance}
-#toast.show #announcement{animation:arcade-punch var(--fx-time) both}
-#toast[data-effect="super"],#toast[data-effect="mega"],#toast[data-effect="overdrive"]{--fx:#ffac78;font-size:clamp(22px,7.2vw,48px)}
-#toast[data-effect="overdrive"],#toast[data-effect="end"]{--fx:#65fbff}
-#toast[data-effect="phase"]{--fx:#e79bff;font-size:clamp(16px,5vw,28px);font-style:normal;letter-spacing:.18em}
-#toast[data-effect="critical"]{--fx:#ff6486}
-#toast.show:is([data-effect="super"],[data-effect="mega"],[data-effect="overdrive"])::before{content:"";position:absolute;z-index:-1;width:min(440px,92vw);height:46px;background:repeating-linear-gradient(171deg,transparent 0 8px,var(--fx) 9px 10px,transparent 11px 15px);animation:arcade-streak var(--fx-time) both;clip-path:polygon(0 48%,34% 24%,32% 42%,100% 0,71% 52%,82% 47%,100% 57%,51% 80%,54% 61%,0 100%)}
-#toast.show[data-effect="super"] #announcement{animation-name:arcade-cross}
-#toast.show[data-effect="mega"] #announcement{animation-name:arcade-diagonal}
-#toast.show[data-effect="overdrive"] #announcement{animation-name:arcade-charge}
-#toast.show[data-effect="phase"] #announcement{animation-name:arcade-title}
-@keyframes arcade-punch{0%{opacity:0;transform:translateY(8px) scale(.8)}24%{opacity:1;transform:translateY(-2px) scale(1.06)}68%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-12px) scale(.96)}}
-@keyframes arcade-cross{0%{opacity:0;transform:translateX(min(58vw,300px)) skewX(-14deg)}24%{opacity:1;transform:translateX(-12px) skewX(-5deg)}71%{opacity:1;transform:translateX(-3px)}100%{opacity:0;transform:translateX(-32px)}}
-@keyframes arcade-diagonal{0%{opacity:0;transform:translate(32vw,-50px) rotate(-12deg) scale(.64)}24%{opacity:1;transform:translate(-4px,0) rotate(-4deg) scale(1.09)}66%{opacity:1;transform:rotate(-3deg)}100%{opacity:0;transform:translate(-18px,8px) rotate(-6deg)}}
-@keyframes arcade-charge{0%{opacity:0;transform:scaleX(.45) scaleY(1.35)}20%{opacity:1;transform:scale(1.12)}66%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.14)}}
-@keyframes arcade-title{0%{opacity:0;transform:translateY(7px);letter-spacing:.32em}28%,75%{opacity:1;transform:none;letter-spacing:.18em}100%{opacity:0;transform:translateY(-7px)}}
-@keyframes arcade-streak{0%,100%{opacity:0;transform:scaleX(.35)}24%{opacity:.60;transform:scaleX(1)}65%{opacity:.16;transform:scaleX(1.12)}}
-@media(max-width:360px){#pressure-state{font-size:7px}#reactor-meter .meter-label{letter-spacing:0}#overdrive-status .meter-label{letter-spacing:0}}
-@media(min-width:760px) and (max-height:500px) and (orientation:landscape){#pressure-state{display:none}#toast{width:156px;font-size:14px}#toast[data-effect]{font-size:16px}}
-@media(prefers-reduced-motion:reduce){#toast.show #announcement{animation-name:none}#toast.show::before{display:none}#reactor-meter .bar{animation:none!important}.bar>div{transition:none}}
+/* Shared smoked-glass modules with machined edges. */
+#hud,#bottom{isolation:isolate;border-color:#8a9ec97a;background:linear-gradient(145deg,#332645f7 0%,#1c2037f7 37%,#11192ef7 100%);box-shadow:inset 0 1px #f7dfff2b,inset 0 -2px #0d1020,0 5px 14px #09081787}
+#hud::before,#bottom::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;box-shadow:-1px 0 #62ffe590,1px 0 #ff69b48a,inset 0 1px #dbf4ff3a;opacity:.72;transition:opacity .24s ease,box-shadow .24s ease}
+#hud .brand{color:#fff5fb;text-shadow:0 1px 0 #090b1c;letter-spacing:.1em}
+#hud .subtitle{color:#8cf9e2}
+#score-module{position:relative;align-self:center;gap:10px;justify-content:space-between;height:36px;min-width:120px;padding:2px 8px 2px 9px;border-radius:8px;border:1px solid #aeb5e440;background:linear-gradient(155deg,#100e21,#101c32 75%);box-shadow:inset 0 1px 5px #050817,0 1px #d1c4fa34}
+#score-module::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 1px 0 #53fddbad,inset -1px 0 #e668b088}
+#score-module .stat-label{font-size:7px;letter-spacing:.16em;color:#c9bde5;line-height:8px}
+#score,#best{font-variant-numeric:tabular-nums lining-nums;letter-spacing:.02em;white-space:nowrap}
+#score{font-size:clamp(19px,6.2vw,29px);line-height:22px;color:#f4feff;text-shadow:0 0 9px #71f5fd6d}
+#best{color:#e7b7ff;font-size:clamp(9px,2.4vw,12px);line-height:15px}
+.best-readout{padding-left:7px;border-left:1px solid #b3b0e431}
+#hud[data-surge="true"]::before,#bottom[data-surge="true"]::before,#bottom[data-overdrive="active"]::before{opacity:1;box-shadow:-1px 0 #6bfff4,1px 0 #ff82c9,inset 0 0 8px #77f2ff4c,0 0 12px #78f3ff55}
+#hud[data-surge="true"] #score{color:#fff;text-shadow:0 0 11px #6af5f9,0 0 4px #ff97d9}
+#bottom{border-radius:14px}
+#reactor-meter .meter-label,#overdrive-status .meter-label{line-height:13px;align-items:center}
+#reactor-meter .meter-label>span:first-child{color:#f2eaf9}
+#reactor-meter .bar{position:relative;box-shadow:inset 0 1px 3px #040510,0 0 5px color-mix(in srgb,var(--pressure),transparent 65%)}
+#reactor-meter .bar::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 calc(8.333% - 1px),#170e25 calc(8.333% - 1px) 8.333%)}
+#reactor-meter[data-danger="critical"] .meter-label,#reactor-meter[data-danger="maximum"] .meter-label{filter:drop-shadow(0 0 3px #ff466366)}
+#overdrive-status{color:#8df7fa}
+#overdrive-status .bar{position:relative;border-color:#6fe3e967;background:#0a1423}
+#overdrive-status .energy{position:relative;overflow:hidden;background:linear-gradient(90deg,#7260cf,#6bf8f3 78%,#d4fffb);box-shadow:0 0 8px #51f4ff88}
+#overdrive-status[data-state="active"]{color:#d3fffd}
+#overdrive-status[data-state="active"] .energy::after{content:"";position:absolute;inset:0;width:55%;background:linear-gradient(100deg,transparent,#ffffffa6,transparent);animation:energy-flow 1.1s linear infinite}
+#overdrive-status[data-state="recovery"] .energy{background:linear-gradient(90deg,#49386c,#c69bfb)}
+@keyframes energy-flow{from{transform:translateX(-100%)}to{transform:translateX(190%)}}
+#arcade-fx{position:fixed;z-index:3;left:var(--board-center-x,-100%);top:var(--board-center-y,-100%);width:var(--board-fx-span,0px);transform:translate(-50%,-50%);display:grid;place-items:center;pointer-events:none;visibility:hidden;--fx:#70fff1;--hit:#e674b8;--headline:clamp(16px,calc(var(--board-fx-span) * .067),31px)}
+#arcade-fx.show{visibility:visible}
+.fx-seal{position:relative;display:grid;justify-items:center;align-items:center;min-width:0;max-width:100%;isolation:isolate;text-align:center;padding:5px 7px}
+.fx-seal::before{content:"";position:absolute;z-index:-1;inset:-7px -14px;border-radius:50%;background:radial-gradient(ellipse,#120d2af5 7%,#150f2a92 51%,transparent 74%)}
+#announcement{display:block;max-width:100%;font-size:var(--headline);line-height:1;font-weight:950;font-style:italic;letter-spacing:.023em;color:#fff8fc;white-space:nowrap;-webkit-text-stroke:1px #1d1235;paint-order:stroke fill;text-shadow:1px 2px #291844,0 0 10px var(--fx),0 0 20px var(--hit)}
+#announcement-points{margin-top:5px;color:var(--fx);font-size:clamp(11px,calc(var(--board-fx-span) * .042),21px);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.12em;text-shadow:0 1px 2px #160a2c,0 0 8px var(--fx)}
+#announcement-points:empty{display:none}
+.fx-arc{display:none;position:absolute;z-index:-1;top:37%;width:41%;height:22px;background:var(--fx);clip-path:polygon(0 76%,36% 59%,28% 35%,60% 37%,59% 12%,100% 0,70% 29%,77% 50%,43% 49%,49% 68%);opacity:.77}
+.fx-arc-left{right:66%;transform:rotate(-13deg)}
+.fx-arc-right{left:66%;transform:rotate(167deg)}
+#arcade-fx[data-effect="super"]{--fx:#77ffef;--hit:#43a9ff;--headline:clamp(20px,calc(var(--board-fx-span) * .084),45px)}
+#arcade-fx[data-effect="mega"]{--fx:#ffda9c;--hit:#ff4dbd;--headline:clamp(22px,calc(var(--board-fx-span) * .102),55px)}
+#arcade-fx[data-effect="overdrive"]{--fx:#8ffff9;--hit:#fa64c9;--headline:clamp(24px,calc(var(--board-fx-span) * .114),61px)}
+#arcade-fx[data-effect="phase"]{--fx:#e0a7ff;--hit:#ae67d9;--headline:clamp(15px,calc(var(--board-fx-span) * .061),33px)}
+#arcade-fx[data-effect="phase"] #announcement{font-style:normal;letter-spacing:.10em}
+#arcade-fx[data-effect="critical"]{--fx:#ff8e9c;--hit:#ea3a62}
+#arcade-fx.show .fx-seal{animation:fx-standard var(--fx-time) cubic-bezier(.17,.78,.24,1) both}
+#arcade-fx.show:is([data-effect="super"],[data-effect="mega"],[data-effect="overdrive"]) .fx-arc{display:block}
+#arcade-fx.show .fx-arc{animation:fx-lightning var(--fx-time) ease-out both}
+#arcade-fx.show #announcement-points{animation:fx-points var(--fx-time) both}
+#arcade-fx.show[data-effect="super"] .fx-seal{animation-name:fx-super}
+#arcade-fx.show[data-effect="mega"] .fx-seal{animation-name:fx-mega}
+#arcade-fx.show[data-effect="overdrive"] .fx-seal{animation-name:fx-overdrive}
+#arcade-fx.show[data-effect="phase"] .fx-seal{animation-name:fx-phase}
+@keyframes fx-standard{0%{opacity:0;transform:translateY(8px) scale(.82)}23%{opacity:1;transform:scale(1.075)}65%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-13px) scale(.95)}}
+@keyframes fx-super{0%{opacity:0;transform:translateX(36%) skewX(-18deg)}23%{opacity:1;transform:translateX(-4%) skewX(-5deg)}64%{opacity:1;transform:none}100%{opacity:0;transform:translateX(-18%) skewX(-12deg)}}
+@keyframes fx-mega{0%{opacity:0;transform:translate(29%,-42px) rotate(-15deg) scale(.76)}24%{opacity:1;transform:translate(-4%,4px) rotate(-6deg) scale(1.13)}66%{opacity:1;transform:rotate(-3deg)}100%{opacity:0;transform:translate(-17%,23px) rotate(-8deg) scale(1.02)}}
+@keyframes fx-overdrive{0%{opacity:0;transform:scale(.53,1.24)}22%{opacity:1;transform:scale(1.11)}67%{opacity:1;transform:none}100%{opacity:0;transform:scale(1.16,.89)}}
+@keyframes fx-phase{0%{opacity:0;transform:translateY(12px) scaleX(.91)}27%,70%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-8px) scaleX(1.04)}}
+@keyframes fx-points{0%,16%{opacity:0;transform:translateY(7px)}35%,71%{opacity:1;transform:none}100%{opacity:.4;transform:translateY(-9px)}}
+@keyframes fx-lightning{0%,100%{opacity:0}21%{opacity:.88}59%{opacity:.21}}
+@media(max-width:360px){#pressure-state{font-size:7px}#reactor-meter .meter-label,#overdrive-status .meter-label{letter-spacing:0}#score-module{gap:5px;min-width:101px;padding-inline:5px}.best-readout{padding-left:4px}}
+@media(min-width:760px) and (max-height:500px) and (orientation:landscape){#pressure-state{display:none}#reactor-meter .meter-label{font-size:8px;letter-spacing:.025em}#score-module{justify-content:space-between}#score{font-size:21px}}
+@media(prefers-reduced-motion:reduce){#arcade-fx.show .fx-seal,#arcade-fx.show #announcement-points{animation:none!important}#arcade-fx.show .fx-arc{display:none!important}#reactor-meter .bar,#overdrive-status .energy::after{animation:none!important}.bar>div,#hud::before,#bottom::before{transition:none}}
 </style>
 </head>
 <body>
 <div id="game"></div>
 <header id="hud">
-  <div><div class="brand">REACTOR <span>3.3</span></div><div class="subtitle">Arcade Mayhem</div></div>
-  <div class="stats"><div><span class="stat-label">Score</span><strong id="score">0</strong></div><div><span class="stat-label">Record</span><strong id="best">0</strong></div></div>
+  <div><div class="brand">REACTOR <span>3.4</span></div><div class="subtitle">Neon Impact</div></div>
+  <div class="stats" id="score-module"><div class="score-readout"><span class="stat-label">Score</span><strong id="score">0</strong></div><div class="best-readout"><span class="stat-label">Best</span><strong id="best">0</strong></div></div>
 </header>
-<div id="combo"></div><div id="toast" aria-hidden="true"><span id="announcement"></span></div>
-<div id="bottom">
+<div id="combo"></div>
+<div id="arcade-fx" aria-hidden="true">
+  <div class="fx-seal"><span class="fx-arc fx-arc-left"></span><span class="fx-arc fx-arc-right"></span>
+    <span id="announcement"></span><span id="announcement-points"></span>
+  </div>
+</div>
+<div id="bottom" data-overdrive="charge">
   <div id="reactor-meter" data-danger="stable"><div class="meter-label"><span>REACTOR / PRESSURE</span><span id="pressure-state">STABLE</span><strong id="pct">10%</strong></div><div class="bar"><div id="pfill" class="pressure"></div></div></div>
   <div class="audio-toggles">
     <button id="music-toggle" aria-label="Musique" aria-pressed="true">♫</button>
     <button id="effects-toggle" aria-label="Effets sonores" aria-pressed="true">SFX</button>
   </div>
-  <div id="overdrive-status" data-state="charge"><div class="meter-label">Overdrive <span id="epct">Recharge · 0%</span></div><div class="bar"><div id="efill" class="energy"></div></div></div>
+  <div id="overdrive-status" data-state="charge"><div class="meter-label"><span class="energy-label">OVERDRIVE</span><span id="epct">CHARGE · 0%</span></div><div class="bar"><div id="efill" class="energy"></div></div></div>
 </div>
 <div id="overlay"><div id="panel">
-  <div class="eyebrow">REACTOR 3.3 · MIAMI 1986</div><h1>ARCADE <span>MAYHEM</span></h1>
+  <div class="eyebrow">REACTOR 3.4 · MIAMI 1986</div><h1>NEON <span>IMPACT</span></h1>
   <p>Touche un groupe de deux cristaux ou plus. Les grands groupes réduisent la pression. Enchaîne les coups pour charger OVERDRIVE.</p>
   <button id="start">JOUER</button>
 </div></div>
@@ -163,6 +200,9 @@ const ANNOUNCEMENTS={
   critical:[6,680],mega:[7,880],end:[8,580],overdrive:[9,1050],notice:[2,550]
 };
 let currentAnnouncement=null,announcementQueue=[],cityImpact=0,lastReactorTick=0;
+const SCORE_COUNT_MS=300, SCORE_SURGE_MIN=900;
+let scoreShown=0, scoreFrom=0, scoreTarget=0, scoreCountAt=0, scoreSurgeUntil=0;
+let surgeDisplayed=false;
 try{best=Number(localStorage.getItem('reactor_miami_best')||0)}catch(e){}
 // Temporary procedural prototype. Set this to a local stem pack when the original production is ready.
 const STEM_PACK=null;
@@ -445,29 +485,61 @@ function pressureState(value){
 function overdriveSeconds(deadline){
   return Math.max(0,Math.ceil((deadline-elapsed)/1000));
 }
+function updateScoreDisplay(){
+  if(score!==scoreTarget){
+    const gained=score-scoreTarget;
+    scoreFrom=scoreShown;
+    scoreTarget=score;
+    scoreCountAt=elapsed;
+    if(playing&&gained>=SCORE_SURGE_MIN)scoreSurgeUntil=elapsed+410;
+  }
+  const portion=playing&&!reducedMotion.matches?Math.min(1,(elapsed-scoreCountAt)/SCORE_COUNT_MS):1;
+  const next=portion===1?scoreTarget:Math.round(scoreFrom+(scoreTarget-scoreFrom)*(1-(1-portion)**3));
+  if(next!==scoreShown){
+    scoreShown=next;
+    $('score').textContent=scoreShown.toLocaleString('fr-FR');
+  }
+}
+function updateDashboardLight(){
+  const surge=playing&&!reducedMotion.matches&&(elapsed<scoreSurgeUntil||cityImpact>.63);
+  if(surge===surgeDisplayed)return;
+  surgeDisplayed=surge;
+  $('hud').dataset.surge=String(surge);
+  $('bottom').dataset.surge=String(surge);
+}
+function resetScoreDisplay(){
+  scoreShown=scoreFrom=scoreTarget=score;
+  scoreCountAt=scoreSurgeUntil=0;
+  $('score').textContent=score.toLocaleString('fr-FR');
+  updateDashboardLight();
+}
 function updateHud(){
   const active=elapsed<overUntil;
   const remaining=overdriveSeconds(recoverUntil);
   const [danger,label]=pressureState(pressure);
-  $('score').textContent=score.toLocaleString('fr-FR');
+  updateScoreDisplay();
   $('best').textContent=best.toLocaleString('fr-FR');
   $('pct').textContent=Math.floor(pressure)+'%';
   $('pressure-state').textContent=label;
   $('reactor-meter').dataset.danger=danger;
   $('pfill').style.width=pressure+'%';
-  $('overdrive-status').dataset.state=active?'active':remaining?'recovery':'charge';
+  const driveState=active?'active':remaining?'recovery':'charge';
+  $('overdrive-status').dataset.state=driveState;
+  $('bottom').dataset.overdrive=driveState;
   $('epct').textContent=active?'×3 · '+overdriveSeconds(overUntil)+' s':remaining?'Récup. · '+remaining+' s':'Charge · '+energy+'%';
   $('efill').style.width=(active?100*(overUntil-elapsed)/OVERDRIVE_MS:remaining?100*(1-(recoverUntil-elapsed)/RECOVERY_MS):energy)+'%';
   $('combo').textContent=combo>1?'COMBO ×'+combo:'';
 }
 function showAnnouncement(event){
-  const toast=$('toast');
-  toast.classList.remove('show');
-  toast.dataset.effect=event.style;
-  $('announcement').textContent=event.message;
-  toast.style.setProperty('--fx-time',event.duration+'ms');
-  void toast.offsetWidth;
-  toast.classList.add('show');
+  const overlay=$('arcade-fx');
+  overlay.classList.remove('show');
+  overlay.dataset.effect=event.style;
+  const [title,points]=event.message.split(' · +');
+  $('announcement').textContent=title;
+  $('announcement-points').textContent=points?'+'+points+' PTS':'';
+  overlay.style.setProperty('--fx-time',event.duration+'ms');
+  void overlay.offsetWidth;
+  overlay.classList.add('show');
   currentAnnouncement={...event,until:elapsed+event.duration};
 }
 function flash(message,style='notice'){
@@ -496,13 +568,15 @@ function updateAnnouncements(){
   if(next)showAnnouncement(next);
   else{
     currentAnnouncement=null;
-    $('toast').classList.remove('show');
+    $('arcade-fx').classList.remove('show');
   }
 }
 function resetAnnouncements(){
   currentAnnouncement=null;
   announcementQueue=[];
-  $('toast').classList.remove('show');
+  $('arcade-fx').classList.remove('show');
+  $('announcement').textContent='';
+  $('announcement-points').textContent='';
 }
 function cue(kind){
   const cues={
@@ -670,6 +744,7 @@ function start(){
   cityImpact=0;
   lastReactorTick=0;
   resetAnnouncements();
+  resetScoreDisplay();
   pressure=PRESSURE.initial;
   energy=0;
   combo=0;
@@ -700,6 +775,7 @@ function finish(){
   stopMusic();
   resetAnnouncements();
   cityImpact=0;
+  updateDashboardLight();
   cue('defeat');
   clearEffects();
   overUntil=0;
@@ -924,6 +1000,8 @@ class Game extends Phaser.Scene{
     updateCityPhase();
     updateAnnouncements();
     cityImpact=Math.max(0,cityImpact-delta/570);
+    updateScoreDisplay();
+    updateDashboardLight();
     this.animateCity(time);
     const previousPressure=Math.floor(pressure);
     changePressure(passivePressureBetween(elapsed-delta,elapsed));
@@ -973,9 +1051,20 @@ class Game extends Phaser.Scene{
     this.top=Math.floor((top+bottom-this.cell*N)/2);
     this.meterLift=landscape?0:Math.max(0,Math.floor(bottomTop-this.top-this.cell*N-43));
     document.documentElement.style.setProperty('--meter-lift',this.meterLift+'px');
+    this.positionArcadeFX();
     this.paintReactorFX();
     this.paintCity();
     paintBoard();
+  }
+  positionArcadeFX(){
+    // Convert the grid's Phaser-space bounds through the actual canvas CSS box.
+    const canvas=this.game.canvas.getBoundingClientRect();
+    const sx=canvas.width/this.w, sy=canvas.height/this.h;
+    const span=this.cell*N;
+    const overlay=$('arcade-fx').style;
+    overlay.setProperty('--board-center-x',canvas.left+(this.left+span/2)*sx+'px');
+    overlay.setProperty('--board-center-y',canvas.top+(this.top+span/2)*sy+'px');
+    overlay.setProperty('--board-fx-span',span*sx+'px');
   }
   paintCity(){
     for(const sign of this.signs)sign.destroy();
