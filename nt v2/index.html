@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#100d25">
-<meta name="reactor-version" content="4.4">
-<title>REACTOR 4.4 · MIAMI SIGNATURE</title>
+<meta name="reactor-version" content="4.4.1">
+<title>REACTOR 4.4.1 · MIAMI DIRECTOR'S CUT</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--paper:#fff2fa;--mint:#78f9e5;--pink:#ff80c2;--gold:#ffd48a;--edge:#ba8fcb48}
@@ -371,6 +371,29 @@ body[data-mode="menu"] #main-menu:not([hidden]) .signature-logo{animation:signat
 }
 @media(prefers-reduced-motion:reduce){body[data-mode="menu"] #main-menu .signature-logo{animation:none}#main-menu .hub-actions button{transition:none}}
 html[data-reduce-motion="true"] #main-menu .signature-logo{animation:none!important}
+#main-menu{position:relative;z-index:1;pointer-events:none}
+#main-menu .hub-actions button{pointer-events:auto;border-color:#94ffffe0;box-shadow:inset -1px 0 #ff83dfff,inset 1px 0 #8afff5d9,0 2px 6px #130f2cbd}
+#main-menu .hub-actions button:is(:active,:focus-visible)::before{animation:director-streak .34s ease-out both}
+@keyframes director-streak{from{transform:translateX(-68%);opacity:.85}to{transform:translateX(68%);opacity:0}}
+.signature-logo{filter:drop-shadow(0 0 4px #61fff0d2) drop-shadow(1px 5px 6px #a52f849e)}
+#miami-hotspots{position:fixed;inset:0;pointer-events:none}
+#arcade-menu .scene-hotspot{position:absolute;width:48px;height:48px;min-height:48px;padding:0;border:0;border-radius:50%;background:transparent;transform:translate(-50%,-50%);pointer-events:auto;-webkit-tap-highlight-color:transparent}
+#arcade-menu .scene-hotspot:focus-visible{outline:2px solid #bbfff3;background:#6cffff29}
+#radio-caption{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);max-width:88vw;width:max-content;padding:6px 9px;background:#151430ed;border:1px solid #78fff2a6;border-radius:6px;color:#e6fff9;font:800 11px/1.25 ui-monospace,monospace;letter-spacing:.08em;text-align:center}
+#world-menu{width:min(100%,525px)}
+.pixel-map{position:relative;overflow:hidden;aspect-ratio:2;border:1px solid #78e5f8be;background:#13435d;isolation:isolate}
+.pixel-map canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+.pixel-map::after{content:"";pointer-events:none;position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,transparent 45%,#7bffed31 50%,transparent 55%);animation:map-scan 5s linear infinite}
+@keyframes map-scan{from{transform:translateY(-60%)}to{transform:translateY(60%)}}
+#arcade-menu .map-destination{position:absolute;z-index:2;left:27.72%;top:35.69%;transform:translate(-50%,-50%);height:44px;width:44px;padding:0;border:0;background:transparent;color:#b8fff8;font-size:0}
+.map-destination::before,.map-mystery{display:grid;place-items:center;background:#093646;border:2px solid #99ffec;box-shadow:0 0 7px #50ffed;color:#ecfffa;font:900 8px monospace}
+.map-destination::before{content:"";width:8px;height:8px;margin:auto;transform:rotate(45deg)}
+.map-mystery{position:absolute;width:13px;height:13px;border-color:#ff84d6;box-shadow:0 0 6px #ff68c5;transform:translate(-50%,-50%);pointer-events:none}
+#world-presentation p{font:800 9px ui-monospace,monospace;color:#b5fff6;letter-spacing:.12em;margin:6px 0}
+.filters{flex-wrap:wrap}
+#arcade-fx[data-effect="record"]{--headline:clamp(16px,calc(var(--board-fx-span) * .09),47px);--fx:#77fff5;--hit:#ff67d1;--ink:#a3fff5;--ink-hi:#fff0f9;--ink-low:#f561d0}
+@media(prefers-reduced-motion:reduce){.pixel-map::after,#main-menu .hub-actions button::before{animation:none!important}}
+html[data-reduce-motion="true"] .pixel-map::after,html[data-reduce-motion="true"] #main-menu .hub-actions button::before{animation:none!important}
 </style>
 </head>
 <body data-mode="menu">
@@ -401,6 +424,12 @@ html[data-reduce-motion="true"] #main-menu .signature-logo{animation:none!import
   </div>
 </div>
 <div id="arcade-menu" aria-label="Reactor arcade hub">
+  <div id="miami-hotspots" hidden>
+    <button id="secret-penthouse" class="scene-hotspot" type="button" aria-label="Inspect the lit hotel window"></button>
+    <button id="secret-jet" class="scene-hotspot" type="button" aria-label="Tap the jet ski"></button>
+    <button id="secret-radio" class="scene-hotspot" type="button" aria-label="Tune the waterfront radio"></button>
+    <div id="radio-caption" role="status" hidden></div>
+  </div>
   <section id="main-menu" class="hub-page">
     <div class="menu-brand">
       <h1 aria-label="REACTOR">
@@ -435,12 +464,12 @@ html[data-reduce-motion="true"] #main-menu .signature-logo{animation:none!import
   </section>
   <section id="world-menu" class="hub-page hub-card" hidden>
     <h2>World Map</h2>
-    <div id="world-list"></div><button class="back" data-back-to="skins" data-back>Back</button>
+    <div id="world-presentation"></div><div id="world-list"></div><button class="back" data-back-to="skins" data-back>Back</button>
   </section>
   <section id="achievements-menu" class="hub-page hub-card" hidden>
     <h2>Achievements</h2><p id="achievement-count"></p>
     <div class="filters" aria-label="Achievement categories">
-      <button data-filter="all" aria-pressed="true">All</button><button data-filter="core" aria-pressed="false">Core</button><button data-filter="skin" aria-pressed="false">Miami 1986</button>
+      <button data-filter="all" aria-pressed="true">All</button><button data-filter="core" aria-pressed="false">Core</button><button data-filter="skin" aria-pressed="false">Miami 1986</button><button data-filter="secrets" aria-pressed="false">Secrets</button>
     </div>
     <ul id="achievement-list"></ul><button class="back" data-back>Back</button>
   </section>
@@ -552,7 +581,8 @@ const SKINS={
     palette:{accent:'#83fff1',hot:'#f282dd'},
     typography:'system-ui, Arial, sans-serif',animationStyle:'neon',
     music:'./audio/miami-reactor.mp3',sound:kind=>miamiCue(kind),
-    menu:{line:'MIAMI 1986',badge:'SKIN 01'},
+    menu:{line:'MIAMI 1986',badge:'SKIN 01',music:null,worldMap:drawMiamiMap},
+    special:{record:celebrateMiamiRecord},
     achievements:[
       ['welcome','WELCOME TO MIAMI','Start a Miami 1986 game.','started',1],
       ['golden-hour','GOLDEN HOUR','Score 2,500 points in Miami.','score',2500],
@@ -574,23 +604,33 @@ const WORLD_CATEGORIES=[
   {id:'geographic',title:'Geographic destinations',unknown:'Uncharted coast'},
   {id:'universes',title:'Other universes',unknown:'Unknown universe'}
 ];
+const MIAMI_SECRETS=[
+  ['the-penthouse','THE PENTHOUSE','Discover the hidden hotel-window interaction.','penthouse',1],
+  ['jet-ski-chaser','JET SKI CHASER','Tap the jet ski in the Miami menu.','jet',1],
+  ['city-never-sleeps','THE CITY NEVER SLEEPS','Witness three sunrises in one Miami run.','sunrises',3],
+  ['fireworks-over-miami','FIREWORKS OVER MIAMI','Beat a previously established Miami personal best.','record',1],
+  ['pirate-radio','PIRATE RADIO','Tune the hidden waterfront radio.','radio',1]
+];
+SKINS.miami.secrets=MIAMI_SECRETS;
 const savedAchievements=readStore(ACHIEVEMENTS_KEY);
 const unlocks=Object.assign(Object.create(null),savedAchievements.unlocks);
 const achievementProgress=Object.assign(Object.create(null),savedAchievements.progress);
 let coolingArmed=false,noticeUntil=0,nextAchievementSound=0,lastRunSecond=0;
+let runStartingBest=0, recordCelebrated=false, runSunrises=0, lastSunriseCycle=-1;
 function saveAchievements(){writeStore(ACHIEVEMENTS_KEY,{unlocks,progress:achievementProgress})}
 function achievementDefinitions(category){
-  const pack=(list,scope)=>list.map(([id,title,description,stat,goal])=>({id:scope+':'+id,scope,title,description,stat,goal}));
+  const pack=(list,scope,secret=false)=>list.map(([id,title,description,stat,goal])=>({id:scope+':'+id,scope,title,description,stat,goal,secret}));
   return [
-    ...(category!=='skin'?pack(CORE_ACHIEVEMENTS,'core'):[]),
-    ...(category!=='core'?pack(activeSkin.achievements,activeSkin.id):[])
+    ...((category==='all'||category==='core')?pack(CORE_ACHIEVEMENTS,'core'):[]),
+    ...((category==='all'||category==='skin')?pack(activeSkin.achievements,activeSkin.id):[]),
+    ...((category==='all'||category==='secrets')?pack(activeSkin.secrets||[],activeSkin.id,true):[])
   ];
 }
 function trackAchievement(stat,value,scope='core'){
   const key=scope+':'+stat;
   if(value<=(achievementProgress[key]||0))return;
   achievementProgress[key]=value;
-  const definitions=scope==='core'?CORE_ACHIEVEMENTS:activeSkin.achievements;
+  const definitions=scope==='core'?CORE_ACHIEVEMENTS:[...activeSkin.achievements,...(activeSkin.secrets||[])];
   const unlocked=[];
   for(const [id,title,,metric,goal] of definitions){
     if(metric!==stat||value<goal||unlocks[scope+':'+id])continue;
@@ -608,16 +648,47 @@ function trackAchievement(stat,value,scope='core'){
     nextAchievementSound=elapsed+800;
   }
 }
+let radioTimer=0;
+function syncMiamiHotspots(){
+  if(!document.body)return;
+  const active=runMode==='menu'&&screen==='main'&&activeSkin.id==='miami';
+  $('miami-hotspots').hidden=!active;
+  if(!active&&radioTimer){
+    clearTimeout(radioTimer);radioTimer=0;
+    $('radio-caption').hidden=true;
+  }
+}
+function discoverMiami(stat,caption){
+  if(runMode!=='menu'||screen!=='main'||activeSkin.id!=='miami')return;
+  if(stat==='jet'&&!scene?.jetSki.visible)return;
+  unlockEffects();
+  cue('radio');
+  trackAchievement(stat,1,'miami');
+  const output=$('radio-caption');
+  output.textContent='OCEAN DRIVE FM · '+caption;
+  output.hidden=false;
+  if(radioTimer)clearTimeout(radioTimer);
+  radioTimer=setTimeout(()=>{output.hidden=true;radioTimer=0},2100);
+  scene?.pulseMenuSecret(stat);
+}
 function trackMiamiProgress(){
   if(activeSkin.id!=='miami')return;
   if(cityMix[1]>=.99)trackAchievement('violet',1,'miami');
   if(cityMix[2]>=.99)trackAchievement('neon',1,'miami');
   if(cityMix[3]>=.99)trackAchievement('dark',1,'miami');
-  if(cityMix[4]>=.99)trackAchievement('sunrise',1,'miami');
+  if(cityMix[4]>=.99&&cityCycleStart!==null){
+    trackAchievement('sunrise',1,'miami');
+    const cycle=Math.floor((elapsed-cityCycleStart)/CITY_CYCLE_MS);
+    if(cycle!==lastSunriseCycle){
+      lastSunriseCycle=cycle;
+      trackAchievement('sunrises',++runSunrises,'miami');
+    }
+  }
   if(cityCycleStart!==null)trackAchievement('cycles',Math.floor((elapsed-cityCycleStart)/CITY_CYCLE_MS),'miami');
 }
 function setMode(mode){
   runMode=mode;
+  syncMiamiHotspots();
   if(document.body){
     document.body.dataset.mode=mode;
     $('arcade-menu').inert=mode==='playing'||mode==='ended';
@@ -638,7 +709,7 @@ function applySkin(){
   document.querySelector('.menu-city span').textContent=activeSkin.menu.badge;
 }
 const ANNOUNCEMENTS={
-  combo:[1,410],clear:[2,520],chain:[3,570],super:[4,570],
+  combo:[1,410],clear:[2,520],chain:[3,570],super:[4,570],record:[8.5,900],
   critical:[6,680],mega:[7,680],end:[8,580],overdrive:[9,820],notice:[2,550]
 };
 let currentAnnouncement=null,announcementQueue=[],cityImpact=0,lastReactorTick=0;
@@ -724,6 +795,7 @@ function stopMusic(){
   musicFade=requestAnimationFrame(fade);
 }
 let menuBus=null, menuClock=0, menuNoteAt=0, menuPhrase=0, menuAudioUnlocked=false;
+let optionalMenuTrack=null, optionalMenuFailed=false;
 const MENU_BEAT=60/82, menuVoices=new Set();
 const MENU_CHORDS=[
   [130.81,261.63,329.63,392,493.88],[110,220,261.63,329.63,392],
@@ -795,6 +867,7 @@ function scheduleMenuAmbience(){
   menuNoteAt+=MENU_BEAT*4;
 }
 function stopMenuAmbience(){
+  optionalMenuTrack?.pause();
   if(menuClock){
     clearInterval(menuClock);
     menuClock=0;
@@ -807,11 +880,39 @@ function stopMenuAmbience(){
     menuVoices.clear();
   }
 }
+function tryMenuTrack(fromGesture){
+  const path=activeSkin.menu.music;
+  if(!path||optionalMenuFailed||typeof Audio!=='function')return false;
+  if(!optionalMenuTrack){
+    if(!fromGesture)return true;
+    if(ensureAudio())menuAudioUnlocked=true;
+    optionalMenuTrack=new Audio();
+    optionalMenuTrack.loop=true;
+    optionalMenuTrack.preload='none';
+    const track=optionalMenuTrack;
+    const fallback=()=>{
+      if(optionalMenuFailed||track!==optionalMenuTrack)return;
+      optionalMenuFailed=true;
+      track.pause();
+      syncMenuAmbience();
+    };
+    optionalMenuTrack.addEventListener('error',fallback);
+    optionalMenuTrack.src=path;
+  }
+  optionalMenuTrack.volume=musicVolume();
+  if(optionalMenuTrack.paused)optionalMenuTrack.play().catch(error=>{
+    if(error.name==='AbortError'||runMode!=='menu'||!musicEnabled||document.hidden)return;
+    optionalMenuFailed=true;
+    syncMenuAmbience(fromGesture);
+  });
+  return true;
+}
 function syncMenuAmbience(fromGesture=false){
   if(runMode!=='menu'||!musicEnabled||document.hidden||musicVolume()===0){
     stopMenuAmbience();
     return;
   }
+  if(tryMenuTrack(fromGesture))return;
   if(!menuClock){
     if(fromGesture){
       if(!ensureAudio())return;
@@ -926,7 +1027,7 @@ function flash(message,style='notice'){
   const comboLevel=style==='combo'||style==='super'||style==='mega'?combo:0;
   const event={message,style,priority,duration,growth,comboLevel,expires:elapsed+1750};
   if(!currentAnnouncement||priority>currentAnnouncement.priority){
-    if(currentAnnouncement&&currentAnnouncement.style==='mega'){
+    if(currentAnnouncement&&(currentAnnouncement.style==='mega'||currentAnnouncement.style==='record')){
       announcementQueue=announcementQueue.filter(item=>item.style!==currentAnnouncement.style);
       announcementQueue.push(currentAnnouncement);
       announcementQueue.sort((a,b)=>b.priority-a.priority);
@@ -976,6 +1077,11 @@ function miamiCue(kind){
       sound(67,.27,'sine',.105,.26,39);
       sound(478,.19,'triangle',.040,.30,258);
       break;
+    case 'record':
+      sound(330,.11,'triangle',.054);sound(440,.14,'triangle',.051,.10);
+      sound(659,.26,'sine',.055,.21);sound(880,.14,'triangle',.030,.26);break;
+    case 'radio':
+      sound(740,.050,'triangle',.040,0,485);sound(526,.092,'triangle',.038,.075,362);break;
     case 'achievement':
       sound(528,.19,'sine',.034);sound(792,.24,'triangle',.039,.065);break;
     case 'critical':
@@ -1239,6 +1345,10 @@ function start(){
   $('overlay').dataset.shutdown='false';
   board=Array.from({length:N},()=>Array.from({length:N},rand));
   score=0;
+  runStartingBest=best;
+  recordCelebrated=false;
+  runSunrises=0;
+  lastSunriseCycle=-1;
   activeSkin.environment.reset();
   cityImpact=0;
   lastReactorTick=0;
@@ -1260,6 +1370,7 @@ function start(){
   busy=false;
   updateHud();
   if(scene?.sys){
+    scene.recordFireworks?.setVisible(false);
     scene.boardFrame.setVisible(true);
     scene.glass.setVisible(true);
     scene.layout();
@@ -1268,12 +1379,22 @@ function start(){
   syncMusic(true);
   trackAchievement('started',1,activeSkin.id);
 }
+function celebrateMiamiRecord(){
+  trackAchievement('record',1,'miami');
+  flash('NEW HIGH SCORE!','record');
+  cue('record');
+  if(scene?.sys&&!reducedMotion.matches)scene.launchRecordFireworks();
+}
 function award(points){
   score+=points*(elapsed<overUntil?3:1);
   trackAchievement('score',score);
   trackAchievement('score',score,activeSkin.id);
   if(score<=best)return;
   best=score;
+  if(runStartingBest>0&&score>runStartingBest&&!recordCelebrated&&activeSkin.special?.record){
+    recordCelebrated=true;
+    activeSkin.special.record();
+  }
   try{localStorage.setItem('reactor_miami_best',String(best))}catch(e){}
 }
 function finish(){
@@ -1518,6 +1639,12 @@ class Game extends Phaser.Scene{
     this.sideLights=this.add.graphics().setDepth(-5.5);
     this.streetGlow=this.add.graphics().setDepth(-4);
     this.menuLights=this.add.graphics().setDepth(-4.5);
+    this.menuTerrain=this.add.graphics().setDepth(-8.7);
+    this.jetWake=this.add.graphics().setDepth(-4.41).setVisible(false);
+    this.jetSki=this.add.graphics().setDepth(-4.4).setVisible(false);
+    this.secretPulse=this.add.graphics().setDepth(-3.9).setVisible(false);
+    this.recordFireworks=this.add.graphics().setDepth(-3).setVisible(false);
+    this.fireworksAt=-Infinity;
   }
   create(){
     scene=this;
@@ -1652,7 +1779,7 @@ class Game extends Phaser.Scene{
     this.signs.length=0;
     const {w,h,bg,sun,city}=this;
     const menu=runMode==='menu';
-    const horizon=this.horizon=menu?h*.46:Math.max(h*.13,Math.min(h*.36,this.top-58));
+    const horizon=this.horizon=menu?h*.40:Math.max(h*.13,Math.min(h*.36,this.top-58));
     this.foregroundFoot=menu?h*.59:this.top+this.cell*N;
     const r=this.sunRadius=menu?Math.min(w*.37,h*.26,170):Math.min(w*.23,h*.14,118);
     const skyHeight=horizon+45;
@@ -1665,6 +1792,16 @@ class Game extends Phaser.Scene{
     bg.fillGradientStyle(0x281734,0x261737,0x080f24,0x1b132e);
     bg.fillRect(0,h*.5,w,h*.5);
     this.paintCoast();
+    this.menuTerrain.setVisible(menu);
+    this.promenade.setVisible(!menu);
+    this.beachLife.setVisible(!menu);
+    this.surf.setVisible(!menu);
+    if(menu)this.paintMenuTerrain();
+    else{
+      this.jetSki.setVisible(false);
+      this.jetWake.setVisible(false);
+      this.secretPulse.setVisible(false);
+    }
     this.stars.clear();
     this.stars.fillStyle(0xffdaee,.7);
     for(let i=0;i<31;i++)this.stars.fillCircle((i*83+19)%Math.max(1,w),(i*29+13)%Math.max(1,horizon-r*.7),i%7===0?1.3:.65);
@@ -1689,6 +1826,13 @@ class Game extends Phaser.Scene{
     this.cityShade.clear();
     this.cityWindows.clear();
     const hotelWidth=Math.max(48,Math.min(w*.26,132));
+    if(menu){
+      this.penthousePoint=[w*.078,horizon+32-hotelWidth*.83*.73];
+      this.radioPoint=[w*.88,h*.84];
+      this.placeSecret('penthouse',...this.penthousePoint);
+      this.placeSecret('radio',...this.radioPoint);
+      this.paintJetSki();
+    }
     const span=this.cell*N, boardBottom=this.foregroundFoot;
     const haloSize=Math.min(w*.57,255);
     for(let i=0;i<2;i++){
@@ -1700,9 +1844,9 @@ class Game extends Phaser.Scene{
     this.hotel(w*.05,horizon+32,hotelWidth,hotelWidth*.83,0xeab2ba,0xffa46d,'PALOMA');
     this.hotel(w-hotelWidth-w*.045,horizon+39,hotelWidth,hotelWidth*.97,0xb8bedb,0x86f8e8,'TIDE');
     city.fillStyle(0x201632,1);
-    city.fillRect(w*.68,horizon+39,w*.32,16);
+    if(!menu)city.fillRect(w*.68,horizon+39,w*.32,16);
     city.lineStyle(1,0xffa1c7,.55);
-    city.lineBetween(w*.68,horizon+40,w,horizon+40);
+    if(!menu)city.lineBetween(w*.68,horizon+40,w,horizon+40);
     for(let i=0;i<16;i++){
       const x=w*(.68+.32*i/15);
       city.fillStyle(i%2?0x74f4ed:0xff84c1,.19);
@@ -1738,6 +1882,136 @@ class Game extends Phaser.Scene{
     this.palms.forEach((p,i)=>this.drawPalm(p,i,horizon));
     this.paintGlass();
   }
+  placeSecret(id,x,y){
+    const button=$('secret-'+id);
+    const left=Math.round(x)+'px',top=Math.round(y)+'px';
+    if(button.style.left!==left)button.style.left=left;
+    if(button.style.top!==top)button.style.top=top;
+  }
+  paintMenuTerrain(){
+    const {menuTerrain:g,w,h,horizon:y}=this;
+    const point=(x,py)=>({x:x*w,y:py});
+    const fill=(color,points)=>{
+      g.fillStyle(color,1);
+      g.fillPoints(points.map(([x,py])=>point(x,py)),true);
+    };
+    g.clear();
+    g.fillGradientStyle(0x64ddd7,0x5e9caa,0x117d98,0x197590);
+    g.fillRect(0,y,w,h-y);
+    // The distant causeway has a raised deck, rails and piers above the bay.
+    for(let i=0;i<9;i++){
+      const x=w*(.16+i*.105), top=y+14+(i-4)*.67;
+      g.fillStyle(0x553459,1);
+      g.fillRect(x,top,Math.max(2,w*.007),12+i*.8);
+      g.fillStyle(0xffa1be,.26);
+      g.fillEllipse(x+1,top+14+i*.8,11+i,2);
+    }
+    fill(0x43355c,[[0,y+9],[1,y+15],[1,y+22],[0,y+14]]);
+    g.lineStyle(1.2,0xffb8c5,.85);
+    g.lineBetween(0,y+9,w,y+15);
+    g.lineStyle(.8,0x75fff0,.7);
+    g.lineBetween(0,y+14,w,y+21);
+    // Both hotels and the road share the same continuous landmass.
+    fill(0xe9a781,[[0,y+19],[.44,y+26],[1,y+20],[1,h],[.38,h],[.48,h*.88],[.64,h*.79],[.26,h*.68],[0,h*.58]]);
+    fill(0xb88177,[[0,y+27],[1,y+29],[1,h*.57],[.51,h*.65],[0,h*.54]]);
+    fill(0x3c354d,[[0,y+36],[1,y+44],[1,y+75],[.49,y+56],[0,y+52]]);
+    g.lineStyle(1,0xffcfad,.88);
+    g.strokePoints([point(0,y+52),point(.49,y+56),point(1,y+75)],false);
+    for(let i=0;i<11;i++){
+      const x=i*w*.103, py=y+46+i*.85;
+      g.lineStyle(1,0xffd398,.62);
+      g.lineBetween(x,py,x+w*.045,py+.7);
+    }
+    g.lineStyle(2,0xffefd1,.69);
+    g.strokePoints([point(0,h*.58),point(.26,h*.68),point(.64,h*.79),point(.48,h*.88),point(.38,h)],false);
+    for(let i=0;i<14;i++){
+      const x=w*(.02+(i%3)*.12), py=h*(.71+i*.019);
+      g.lineStyle(1,i%2?0xc6fff1:0xffb6db,.36);
+      g.lineBetween(x,py,x+(9+i*2),py-1);
+    }
+    for(let i=0;i<7;i++){
+      const x=w*(.07+i*.14),py=y+57+i*1.7;
+      g.lineStyle(1.2,0x392943,1);
+      g.lineBetween(x,py,x,py-10);
+      g.fillStyle(i%2?0x54fff2:0xff7ccf,.35);
+      g.fillCircle(x,py-10,4);
+      g.fillStyle(0xfff2df,.9);
+      g.fillCircle(x,py-10,1.5);
+    }
+    const radioX=w*.88, radioY=h*.84;
+    g.fillStyle(0x342d4d,1);
+    g.fillRoundedRect(radioX-8,radioY-5,16,10,2);
+    g.lineStyle(1,0x7660a2,1);
+    g.lineBetween(radioX+3,radioY-5,radioX+9,radioY-12);
+    g.fillStyle(0xff81ce,1);
+    g.fillRect(radioX-5,radioY-2,6,3);
+  }
+  paintJetSki(){
+    const g=this.jetSki;
+    g.clear();
+    const wake=this.jetWake;
+    wake.clear();
+    wake.fillStyle(0x9afbef,.55);
+    for(let i=0;i<5;i++)wake.fillRect(-12-i*5,2+i%2*2,5+i,1);
+    wake.fillStyle(0xd6ffff,.91);
+    wake.fillRect(-10,1,18,2);wake.fillRect(-17,4,4,1);wake.fillRect(-22,1,3,1);
+    wake.fillRect(-13,-2,2,1);wake.fillRect(-19,-4,1,1);
+    g.fillStyle(0xff58bc,1);
+    g.fillRect(-6,-3,14,3);g.fillRect(4,-5,5,2);
+    g.fillStyle(0x252548,1);
+    g.fillRect(-3,-8,6,5);
+    g.fillStyle(0xffc48e,1);
+    g.fillRect(-1,-11,3,3);
+  }
+  pulseMenuSecret(stat){
+    const point=stat==='penthouse'?this.penthousePoint:stat==='radio'?this.radioPoint:[this.jetSki.x,this.jetSki.y];
+    if(!point)return;
+    const g=this.secretPulse;
+    g.clear();
+    g.lineStyle(2,0x9dfff5,.85);g.strokeCircle(0,0,12);
+    g.lineStyle(1,0xff78ce,.75);g.strokeCircle(0,0,18);
+    g.setPosition(...point).setScale(1).setAlpha(1).setVisible(true);
+    this.secretStarted=this.time.now;
+  }
+  animateMiamiMenu(time,subdued){
+    const active=runMode==='menu'&&screen==='main';
+    const travel=(time+2000)%16000;
+    const visible=active&&(subdued||travel<8500);
+    const progress=subdued?.56:travel/8500;
+    const x=this.w*(.12+progress*.27), y=this.h*.91+(subdued?0:Math.sin(time/370)*1.25);
+    this.jetSki.setVisible(visible);
+    this.jetWake.setVisible(visible);
+    if(visible){
+      this.jetSki.setPosition(x,y);
+      this.jetWake.setPosition(x-1,y+(subdued?0:Math.sin(time/176)))
+        .setScale(subdued?1:1+.10*Math.sin(time/193),1)
+        .setAlpha(subdued?.76:.73+.24*Math.sin(time/221));
+      this.placeSecret('jet',x,y);
+    }
+    $('secret-jet').hidden=!visible;
+    if(this.secretPulse.visible){
+      const ratio=(time-this.secretStarted)/700;
+      if(!active||ratio>=1)this.secretPulse.setVisible(false);
+      else this.secretPulse.setScale(subdued?1:1+ratio*.75).setAlpha(1-ratio);
+    }
+  }
+  launchRecordFireworks(){
+    const g=this.recordFireworks;
+    g.clear();
+    for(const [x,y,color] of [[.28,.72,0xff70ce],[.55,.52,0x8cfff0],[.74,.69,0xffdf9a]]){
+      const px=this.w*x,py=this.horizon*y;
+      const radius=Math.min(37,this.w*.087);
+      for(let i=0;i<12;i++){
+        const angle=i*Math.PI/6,dx=Math.cos(angle),dy=Math.sin(angle);
+        g.lineStyle(i%2?1:1.6,color,.85);
+        g.lineBetween(px+dx*radius*.44,py+dy*radius*.44,px+dx*radius,py+dy*radius);
+        g.fillStyle(0xfff3fc,.72);
+        g.fillCircle(px+dx*(radius+4),py+dy*(radius+4),1.1);
+      }
+    }
+    g.setVisible(true).setAlpha(1).setY(0);
+    this.fireworksAt=elapsed;
+  }
   paintSignatureBackdrop(){
     const {w,h,horizon,menuLights:g}=this;
     g.clear();
@@ -1755,6 +2029,9 @@ class Game extends Phaser.Scene{
     }
     g.lineStyle(1,0xffdcba,.35);
     g.lineBetween(w*.03,horizon+3,w*.97,horizon+3);
+    const [px,py]=this.penthousePoint;
+    g.fillStyle(0xff80da,.33);g.fillRect(px-5,py-4,10,8);
+    g.fillStyle(0xffe0a9,1);g.fillRect(px-2,py-2,4,4);
   }
   paintCoast(){
     const {w,h,coasts,surf,promenade}=this;
@@ -2085,7 +2362,15 @@ class Game extends Phaser.Scene{
     const sway=subdued?0:Math.sin(time/3400);
     this.edgeDanger.setAlpha(danger*.79);
     this.edgeElectric.setVisible(runMode!=='menu');
-    if(runMode==='menu')this.menuLights.setAlpha(subdued?.86:.82+.12*Math.sin(time/2100));
+    if(runMode==='menu'){
+      this.menuLights.setAlpha(subdued?.86:.82+.12*Math.sin(time/2100));
+      this.animateMiamiMenu(time,subdued);
+    }
+    if(this.recordFireworks.visible){
+      const ratio=(elapsed-this.fireworksAt)/940;
+      if(!playing||subdued||ratio<0||ratio>=1)this.recordFireworks.setVisible(false);
+      else this.recordFireworks.setAlpha(1-ratio).setY(ratio*7);
+    }
     for(let i=0;i<2;i++){
       const tint=phaseGlow(i);
       if(tint!==this.cockpitColors[i]){
@@ -2117,7 +2402,7 @@ class Game extends Phaser.Scene{
       const depth=i%2===0?progress:1-progress;
       const scale=.38+depth*.48;
       const direction=i%2===0?-1:1;
-      walker.setVisible(waterfront>=64)
+      walker.setVisible(waterfront>=64&&runMode!=='menu')
         .setPosition(this.w*(.79-.21*depth)+(i%2)*17,this.beachPathStart+waterfront*(.12+.72*depth))
         .setScale(scale*direction,scale)
         .setAlpha((1-night*.37)*Math.min(1,progress*8,(1-progress)*8));
@@ -2132,7 +2417,7 @@ class Game extends Phaser.Scene{
     this.traffic.forEach((car,i)=>{
       const travel=(time*(i===0?.043:.036)+i*this.w*.47)%(this.w+115);
       car.setPosition(i===0?travel-55:this.w+55-travel,this.horizon+46+i*8)
-        .setVisible((i===0?travel-55:this.w+55-travel)>this.w*.69);
+        .setVisible(runMode!=='menu'&&(i===0?travel-55:this.w+55-travel)>this.w*.69);
     });
     this.signs.forEach((sign,i)=>sign.setAlpha(Math.min(1,lights*(.93+(subdued?0:.07*Math.sin(time/960+i)))+impact*.4+(active?.15:0))).setX(sign.homeX+1.5*sway));
   }
@@ -2150,6 +2435,7 @@ window.addEventListener('resize',resizeGame);
 window.visualViewport?.addEventListener('resize',resizeGame);
 function showScreen(next){
   screen=next;
+  syncMiamiHotspots();
   for(const name of ['main','skins','world','achievements','scores','options','pause'])$(name+'-menu').hidden=name!==next;
   if(next==='options')refreshOptions();
   if(next==='scores')$('saved-best').textContent=best.toLocaleString('en-US');
@@ -2161,9 +2447,50 @@ function showScreen(next){
   const heading=panel.querySelector('h2');
   if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
 }
+// Public-domain Natural Earth 1:110m land polygons rasterized in equirectangular projection.
+const WORLD_LAND='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF//gD//+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////////8AAAAAAAAAAAMAAAAAAAAAAAAAAAAAAf////////wAA//gB+AAAA/gAAAAAAAAAAAAAAAOf/////////AAAf8AAAAAAAP+AAAAAAAAAAAAAAHvB+/4//////AAAH+AAAAMAAA/4AAAAAAAAAAAAAP/3//gf////+AAAAAAAAf8AD//+AAf+AAAAAAAAA/ux//wAH////AAAAAAAB4AB////zgPsAAAAAAAAA/////8AB///+AAAAAAADwD//////4P8AAAwAfoAA//5+//4D///8AAAADgAD4P/////////8ABAB//9///////8B///8AAAA//gAD///////////9/wP/////////P+A///AAAAH//7////////////////P/////////P/g//wNYAAH////////////////////////////+f/Af/Af4AAP7/////////////////Dz/////////v+Af4AP4AB///////////////////An////////D/+APwAAAAH/P/////////////////AP///////8APyAHwAAAAH/v//////////////7/gAP/8v////8Af/AAAAAAMH/H//////////////z5AAAfgD/////AP/gAAAAAOD+P////////////4APgAAA/AAf////4P/wAAAAAeB+P////////////wAfgAADgAAf///////8AAAAA/B///////////////AfgAAAAAAX/////f/+AAAAB/3///////////////AeAAAAAAAL////////AAAAB/////////////////AMAAAAAAAD///////3AAAAAP////////////////AAAAAAAAAA///////vgAAAAP////////////////gAAAAAAAAAf//////fgAAAAH/////4/////////7AAAAAAAAAAf//////4AAAAAB/////g/////////7AAAAAAAAAAf//////AAAAAA5///zfh/////////jgAAAAAAAAA//////wAAAAAB//9/jPg/////////HwAAAAAAAAAf/////wAAAAAB/5v///wf///////4HAAAAAAAAAAf////+AAAAAAB/hn///w////////4GAAAAAAAAAAf////+AAAAAAB/hPf//w///////5wMAAAAAAAAAAP////8AAAAAAA//2M//4///////84cAAAAAAAAAAH////8AAAAAAAf/wHH/////////w/8AAAAAAAAAAH////wAAAAAAA//wAB/////////4vgAAAAAAAAAAB////gAAAAAAB//+fL/////////8OAAAAAAAAAAAA////AAAAAAAB//////////////8MAAAAAAAAAAAA///ngAAAAAAD//////////////8AAAAAAAAAAAAAf/wDoAAAAAAH//////7///////8AAAAAAAAAAAAAP/wB4AAAAAAP////+/////////wAAAAAAAAAAAAAH/gB4AAAAAAf///////3//////8AAAAAAAAAAAAAD/gH4AAAAAAf/////f/8P/////oAAAAAAAAcAAAAAfw/8AAAAAA//////v/8D////+IAAAAAAAAGAAAAAfx4fwAAAAA//////v/4D/+f/4AAAAAAAAACAAAAAP/wf+AAAAAf/////3/4A/4P+wMAAAAAAAAAAAAAAH/wMmAAAAA//////3/wA/wH/AMAAAAAAAAAAAAAAA/+AAAAAAA//////7+AAfgP/gcAAAAAAAAAAAAAAAD+AAAAAAA///////8AAfAB/gOAAAAAAAAAAAAAAAA+AwAAAAA///////2AAfAB/gPAAAAAAAAAAAAAAAAOH9wAAAAf//////+AAPABvgXAAAAAAAAAAAAAAAAP3/wAAAAP//////8AAPABnA3gAAAAAAAAAAAAAAAD//4AAAAH//////8AAHgBiAngAAAAAAAAAAAAAAAAv/9AAAAH//////4AABgA4BngAAAAAAAAAAAAAAAAP//wAAAB/n////4AABAG4DxAAAAAAAAAAAAAAAAAP//wAAAAgH////wAAAAD4HwAAAAAAAAAAAAAAAAAf//4AAAAAA////wAAAAB8fhQAAAAAAAAAAAAAAAA///4AAAAAA////AAAAAB8//wAAAAAAAAAAAAAAAA///+AAAAAB///+AAAAAA8/+XAAAAAAAAAAAAAAAA////8AAAAA///8AAAAAAefcf+DAAAAAAAAAAAAAB////+AAAAAf//4AAAAAAOPd//jgAAAAAAAAAAAAB/////gAAAAf//4AAAAAAHAeB//QAAAAAAAAAAAAB/////gAAAAP//4AAAAAAD8ABP+cAAAAAAAAAAAAAf////gAAAAP//4AAAAAAA/9gf4HAAAAAAAAAAAAAf////gAAAAP//4AAAAAAAB7ADODgAAAAAAAAAAAAP////AAAAAH//4AAAAAAAAAHjCBgAAAAAAAAAAAAP///+AAAAAP//8MAAAAAAAAPzAAAAAAAAAAAAAAAH///+AAAAAP//8cAAAAAAAB/jgAEAgAAAAAAAAAAH///+AAAAAf//58AAAAAAAD/zgAEBgAAAAAAAAAAA///8AAAAAf//58AAAAAAAH//wAEDAAAAAAAAAAAAf//8AAAAAf//h4AAAAAAAP//4AADAAAAAAAAAAAAf//8AAAAAP//B4AAAAAAB///8AYAAAAAAAAAAAAAf//4AAAAAH//DwAAAAAAH///+AcAAAAAAAAAAAAAf//4AAAAAH//DwAAAAAAH///+AAAAAAAAAAAAAAAf//AAAAAAH//BwAAAAAAH////AAAAAAAAAAAAAAA//8AAAAAAH/8AgAAAAAAH////gAAAAAAAAAAAAAA//8AAAAAAD/8AAAAAAAAD////gAAAAAAAAAAAAAA//8AAAAAAD/8AAAAAAAAD////gAAAAAAAAAAAAAA//4AAAAAAB/4AAAAAAAAD////gAAAAAAAAAAAAAA//wAAAAAAB/wAAAAAAAAB/7//AAAAAAAAAAAAAAA//gAAAAAAA/gAAAAAAAAD+B//AAQAAAAAAAAAAAB//AAAAAAAAQAAAAAAAAABwA/+AAYAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAH+AAcAAAAAAAAAAAD/8AAAAAAAAAAAAAAAAAAAAAH8AAPAAAAAAAAAAAD/gAAAAAAAAAAAAAAAAAAAAAAQAAeAAAAAAAAAAAD/gAAAAAAAAAAAAAAAAAAAAAA4AA8AAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAA4ABwAAAAAAAAAAAD+AAAAAAAAAAAAAAAAAAAAAAAQADwAAAAAAAAAAAD+AAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAH+AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAH+AAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAH4AAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAH4cAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAABwAAAAMEAAgAAAAAAAAAAAAAAAAPgAAAAAAAAAAAP8gA///////wAAAAAAAAAAAAAAAfAAAAAAAAAADH//+D////////wAAAAAAAAAAAAAA/gAAAAAADv7////+//////////AAAAAAAAAAHwAH/gAAAAD////////////////////gAAAAABqAP/8r/wAAAAf////////////////////gAAAAH///P////wAAAA////////////////////+AAAAD/////////AAAB/////////////////////wAAAP/////////gACAf/////////////////////wAAD/////////+AAPw//////////////////////8AAAgH////////n5/wf/////////////////////AAAAH//////////4////////////////////////wAAgB///////////////////////////////////+A////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////';
+function drawMiamiMap(container){
+  const frame=document.createElement('div'), canvas=document.createElement('canvas');
+  frame.className='pixel-map';
+  canvas.width=240;canvas.height=120;
+  canvas.setAttribute('role','img');
+  canvas.setAttribute('aria-label','World map with a playable destination in Miami, Florida');
+  const ctx=canvas.getContext('2d'),land=atob(WORLD_LAND),image=ctx.createImageData(240,120);
+  const isLand=(x,y)=>x>=0&&x<240&&y>=0&&y<120&&(land.charCodeAt(y*30+(x>>3))&(128>>(x&7)))!==0;
+  for(let y=0;y<120;y++)for(let x=0;x<240;x++){
+    const filled=isLand(x,y);
+    const edge=filled&&(!isLand(x+1,y)||!isLand(x-1,y)||!isLand(x,y+1)||!isLand(x,y-1));
+    const grid=x%20===0||y%15===0;
+    const color=edge?[241,87,168]:filled?(grid?[25,37,68]:[13,25,48]):grid?[37,118,147]:[20,86,117];
+    const at=(y*240+x)*4;
+    image.data.set(color,at);
+    image.data[at+3]=255;
+  }
+  ctx.putImageData(image,0,0);
+  frame.append(canvas);
+  const miami=document.createElement('button');
+  miami.className='map-destination';
+  miami.type='button';
+  miami.setAttribute('aria-label','Select Miami 1986 on the map');
+  miami.onclick=()=>selectSkin(SKINS.miami);
+  frame.append(miami);
+  for(const [x,y] of [[52,29],[72,42],[81,66]]){
+    const node=document.createElement('span');
+    node.className='map-mystery';
+    node.textContent='?';
+    node.setAttribute('aria-hidden','true');
+    node.style.left=x+'%';node.style.top=y+'%';
+    frame.append(node);
+  }
+  const caption=document.createElement('p');
+  caption.textContent='MIAMI 1986 · PLAYABLE   /   ? · UNCHARTED';
+  container.append(frame,caption);
+}
 function renderWorldMap(){
-  const list=$('world-list');
+  const list=$('world-list'),presentation=$('world-presentation');
   list.replaceChildren();
+  presentation.replaceChildren();
+  activeSkin.menu.worldMap?.(presentation);
   for(const category of WORLD_CATEGORIES){
     const group=document.createElement('section'), title=document.createElement('h3');
     group.className='world-group';
@@ -2193,6 +2520,11 @@ function selectSkin(skin){
     musicTrack.pause();
     musicTrack=null;
     musicFailed=musicNeedsGesture=false;
+  }
+  if(changed){
+    stopMenuAmbience();
+    optionalMenuTrack=null;
+    optionalMenuFailed=false;
   }
   activeSkin=skin;
   settings.skin=skin.id;
@@ -2235,7 +2567,13 @@ function renderAchievements(){
     const row=document.createElement('li'), title=document.createElement('strong'), detail=document.createElement('small');
     const unlocked=!!unlocks[item.id];
     row.dataset.unlocked=String(unlocked);
-    title.textContent=item.title;
+    title.textContent=item.secret&&!unlocked?'???':item.title;
+    if(item.secret&&!unlocked){
+      detail.textContent='Secret · Locked';
+      row.append(title,detail);
+      list.append(row);
+      continue;
+    }
     detail.textContent=item.description+' · '+(unlocked?'Unlocked':'Locked')+
       (item.goal>1?' · '+Math.min(item.goal,achievementProgress[item.scope+':'+item.stat]||0).toLocaleString('en-US')+' / '+item.goal.toLocaleString('en-US'):'');
     row.append(title,detail);
@@ -2350,6 +2688,10 @@ if(document.body){
   persistOptions();
   setMode('menu');
   $('arcade-menu').addEventListener('click',menuClick,true);
+  $('secret-penthouse').onclick=()=>discoverMiami('penthouse','WELCOME TO MIAMI!');
+  $('secret-jet').onclick=()=>discoverMiami('jet','NICE CATCH!');
+  $('secret-radio').onclick=()=>discoverMiami('radio','THE CITY IS YOURS!');
+  syncMiamiHotspots();
   for(const button of document.querySelectorAll('[data-screen]'))button.onclick=()=>{
     if(button.dataset.screen==='options')optionsBack=screen;
     showScreen(button.dataset.screen);
