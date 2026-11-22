@@ -1,6 +1,8 @@
 (function(root){
 'use strict';
 const words={
+  sunsetCongrats:['Congratulations','Félicitations','Felicidades'],
+  sunsetReplay:['Replay drive','Revoir la balade','Repetir el paseo'],
   legacyStars:['Legacy','Historique','Histórico'],
   hardMode:['Hard Mode','Mode difficile','Modo difícil'],
   loadingMission:['Loading…','Chargement…','Cargando…'],
@@ -151,7 +153,18 @@ function achievement(id,english,language){
   if(typeof translation==='string')return text(translation,language);
   return translation?.[languages.indexOf(language)-1]||english;
 }
-const api={text,achievement};
+const missions={
+  fr:['Bienvenue à Miami','Ocean Drive','Fièvre à Palm Beach','Boulevard du couchant','L’Heure dorée','Brume violette',
+    'Collins Avenue','Boulevard néon','Lumières de Vice City','L’Appel de minuit','Après le coucher du soleil','Paradis électrique',
+    'Les Souterrains de South Beach','Surcharge néon','Chaleur à Miami','La Dernière Virée','Protocole nocturne','Orage électrique',
+    'Le Dernier Overdrive','Miami 1986 : Légende'],
+  es:['Bienvenido a Miami','Ocean Drive','Fiebre de Palm Beach','Bulevar del ocaso','La Hora Dorada','Bruma violeta',
+    'Collins Avenue','Bulevar de neón','Luces de Vice City','La Llamada de Medianoche','Tras la puesta del sol','Paraíso eléctrico',
+    'El Subsuelo de South Beach','Sobrecarga de neón','Calor en Miami','El Último Paseo','Protocolo nocturno','Tormenta eléctrica',
+    'La Última Sobrecarga','Miami 1986: Leyenda']
+};
+function missionName(level,language){return missions[language]?.[level.number-1]||level.title;}
+const api={text,achievement,missionName};
 if(typeof module==='object'&&module.exports)module.exports=api;
 else root.ReactorLocale=Object.freeze(api);
 })(globalThis);
